@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
+import { EyeIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
-import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 // Sample data
-const initialOrders = [
-  { id: '1', date: '2024-07-20', name: 'John Doe', address: '123 Elm St', status: 'Pending', type: 'Online' },
-  { id: '2', date: '2024-07-22', name: 'Jane Smith', address: '456 Oak St', status: 'Approved', type: 'In-Store' },
-  // Add more sample orders as needed
+const initialMessages = [
+  { id: '1', date: '2024-07-20', sender: 'John Doe', content: 'Hello, this is a test message.', status: 'Unread' },
+  { id: '2', date: '2024-07-22', sender: 'Jane Smith', content: 'Important update regarding your account.', status: 'Read' },
+  // Add more sample messages as needed
 ];
 
 // Filter Component
@@ -32,13 +32,14 @@ const FilterBar = ({ onFilterChange, onReset }) => (
       {/* Add more options */}
     </select>
     <select
-      onChange={(e) => onFilterChange('type', e.target.value)}
+      onChange={(e) => onFilterChange('sender', e.target.value)}
       className="border rounded p-2"
-      aria-label="Filter by type"
+      aria-label="Filter by sender"
     >
-      <option value="">Select Type</option>
-      <option value="Online">Online</option>
-      <option value="In-Store">In-Store</option>
+      <option value="">Select Sender</option>
+      <option value="John Doe">John Doe</option>
+      <option value="Jane Smith">Jane Smith</option>
+      {/* Add more options */}
     </select>
     <select
       onChange={(e) => onFilterChange('status', e.target.value)}
@@ -46,8 +47,8 @@ const FilterBar = ({ onFilterChange, onReset }) => (
       aria-label="Filter by status"
     >
       <option value="">Select Status</option>
-      <option value="Pending">Pending</option>
-      <option value="Approved">Approved</option>
+      <option value="Unread">Unread</option>
+      <option value="Read">Read</option>
     </select>
     <button
       onClick={onReset}
@@ -59,10 +60,10 @@ const FilterBar = ({ onFilterChange, onReset }) => (
   </div>
 );
 
-// Main Order List Component
-export default function Order_List() {
-  const [orders, setOrders] = useState(initialOrders);
-  const [filters, setFilters] = useState({ date: '', type: '', status: '' });
+// Main Messages List Component
+export default function Messages_List() {
+  const [messages, setMessages] = useState(initialMessages);
+  const [filters, setFilters] = useState({ date: '', sender: '', status: '' });
   const navigate = useNavigate();
 
   const handleFilterChange = (key, value) => {
@@ -70,78 +71,68 @@ export default function Order_List() {
   };
 
   const resetFilters = () => {
-    setFilters({ date: '', type: '', status: '' });
-  };
-
-  const handleApprove = (id) => {
-    setOrders(prevOrders => 
-      prevOrders.map(order => 
-        order.id === id ? { ...order, status: 'Approved' } : order
-      )
-    );
+    setFilters({ date: '', sender: '', status: '' });
   };
 
   const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this order?')) {
-      setOrders(prevOrders => 
-        prevOrders.filter(order => order.id !== id)
+    if (window.confirm('Are you sure you want to delete this message?')) {
+      setMessages(prevMessages => 
+        prevMessages.filter(message => message.id !== id)
       );
     }
   };
 
-  const handleEdit = (id) => {
-    navigate(`/order/${id}`);
+  const handleViewDetails = (id) => {
+    navigate(`/message/${id}`);
   };
 
   // Apply filters
-  const filteredOrders = orders.filter(order => {
+  const filteredMessages = messages.filter(message => {
     return (
-      (!filters.date || order.date === filters.date) &&
-      (!filters.type || order.type === filters.type) &&
-      (!filters.status || order.status === filters.status)
+      (!filters.date || message.date === filters.date) &&
+      (!filters.sender || message.sender === filters.sender) &&
+      (!filters.status || message.status === filters.status)
     );
   });
 
   return (
     <div className="p-6">
       {/* Title */}
-      <h1 className="text-2xl font-semibold mb-4">Order List</h1>
+      <h1 className="text-2xl font-semibold mb-4">Messages List</h1>
 
       <FilterBar onFilterChange={handleFilterChange} onReset={resetFilters} />
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
           <thead>
             <tr className="bg-gray-100 text-gray-600">
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Order ID</th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Message ID</th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Address</th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Sender</th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Content</th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Type</th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody className="text-gray-700">
-            {filteredOrders.map(order => (
-              <tr key={order.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 text-sm">{order.id}</td>
-                <td className="px-6 py-4 text-sm">{order.date}</td>
-                <td className="px-6 py-4 text-sm">{order.name}</td>
-                <td className="px-6 py-4 text-sm">{order.address}</td>
-                <td className="px-6 py-4 text-sm">{order.status}</td>
-                <td className="px-6 py-4 text-sm">{order.type}</td>
+            {filteredMessages.map(message => (
+              <tr key={message.id} className="hover:bg-gray-50">
+                <td className="px-6 py-4 text-sm">{message.id}</td>
+                <td className="px-6 py-4 text-sm">{message.date}</td>
+                <td className="px-6 py-4 text-sm">{message.sender}</td>
+                <td className="px-6 py-4 text-sm">{message.content}</td>
+                <td className="px-6 py-4 text-sm">{message.status}</td>
                 <td className="px-6 py-4 text-sm flex items-center gap-2">
                   <button
-                    onClick={() => handleEdit(order.id)}
+                    onClick={() => handleViewDetails(message.id)}
                     className="text-blue-500 hover:text-blue-700"
-                    aria-label={`Edit Order ID: ${order.id}`}
+                    aria-label={`View Details of Message ID: ${message.id}`}
                   >
-                    <PencilIcon className="w-5 h-5" />
+                    <EyeIcon className="w-5 h-5" />
                   </button>
                   <button
-                    onClick={() => handleDelete(order.id)}
+                    onClick={() => handleDelete(message.id)}
                     className="text-red-500 hover:text-red-700"
-                    aria-label={`Delete Order ID: ${order.id}`}
+                    aria-label={`Delete Message ID: ${message.id}`}
                   >
                     <TrashIcon className="w-5 h-5" />
                   </button>
