@@ -1,17 +1,17 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from './pages/Home';
-import Login from './pages/Login';
+import Home from './pages/Buyer/Home';
+import Login from './pages/Buyer/Login';
 import Create_Account from './pages/Create_Account';
 import Agent_List from './pages/Agent_List';
 import Agent_Requests from './pages/Agent_Requests';
 import Footer from './components/Footer';
 import Header from './components/Header';
-import Invoice from './pages/Invoice';
-import Messages_List from './pages/Messages_List';
-import Messages_Details from './pages/Messages_Details';
+import Invoice from './pages/Buyer/Invoice';
+import Messages_List from './pages/Buyer/Messages_List';
+import Messages_Details from './pages/Buyer/Messages_Details';
 import Order_List from './pages/Order_List';
-import Order_Details from './pages/Order_Details';
+import Order_Details from './pages/Buyer/Order_Details';
 import Reset_Password from './pages/Reset_Password';
 import './App.css';
 
