@@ -246,6 +246,43 @@ def create_delivery():
     db.session.commit()
     return jsonify({"message": "Delivery created successfully"}), 201
 
+# get assigned deliveries
+# TODO: add pagination check on this later
+@app.route('/assigned_deliveries', methods=['GET'])
+@jwt_required()
+def get_assigned_deliveries():
+    user = User.query.get(get_jwt_identity())
+    if user.user_role != 'Agent':
+        return jsonify({"message": "Only agents can get assigned deliveries"}), 403
+    deliveries = Delivery.query.filter_by(agent_id=user.user_id).all()
+    return jsonify([delivery.to_dict() for delivery in deliveries])
+
+# update parcel status
+@app.route('/update_status/<int:parcel_id>', methods=['PUT'])
+@jwt_required()
+def update_parcel_status(parcel_id):
+    current_user = User.query.get(get_jwt_identity())
+    if current_user.user_role != 'Agent':
+        return jsonify({"message": "Only agents can update parcel status"}), 403
+    data = request.get_json()
+    parcel = Parcel.query.get_or_404(parcel_id)
+    parcel.status = data['status']
+    parcel.updated_at = datetime.now()
+    db.session.commit()
+    return jsonify({"message": "Parcel status updated successfully"}), 200
+
+@app.route('/update_delivery_status/<int:delivery_id>', methods=['PUT'])
+@jwt_required()
+def update_delivery_status(delivery_id):
+    current_user = User.query.get(get_jwt_identity())
+    if current_user.user_role != 'Business':
+        return jsonify({"message": "Only businesses can update delivery status"}), 403
+    data = request.get_json()
+    delivery = Delivery.query.get_or_404(delivery_id)
+    delivery.status = data['status']
+    delivery.updated_at = datetime.now()
+    db.session.commit()
+    return jsonify({"message": "Delivery status updated successfully"}), 200
 
 
 
