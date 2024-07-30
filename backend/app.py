@@ -166,6 +166,7 @@ def create_parcel():
         recipient_phone=data['recipient_phone'],
         description=data['description'],
         weight=data['weight'],
+        current_location=data['current_location'],
         created_at=datetime.now(),
         updated_at=datetime.now()
     )
@@ -213,7 +214,37 @@ def simulate_new_location(parcel):
     locations = ['In transit', 'Local distribution center', 'Out for delivery']
     return random.choice(locations)
 
+@app.route('/parcels/<int:parcel_id>', methods=['DELETE'])
+@jwt_required()
+def delete_parcel(parcel_id):
+    parcel = Parcel.query.get_or_404(parcel_id)
+    if parcel.status == 'Delivered':
+        return jsonify({"message": "Cannot delete delivered parcel"}), 400
+    db.session.delete(parcel)
+    db.session.commit()
+    return jsonify({"message": "Parcel deleted successfully"}), 200
 
+
+# DELIVERY ROUTES
+@app.route('/deliveries', methods=['POST'])
+@jwt_required()
+def create_delivery():
+    user = User.query.get(get_jwt_identity())
+    if user.user_role != 'Business':
+        return jsonify({"message": "Only businesses can create deliveries"}), 403
+    data = request.get_json()
+    delivery = Delivery(
+        parcel_id=data['parcel_id'],
+        agent_id=data['agent_id'],
+        pickup_time=data['pickup_time'],
+        delivery_time=data['delivery_time'],
+        status=data['status'],
+        created_at=datetime.now(),
+        updated_at=datetime.now()
+    )
+    db.session.add(delivery)
+    db.session.commit()
+    return jsonify({"message": "Delivery created successfully"}), 201
 
 
 
