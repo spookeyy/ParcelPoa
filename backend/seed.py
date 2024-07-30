@@ -1,8 +1,9 @@
 import random
+import string
 from datetime import datetime, timedelta
 from faker import Faker
 from flask import Flask
-from models import db, User, Parcel, Delivery, Feedback, Notification, Tracking, Order, Product
+from models import db, User, Parcel, Delivery, Notification, Tracking, Order
 from app import app
 
 faker = Faker()
@@ -12,13 +13,13 @@ with app.app_context():
     db.create_all()
 
     def seed_users(num_users=10):
-        user_types = ['Client', 'Business', 'Agent']
+        user_roles = ['Client', 'Agent']
         for _ in range(num_users):
             user = User(
                 name=faker.name(),
                 email=faker.unique.email(),
                 phone_number=faker.unique.phone_number(),
-                user_type=random.choice(user_types),
+                user_role=random.choice(user_roles),
                 created_at=datetime.utcnow(),
                 updated_at=datetime.utcnow()
             )
@@ -26,10 +27,11 @@ with app.app_context():
         db.session.commit()
 
     def seed_parcels(num_parcels=20):
-        user_ids = [user.user_id for user in User.query.filter(User.user_type.in_(['Client', 'Business'])).all()]
+        user_ids = [user.user_id for user in User.query.filter(User.user_role.in_(['Client', 'Agent'])).all()]
         for _ in range(num_parcels):
             parcel = Parcel(
                 sender_id=random.choice(user_ids),
+                tracking_number=''.join(random.choices(string.ascii_uppercase + string.digits, k=10)),
                 recipient_name=faker.name(),
                 recipient_address=faker.address(),
                 recipient_phone=faker.phone_number(),
@@ -43,7 +45,7 @@ with app.app_context():
 
     def seed_deliveries(num_deliveries=15):
         parcel_ids = [parcel.parcel_id for parcel in Parcel.query.all()]
-        agent_ids = [user.user_id for user in User.query.filter_by(user_type='Agent').all()]
+        agent_ids = [user.user_id for user in User.query.filter_by(user_role='Agent').all()]
         statuses = ['Scheduled', 'In Transit', 'Delivered']
         for _ in range(num_deliveries):
             delivery = Delivery(
@@ -58,23 +60,10 @@ with app.app_context():
             db.session.add(delivery)
         db.session.commit()
 
-    def seed_feedback(num_feedbacks=10):
-        user_ids = [user.user_id for user in User.query.all()]
-        delivery_ids = [delivery.delivery_id for delivery in Delivery.query.all()]
-        for _ in range(num_feedbacks):
-            feedback = Feedback(
-                user_id=random.choice(user_ids),
-                delivery_id=random.choice(delivery_ids),
-                rating=random.randint(1, 5),
-                comments=faker.text(),
-                created_at=datetime.utcnow()
-            )
-            db.session.add(feedback)
-        db.session.commit()
 
     def seed_notifications(num_notifications=10):
         user_ids = [user.user_id for user in User.query.all()]
-        types = ['SMS', 'Email', 'App']
+        types = ['SMS', 'Email']
         statuses = ['Sent', 'Delivered', 'Read']
         for _ in range(num_notifications):
             notification = Notification(
@@ -113,26 +102,11 @@ with app.app_context():
             db.session.add(order)
         db.session.commit()
 
-    def seed_products(num_products=20):
-        order_ids = [order.order_id for order in Order.query.all()]
-        for _ in range(num_products):
-            product = Product(
-                order_id=random.choice(order_ids),
-                name=faker.word(),
-                description=faker.text(),
-                price=round(random.uniform(5.0, 100.0), 2),
-                quantity=random.randint(1, 10),
-                created_at=datetime.utcnow(),
-                updated_at=datetime.utcnow()
-            )
-            db.session.add(product)
-        db.session.commit()
 
     seed_users()
     seed_parcels()
     seed_deliveries()
-    seed_feedback()
     seed_notifications()
     seed_tracking()
     seed_orders()
-    seed_products()
+

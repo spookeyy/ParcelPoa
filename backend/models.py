@@ -12,13 +12,12 @@ class User(db.Model):
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     phone_number = Column(String, unique=True, nullable=False)
-    user_type = Column(Enum('Client', 'Business', 'Agent', name='user_types'), nullable=False)
+    user_role = Column(Enum('Client', 'Agent', name='user_roles'), nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow)
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     parcels = relationship('Parcel', back_populates='sender', foreign_keys='Parcel.sender_id')
     deliveries = relationship('Delivery', back_populates='agent', foreign_keys='Delivery.agent_id')
-    feedbacks = relationship('Feedback', back_populates='user', foreign_keys='Feedback.user_id')
     notifications = relationship('Notification', back_populates='user', foreign_keys='Notification.user_id')
     orders = relationship('Order', back_populates='user', foreign_keys='Order.user_id')
 
@@ -28,6 +27,7 @@ class Parcel(db.Model):
 
     parcel_id = Column(Integer, primary_key=True)
     sender_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
+    tracking_number = Column(String(20), unique=True, nullable=False)
     recipient_name = Column(String, nullable=False)
     recipient_address = Column(String, nullable=False)
     recipient_phone = Column(String, nullable=False)
@@ -56,21 +56,6 @@ class Delivery(db.Model):
 
     parcel = relationship('Parcel', back_populates='delivery', foreign_keys=[parcel_id])
     agent = relationship('User', back_populates='deliveries', foreign_keys=[agent_id])
-    feedbacks = relationship('Feedback', back_populates='delivery', foreign_keys='Feedback.delivery_id')
-
-
-class Feedback(db.Model):
-    __tablename__ = 'feedback'
-
-    feedback_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
-    delivery_id = Column(Integer, ForeignKey('deliveries.delivery_id'), nullable=False)
-    rating = Column(Integer, nullable=False)
-    comments = Column(Text)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow)
-
-    user = relationship('User', back_populates='feedbacks', foreign_keys=[user_id])
-    delivery = relationship('Delivery', back_populates='feedbacks', foreign_keys=[delivery_id])
 
 
 class Notification(db.Model):
@@ -109,19 +94,5 @@ class Order(db.Model):
 
     user = relationship('User', back_populates='orders', foreign_keys=[user_id])
     parcel = relationship('Parcel', back_populates='orders', foreign_keys=[parcel_id])
-    products = relationship('Product', back_populates='order', foreign_keys='Product.order_id')
 
 
-class Product(db.Model):
-    __tablename__ = 'products'
-
-    product_id = Column(Integer, primary_key=True)
-    order_id = Column(Integer, ForeignKey('orders.order_id'), nullable=False)
-    name = Column(String, nullable=False)
-    description = Column(Text)
-    price = Column(DECIMAL, nullable=False)
-    quantity = Column(Integer, nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow)
-    updated_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-    order = relationship('Order', back_populates='products', foreign_keys=[order_id])
