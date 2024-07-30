@@ -13,13 +13,14 @@ with app.app_context():
     db.create_all()
 
     def seed_users(num_users=10):
-        user_roles = ['Client', 'Agent']
+        user_roles = ['Client','Business', 'Agent']
         for _ in range(num_users):
             user = User(
                 name=faker.name(),
                 email=faker.unique.email(),
                 phone_number=faker.unique.phone_number(),
                 user_role=random.choice(user_roles),
+                password_hash='password',
                 created_at=datetime.utcnow(),
                 updated_at=datetime.utcnow()
             )

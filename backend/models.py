@@ -2,7 +2,7 @@ from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String, Enum, ForeignKey, Text, DECIMAL, TIMESTAMP
 from sqlalchemy.orm import relationship
-
+from werkzeug.security import generate_password_hash,check_password_hash
 db = SQLAlchemy()
 
 class User(db.Model):
@@ -12,16 +12,32 @@ class User(db.Model):
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     phone_number = Column(String, unique=True, nullable=False)
-    user_role = Column(Enum('Client', 'Agent', name='user_roles'), nullable=False)
+    user_role = Column(Enum('Client','Business','Agent', name='user_roles'), nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow)
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    password_hash = Column(String(128), nullable=False)
 
     parcels = relationship('Parcel', back_populates='sender', foreign_keys='Parcel.sender_id')
     deliveries = relationship('Delivery', back_populates='agent', foreign_keys='Delivery.agent_id')
     notifications = relationship('Notification', back_populates='user', foreign_keys='Notification.user_id')
     orders = relationship('Order', back_populates='user', foreign_keys='Order.user_id')
 
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
 
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+    def to_dict(self):
+        return {
+            'user_id': self.user_id,
+            'name': self.name,
+            'email': self.email,
+            'phone_number': self.phone_number,
+            'user_role': self.user_role,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at
+        }
 class Parcel(db.Model):
     __tablename__ = 'parcels'
 
