@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.logo {
+    width: 70px; /* Adjust this value as needed */
+    height: auto; /* Keeps the aspect ratio */
+  }
+
+  /* Add this to your CSS file if needed */
+.group:hover .transition-transform {
+    transform: translateY(1.5rem); /* Adjust as needed */
+  }
