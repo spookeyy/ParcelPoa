@@ -6,27 +6,27 @@ export default function AddDelivery() {
   const [status, setStatus] = useState('Pending');
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     // Handle the form submission here, e.g., send data to an API
     console.log('Adding delivery:', { parcel, status });
 
-    // Simulate a successful API call
-    try {
-      const response = await fetch('/api/add-delivery', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ parcel, status }),
+    // Simulate a successful API call using fetch with promises
+    fetch('/api/add-delivery', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ parcel, status }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          navigate('/manage-deliveries'); // Redirect after successful submission
+        } else {
+          console.error('Failed to add delivery');
+        }
+      })
+      .catch((error) => {
+        console.error('Error:', error);
       });
-
-      if (response.ok) {
-        navigate('/manage-deliveries'); // Redirect after successful submission
-      } else {
-        console.error('Failed to add delivery');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    }
   };
 
   return (

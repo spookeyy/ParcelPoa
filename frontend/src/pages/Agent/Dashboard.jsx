@@ -2,17 +2,125 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Line } from 'react-chartjs-2';
 import Chart from 'chart.js/auto';
-import DeliveryConfirmation from './DeliveryConfirmation'; // Import the component
+import DeliveryConfirmation from './DeliveryConfirmation'; // Import the DeliveryConfirmation component
 
+// DeliveryCard component code
+function DeliveryCard({ orderID, payment, product, trackingNumber, status, orderDate }) {
+  const statusColor = {
+    Delivered: 'bg-green-500',
+    Pending: 'bg-yellow-500',
+    'In Transit': 'bg-blue-500'
+  }[status] || 'bg-gray-500';
+
+  return (
+    <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex flex-col items-center">
+      <div className="text-sm font-semibold text-gray-800">ORDER ID: {orderID}</div>
+      <div className="text-sm font-semibold text-gray-800">Payment: {payment}</div>
+      <div className="flex items-center">
+        <img src="/path/to/your/product/image.png" alt="Product Image" className="w-16 h-16 rounded-full" />
+        <div className="ml-4">
+          <p className="text-sm">{product}</p>
+        </div>
+      </div>
+      <div className="text-sm font-semibold text-gray-800">Tracking Number: {trackingNumber}</div>
+      <div className="text-sm font-semibold text-gray-800">Order Date: {orderDate}</div>
+      <div className="flex items-center mt-2">
+        <div className={`${statusColor} text-white px-4 py-2 rounded-lg shadow-sm`}>
+          {status}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Deliveries component code
+function Deliveries() {
+  const [activeTab, setActiveTab] = useState('all');
+
+  const deliveries = [
+    {
+      orderID: '764',
+      payment: 'Tocipopas x 7',
+      product: 'Product Image',
+      trackingNumber: 'DB7YTE',
+      status: 'in transit',
+      orderDate: 'MAY 11, 2023, 04:30 PM',
+    },
+    {
+      orderID: '765',
+      payment: 'Tocipopas x 3',
+      product: 'Product Image',
+      trackingNumber: 'DB8YTE',
+      status: 'delivered',
+      orderDate: 'JUNE 5, 2023, 10:00 AM',
+    },
+    {
+      orderID: '766',
+      payment: 'Tocipopas x 1',
+      product: 'Product Image',
+      trackingNumber: 'DB9YTE',
+      status: 'pending',
+      orderDate: 'JULY 2, 2023, 01:30 PM',
+    },
+    // Add more delivery data here
+  ];
+
+  const handleViewAll = () => {
+    setActiveTab('all');
+  };
+
+  return (
+    <div className="flex flex-col items-center mt-8">
+      <div className="flex justify-between w-full mb-4">
+        <h2 className="text-2xl font-bold">Deliveries</h2>
+        <button
+          onClick={handleViewAll}
+          className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-sm"
+        >
+          View All
+        </button>
+      </div>
+      <div className="flex space-x-4 mb-4">
+        <button
+          onClick={() => setActiveTab('pending')}
+          className={`px-4 py-2 rounded-lg ${activeTab === 'pending' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+        >
+          Pending
+        </button>
+        <button
+          onClick={() => setActiveTab('in transit')}
+          className={`px-4 py-2 rounded-lg ${activeTab === 'in transit' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+        >
+          In Transit
+        </button>
+        <button
+          onClick={() => setActiveTab('delivered')}
+          className={`px-4 py-2 rounded-lg ${activeTab === 'delivered' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+        >
+          Delivered
+        </button>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+        {deliveries
+          .filter(delivery => activeTab === 'all' || delivery.status === activeTab)
+          .map((delivery, index) => (
+            <DeliveryCard key={index} {...delivery} />
+          ))}
+      </div>
+    </div>
+  );
+}
+
+// Dashboard component code
 export default function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showDeliveryConfirmation, setShowDeliveryConfirmation] = useState(false);
   const [data, setData] = useState({
-    labels: [],
+    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
     datasets: [
       {
         label: 'Deliveries Over Time',
-        data: [],
+        data: [12, 19, 3, 5, 2, 3, 9],
         borderColor: '#4F46E5',
         backgroundColor: 'rgba(79, 70, 229, 0.1)',
       },
@@ -22,177 +130,176 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Replace with your data fetching logic
-        const fetchedData = {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-          datasets: [
-            {
-              label: 'Deliveries Over Time',
-              data: [65, 59, 80, 81, 56],
-              borderColor: '#4F46E5',
-              backgroundColor: 'rgba(79, 70, 229, 0.1)',
-            },
-          ],
-        };
+    fetchData();
+  }, []);
+
+  const fetchData = () => {
+    fetch('/api/deliveries-data')
+      .then(response => response.json())
+      .then(fetchedData => {
         if (fetchedData && fetchedData.datasets) {
           setData(fetchedData);
         } else {
           console.error('Fetched data is missing datasets');
         }
-      } catch (error) {
+      })
+      .catch(error => {
         console.error('Error fetching data:', error);
-      }
-    };
-    fetchData();
-  }, []);
+      });
+  };
 
   return (
     <div className="relative min-h-screen bg-gray-100 p-6">
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 w-64 h-full bg-white shadow-lg transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300`}
+        className={`fixed top-0 left-0 w-64 h-full bg-white shadow-lg transform ${
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } transition-transform duration-300 z-40`}
       >
-        <button
-          onClick={() => setIsSidebarOpen(false)}
-          className="absolute top-4 right-4 text-2xl"
-        >
-          &times;
-        </button>
-        
-        <nav className="mt-16">
+        <div className="bg-blue-600 text-white p-4 flex items-center justify-between">
+          <span className="text-2xl font-bold">Dashboard</span>
+          <button
+            onClick={() => setIsSidebarOpen(false)}
+            className="text-2xl"
+          >
+            &times;
+          </button>
+        </div>
+
+        <nav className="mt-6">
           <ul className="space-y-4 px-4">
-            {/* Add icons here */}
             <li>
-              <Link to="/manage-deliveries" className="flex items-center text-lg text-gray-700 hover:text-blue-600">
-                <i className="fas fa-box"></i> Manage Deliveries
+              <Link
+                to="/manage-deliveries"
+                className="flex items-center text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-100 p-2 rounded transition"
+              >
+                <i className="fas fa-box mr-3"></i> Manage Deliveries
               </Link>
             </li>
             <li>
-              <Link to="/communication-tools" className="flex items-center text-lg text-gray-700 hover:text-blue-600">
-                <i className="fas fa-comments"></i> Communication Tools
+              <Link
+                to="/communication-tools"
+                className="flex items-center text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-100 p-2 rounded transition"
+              >
+                <i className="fas fa-comments mr-3"></i> Communication Tools
               </Link>
             </li>
             <li>
-              <Link to="/agent-login" className="flex items-center text-lg text-gray-700 hover:text-blue-600">
-                <i className="fas fa-sign-in-alt"></i> Login
+              <Link
+                to="/agent-login"
+                className="flex items-center text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-100 p-2 rounded transition"
+              >
+                <i className="fas fa-sign-in-alt mr-3"></i> Login
               </Link>
             </li>
             <li>
-              <Link to="/agent-register" className="flex items-center text-lg text-gray-700 hover:text-blue-600">
-                <i className="fas fa-user-plus"></i> Register
+              <Link
+                to="/agent-register"
+                className="flex items-center text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-100 p-2 rounded transition"
+              >
+                <i className="fas fa-user-plus mr-3"></i> Register
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/agent-profile"
+                className="flex items-center text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-100 p-2 rounded transition"
+              >
+                <i className="fas fa-user mr-3"></i> Profile
               </Link>
             </li>
             <li>
               <button
                 onClick={() => navigate('/dashboard')}
-                className="flex items-center text-lg text-gray-700 hover:text-blue-600"
+                className="flex items-center text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-100 p-2 rounded transition"
               >
-                <i className="fas fa-home"></i> Go to Dashboard
+                <i className="fas fa-home mr-3"></i> Go to Dashboard
               </button>
             </li>
-            {/* Other items */}
+            <li>
+              <button
+                onClick={() => navigate('/add-delivery')}
+                className="flex items-center text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-100 p-2 rounded transition"
+              >
+                <i className="fas fa-plus mr-3"></i> Create New Delivery
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => navigate('/update-parcel-status')}
+                className="flex items-center text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-100 p-2 rounded transition"
+              >
+                <i className="fas fa-edit mr-3"></i> Update Parcel Status
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => setShowDeliveryConfirmation(true)}
+                className="flex items-center text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-100 p-2 rounded transition"
+              >
+                <i className="fas fa-check-circle mr-3"></i> Confirm Delivery
+              </button>
+            </li>
           </ul>
         </nav>
-        {/* Back Button */}
         <button
-          onClick={() => navigate(-1)}
-          className="bg-blue-500 text-white px-4 py-2 rounded shadow mb-6 mx-4"
+          onClick={() => navigate('/dashboard')}
+          className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md mb-6 mx-4 absolute bottom-4 left-4"
         >
           Back
         </button>
       </div>
 
-      {/* Toggle Button */}
       <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="fixed top-6 right-6 bg-yellow-300 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 transition"
+        className="fixed top-6 left-6 bg-yellow-300 text-white p-3 rounded-full shadow-lg hover:bg-yellow-400 transition"
       >
         ☰
       </button>
 
-      {/* Dashboard Content */}
-      <div className={`p-6 ${isSidebarOpen ? 'ml-64' : ''}`}>
-        <div className="max-w-4xl mx-auto bg-white p-6 rounded shadow">
-          <header className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold">Delivery Agent Dashboard</h1>
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => navigate('/add-delivery')}
-                className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
-              >
-                Create New Delivery
-              </button>
-              <button
-                onClick={() => navigate('/update-parcel-status')}
-                className="bg-green-500 text-white px-4 py-2 rounded shadow hover:bg-green-600"
-              >
-                Update Parcel Status
-              </button>
-              <button
-                onClick={() => setShowDeliveryConfirmation(true)}
-                className="bg-yellow-500 text-white px-4 py-2 rounded shadow hover:bg-yellow-600"
-              >
-                Confirm Delivery
-              </button>
-            </div>
-          </header>
+      <div className="max-w-6xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+        <header className="flex items-center justify-center mb-6">
+          <h1 className="text-4xl font-bold text-gray-900">Agent Dashboard</h1>
+        </header>
 
-          {/* Overview Widgets */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white p-6 rounded shadow">
-              <h3 className="text-xl font-semibold">Total Deliveries</h3>
-              <p className="text-2xl">125</p>
-            </div>
-            <div className="bg-white p-6 rounded shadow">
-              <h3 className="text-xl font-semibold">Pending Requests</h3>
-              <p className="text-2xl">32</p>
-            </div>
-            <div className="bg-white p-6 rounded shadow">
-              <h3 className="text-xl font-semibold">Recent Activities</h3>
-              <ul className="list-disc list-inside ml-4">
-                <li>Delivery #123 updated status</li>
-                <li>New request received from Business X</li>
-              </ul>
-            </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 flex flex-col items-center">
+            <i className="fas fa-truck text-2xl text-gray-500 mb-2"></i>
+            <h3 className="text-xl font-semibold text-gray-800">Total Deliveries</h3>
+            <p className="text-3xl font-bold text-gray-900">125</p>
           </div>
 
-          {/* Data Visualization */}
-          <div className="bg-white p-6 rounded shadow mb-8">
-            <h3 className="text-xl font-semibold mb-4">Deliveries Over Time</h3>
-            <Line data={data} options={{ responsive: true }} />
+          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 flex flex-col items-center">
+            <i className="fas fa-check-circle text-2xl text-green-500 mb-2"></i>
+            <h3 className="text-xl font-semibold text-gray-800">Delivered</h3>
+            <p className="text-3xl font-bold text-gray-900">51</p>
           </div>
 
-          {/* Detailed Sections */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4">Key Features</h2>
-            <ul className="list-disc list-inside ml-6 space-y-2">
-              <li className="bg-gray-100 p-4 shadow rounded hover:bg-gray-200">
-                <Link to="/manage-deliveries" className="text-lg font-medium text-gray-700">Manage Deliveries</Link>
-                <p className="text-gray-600">An efficient portal for managing deliveries and updating parcel statuses.</p>
-              </li>
-              {/* Other items */}
-            </ul>
+          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 flex flex-col items-center">
+            <i className="fas fa-clock text-2xl text-yellow-500 mb-2"></i>
+            <h3 className="text-xl font-semibold text-gray-800">Pending Deliveries</h3>
+            <p className="text-3xl font-bold text-gray-900">3</p>
           </div>
 
-          <div className="mt-8">
-            <h2 className="text-2xl font-semibold mb-4">Enhanced Features</h2>
-            <ul className="list-disc list-inside ml-6 space-y-2">
-              <li className="bg-gray-100 p-4 shadow rounded hover:bg-gray-200">
-                <Link to="/dashboard-overview" className="text-lg font-medium text-gray-700">Dashboard Overview</Link>
-                <p className="text-gray-600">Access a dashboard to view and manage all assigned deliveries.</p>
-              </li>
-              {/* Other items */}
-            </ul>
+          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 flex flex-col items-center">
+            <i className="fas fa-shipping-fast text-2xl text-blue-500 mb-2"></i>
+            <h3 className="text-xl font-semibold text-gray-800">In Transit</h3>
+            <p className="text-3xl font-bold text-gray-900">3</p>
           </div>
         </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-200">
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">Deliveries Over Time</h3>
+          <Line data={data} options={{ responsive: true }} />
+        </div>
+
+        <Deliveries />
+        
       </div>
 
-      {/* Delivery Confirmation Form */}
       {showDeliveryConfirmation && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded shadow-md relative w-full max-w-lg">
+          <div className="bg-white p-6 rounded-lg shadow-lg relative w-full max-w-lg">
             <button
               onClick={() => setShowDeliveryConfirmation(false)}
               className="absolute top-4 right-4 text-2xl text-gray-700"
