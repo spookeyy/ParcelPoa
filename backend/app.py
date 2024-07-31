@@ -102,17 +102,6 @@ def get_user(user_id):
     user = User.query.get_or_404(user_id)
     return jsonify(user.to_dict())
 
-@app.route('/users/<int:user_id>', methods=['PUT'])
-@jwt_required()
-def update_user(user_id):
-    data = request.get_json()
-    user = User.query.get_or_404(user_id)
-    user.name = data.get('name', user.name)
-    user.email = data.get('email', user.email)
-    user.phone_number = data.get('phone_number', user.phone_number)
-    user.updated_at = datetime.now()
-    db.session.commit()
-    return jsonify({"message": "User updated successfully"})
 
 @app.route('/users/<int:user_id>', methods=['DELETE'])
 @jwt_required()
@@ -145,6 +134,37 @@ def profile():
         'phone_number': user.phone_number,
         'user_role': user.user_role
     })
+
+# update profile
+@app.route('/profile', methods=['PUT'])
+@jwt_required()
+def update_profile():
+    data = request.get_json()
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    if user is None:
+        return jsonify({"message": "User not found"}), 404
+    user.name = data.get('name', user.name)
+    user.email = data.get('email', user.email)
+    user.phone_number = data.get('phone_number', user.phone_number)
+    user.updated_at = datetime.now()
+    db.session.commit()
+    return jsonify({"message": "Profile updated successfully"})
+
+# change password
+@app.route('/change_password', methods=['PUT'])
+@jwt_required()
+def change_password():
+    data = request.get_json()
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    if user is None:
+        return jsonify({"message": "User not found"}), 404
+    if not bcrypt.check_password_hash(user.password_hash, data['old_password']):
+        return jsonify({"message": "Old password is incorrect"}), 400
+    user.password_hash = bcrypt.generate_password_hash(data['new_password']).decode('utf-8')
+    db.session.commit()
+    return jsonify({"message": "Password changed successfully"})
 
 
 # TRACKING ROUTES
