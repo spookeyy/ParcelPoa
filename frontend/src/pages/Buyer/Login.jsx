@@ -1,9 +1,16 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+
+  // Hardcoded credentials for demonstration purposes
+  const validEmail = 'user@gmail.com';
+  const validPassword = 'password123';
+
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -12,9 +19,20 @@ export default function Login() {
       setError('Please enter both email and password.');
       return;
     }
+
+    // Validate email and password
+    if (email !== validEmail || password !== validPassword) {
+      setError('Incorrect email or password.');
+      return;
+    }
+
     setError('');
-   
     console.log('Logging in with:', { email, password });
+    // Proceed with login (e.g., redirect or fetch user data)
+  };
+
+  const handleResetPassword = () => {
+    navigate('/reset-password'); // Navigate to the reset password page
   };
 
   return (
@@ -54,6 +72,11 @@ export default function Login() {
         </form>
         <p className="mt-4 text-sm text-center">
           Don't have an account? <a href="/signup" className="text-blue-600 hover:underline">Sign up</a>
+        </p>
+        <p className="mt-2 text-sm text-center">
+          <button onClick={handleResetPassword} className="text-blue-600 hover:underline">
+            Reset Password
+          </button>
         </p>
       </div>
     </div>

@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from "react";
-
 import { useNavigate } from "react-router-dom";
 
 // images for the slider
@@ -13,17 +12,16 @@ const images = [
 function Home() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-// do not delete this
+  // do not delete this
   // useNavigate hook for navigation
   const navigate = useNavigate();
 
   // Function to handle agent button click
   const handleAgentButtonClick = () => {
     navigate("/agent"); // Navigate to the Agent page
-  };
-// do not delete this
+  }; 
+  // do not delete this
 
-  
   // Function to handle the next image
   const nextImage = () => {
     setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -43,8 +41,6 @@ function Home() {
 
     return () => clearInterval(interval);
   }, [nextImage]);
-
-
 
   return (
     <>
@@ -72,8 +68,6 @@ function Home() {
             alt={`Slide ${currentImageIndex + 1}`}
             className="w-full h-full object-cover"
           />
-          
-          
         </div>
 
         <div className="absolute text-center">
@@ -81,28 +75,22 @@ function Home() {
           <p className="mt-2 text-black">
             Manage your deliveries efficiently with our tracking and scheduling services.<br></br>
             Our system allows you to schedule pickups, track your parcels in real-time,<br></br>
-             and receive notifications for every step of the delivery process.<br></br> 
-             Whether you're sending a gift or managing business shipments, <br></br>
-             we ensure your packages arrive safely and on time.
+            and receive notifications for every step of the delivery process.<br></br> 
+            Whether you're sending a gift or managing business shipments, <br></br>
+            we ensure your packages arrive safely and on time.
           </p>
         </div>
       </main>
 
-  {/* Do not delete this */}
- {/* Button to navigate to Agent side */}
-          <button
-            onClick={handleAgentButtonClick}
-            className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Show me the Agent Side
-          </button>
-
-
-
-      <footer className="bg-blue-800 text-white p-4 text-center">
-        <p>&copy; 2024 Parcelpoa. All rights reserved.</p>
-        <p>Contact us: support@parcelpoaservice.com</p>
-      </footer>
+      {/* Do not delete this */}
+      {/* Button to navigate to Agent side */}
+      <button
+        onClick={handleAgentButtonClick}
+        className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      >
+        Show me the Agent Side
+      </button>
+      {/* Footer part removed */}
     </>
   );
 }
