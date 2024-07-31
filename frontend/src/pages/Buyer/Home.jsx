@@ -13,17 +13,6 @@ const images = [
 function Home() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-// do not delete this
-  // useNavigate hook for navigation
-  const navigate = useNavigate();
-
-  // Function to handle agent button click
-  const handleAgentButtonClick = () => {
-    navigate("/agent"); // Navigate to the Agent page
-  };
-// do not delete this
-
-  
   // Function to handle the next image
   const nextImage = () => {
     setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -87,17 +76,6 @@ function Home() {
           </p>
         </div>
       </main>
-
-  {/* Do not delete this */}
- {/* Button to navigate to Agent side */}
-          <button
-            onClick={handleAgentButtonClick}
-            className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Show me the Agent Side
-          </button>
-
-
 
       <footer className="bg-blue-800 text-white p-4 text-center">
         <p>&copy; 2024 Parcelpoa. All rights reserved.</p>
