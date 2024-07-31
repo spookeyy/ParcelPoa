@@ -31,7 +31,6 @@ import AgentLogin from './pages/Agent/AgentLogin';
 import AgentRegister from './pages/Agent/AgentRegister';
 // end of the pages for the agent
 
-
 function App() {
   return (
     <Router>
