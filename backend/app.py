@@ -158,6 +158,10 @@ def get_current_location(parcel_id):
 @jwt_required()
 def create_parcel():
     data = request.get_json()
+    user = User.query.get(get_jwt_identity())
+    if user.user_role != 'Agent':
+        return jsonify({"message": "Only agentes can create parcels"}), 403
+    
     parcel = Parcel(
         sender_id=data['sender_id'],
         tracking_number=data['tracking_number'],
@@ -166,6 +170,7 @@ def create_parcel():
         recipient_phone=data['recipient_phone'],
         description=data['description'],
         weight=data['weight'],
+        status=data['status'],
         current_location=data['current_location'],
         created_at=datetime.now(),
         updated_at=datetime.now()
@@ -177,8 +182,11 @@ def create_parcel():
 @app.route('/parcels', methods=['GET'])
 @jwt_required()
 def get_parcels():
+    user = User.query.get(get_jwt_identity())
+    if user.user_role != 'Agent':
+        return jsonify({"message": "Only agents can view parcels"}), 403
     parcels = Parcel.query.all()
-    return jsonify([parcel.to_dict() for parcel in parcels]) 
+    return jsonify([parcel for parcel in parcels]) 
 
 @app.route('/parcels/<int:parcel_id>', methods=['GET'])
 @jwt_required()
