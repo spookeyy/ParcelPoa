@@ -29,6 +29,7 @@ with app.app_context():
 
     def seed_parcels(num_parcels=20):
         user_ids = [user.user_id for user in User.query.filter(User.user_role.in_(['Client', 'Agent'])).all()]
+        statuses = ['Scheduled', 'In Transit', 'Delivered']
         for _ in range(num_parcels):
             parcel = Parcel(
                 sender_id=random.choice(user_ids),
@@ -38,6 +39,7 @@ with app.app_context():
                 recipient_phone=faker.phone_number(),
                 description=faker.text(),
                 weight=round(random.uniform(1.0, 10.0), 2),
+                status=random.choice(statuses),
                 created_at=datetime.utcnow(),
                 updated_at=datetime.utcnow()
             )

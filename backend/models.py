@@ -44,6 +44,7 @@ class Parcel(db.Model):
     parcel_id = Column(Integer, primary_key=True)
     sender_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
     tracking_number = Column(String(20), unique=True, nullable=False)
+    
     recipient_name = Column(String, nullable=False)
     recipient_address = Column(String, nullable=False)
     recipient_phone = Column(String, nullable=False)
@@ -52,7 +53,7 @@ class Parcel(db.Model):
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow)
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     current_location = db.Column(db.String(255))
-
+    status = Column(Enum('Scheduled', 'In Transit', 'Delivered', name='delivery_statuses'), nullable=False)
     sender = relationship('User', back_populates='parcels', foreign_keys=[sender_id])
     delivery = relationship('Delivery', back_populates='parcel', uselist=False)
     tracking = relationship('Tracking', back_populates='parcel', uselist=False)
