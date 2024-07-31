@@ -51,6 +51,7 @@ class Parcel(db.Model):
     weight = Column(DECIMAL, nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow)
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    current_location = db.Column(db.String(255))
 
     sender = relationship('User', back_populates='parcels', foreign_keys=[sender_id])
     delivery = relationship('Delivery', back_populates='parcel', uselist=False)
