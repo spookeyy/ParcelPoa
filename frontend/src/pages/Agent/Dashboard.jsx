@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import AgentHeader from "../DashboardComponentsforAgent/AgentHeader";
-import Sidebar from "../DashboardComponentsforAgent/Sidebar";
-import StatsCard from "../DashboardComponentsforAgent/StatsCard";
-import DeliveriesChart from "../DashboardComponentsforAgent/DeliveriesChart";
-import Deliveries from "../DashboardComponentsforAgent/Deliveries";
+import AgentHeader from "./DashboardComponentsforAgent/AgentHeader";
+import Sidebar from "./DashboardComponentsforAgent/Sidebar";
+import StatsCard from "./DashboardComponentsforAgent/StatsCard";
+import DeliveriesChart from "./DashboardComponentsforAgent/DeliveriesChart";
+import Deliveries from "./DashboardComponentsforAgent/Deliveries";
 
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);

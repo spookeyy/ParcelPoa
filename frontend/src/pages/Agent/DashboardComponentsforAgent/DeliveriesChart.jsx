@@ -1,6 +1,6 @@
 import React from "react";
 import { Line } from "react-chartjs-2";
-import '../../chartConfig'; // Import chart configuration
+import '../../../chartConfig.js';
 
 export default function DeliveriesChart({ data }) {
   return (
@@ -16,3 +16,4 @@ export default function DeliveriesChart({ data }) {
     </div>
   );
 }
+// /home/simon/phase 5/ParcelPoa/frontend/src/chartConfig.js
