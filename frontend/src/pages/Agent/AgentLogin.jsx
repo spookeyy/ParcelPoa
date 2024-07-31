@@ -7,25 +7,25 @@ export default function AgentLogin() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
 
     // Replace with your login logic
-    try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+    fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          navigate('/dashboard'); // Redirect to the dashboard after successful login
+        } else {
+          console.error('Login failed');
+        }
+      })
+      .catch((error) => {
+        console.error('Error:', error);
       });
-
-      if (response.ok) {
-        navigate('/dashboard');
-      } else {
-        console.error('Login failed');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    }
   };
 
   return (
