@@ -1,23 +1,31 @@
 import random
-from flask import Flask, request, jsonify
+import smtplib
+from flask import Flask, request, jsonify,url_for
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from datetime import datetime, timezone
 from flask_apscheduler import APScheduler
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+from werkzeug.security import generate_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, get_jwt
 from models import db, User, Parcel, Delivery, Notification, Tracking, Order
+import os
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["JWT_SECRET_KEY"] = "super-secret-key" 
-app.config["SECRET-KEY"] = "secret-key"
+app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "super-secret-key")
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "another-secret-key")
 
 migrate = Migrate(app, db)
 db.init_app(app)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
+
+s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
 # scheduler configurations
 # with app.app_context():
@@ -114,6 +122,67 @@ def delete_user(user_id):
     db.session.delete(user)
     db.session.commit()
     return jsonify({"message": "User deleted successfully"})
+
+# reset password
+@app.route('/request-reset-password', methods=['POST'])
+def request_reset_password():
+    data = request.get_json()
+    email = data.get('email')
+    user = User.query.filter_by(email=email).first()
+    
+    if not user:
+        return jsonify({"message": "User with this email does not exist"}), 404
+    
+    token = s.dumps(email, salt='password-reset-salt')
+    
+    reset_url = url_for('reset_password', token=token, _external=True)
+    
+    send_email(user.email, reset_url)
+    
+    return jsonify({"message": "Password reset email sent"}), 200
+
+@app.route('/reset-password/<token>', methods=['POST'])
+def reset_password(token):
+    try:
+        email = s.loads(token, salt='password-reset-salt', max_age=3600)
+    except (SignatureExpired, BadSignature):
+        return jsonify({"message": "The reset link is invalid or has expired"}), 400
+    
+    data = request.get_json()
+    new_password = data.get('new_password')
+    
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"message": "User with this email does not exist"}), 404
+    
+    # Update the user's password
+    user.password = generate_password_hash(new_password)
+    db.session.commit()
+    
+    return jsonify({"message": "Password has been reset successfully"}), 200# send email
+def send_email(to_email, reset_url):
+    smtp_server = "live.smtp.mailtrap.io"
+    smtp_port = 587
+    from_email = os.environ.get("EMAIL_USER", "shisiawhitney215@gmail.com")
+    from_password = os.environ.get("EMAIL_PASS", "@Whit2050")
+
+    subject = "Password Reset Request"
+    message = f"Click the link to reset your password: {reset_url}"
+
+    msg = MIMEMultipart()
+    msg['From'] = from_email
+    msg['To'] = to_email
+    msg['Subject'] = subject
+    msg.attach(MIMEText(message, 'plain'))
+
+    try:
+        server = smtplib.SMTP_SSL(smtp_server, smtp_port)
+        server.login(from_email, from_password)
+        server.send_message(msg)
+        server.quit()
+    except Exception as e:
+        raise Exception(f"Failed to send email: {str(e)}")
+
 
 # user profile
 @app.route('/profile', methods=['GET'])

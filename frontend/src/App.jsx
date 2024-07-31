@@ -31,11 +31,12 @@ import AgentLogin from "./pages/Agent/AgentLogin";
 import AgentRegister from "./pages/Agent/AgentRegister";
 import AgentProfile from "./pages/Agent/AgentProfile";
 // end of the pages for the agent
-
+import UserProvider from './pages/Context/UserContext';
 function App() {
   return (
     <Router>
       <Header />
+      <UserProvider>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -72,6 +73,7 @@ function App() {
         <Route path="/agent-profile" element={<AgentProfile />} />
         {/* end of the pages for the agent */}
       </Routes>
+      </UserProvider>
       <Footer />
     </Router>
   );
