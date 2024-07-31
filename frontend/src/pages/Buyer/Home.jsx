@@ -13,7 +13,7 @@ const images = [
 function Home() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-
+// do not delete this
   // useNavigate hook for navigation
   const navigate = useNavigate();
 
@@ -21,6 +21,7 @@ function Home() {
   const handleAgentButtonClick = () => {
     navigate("/agent"); // Navigate to the Agent page
   };
+// do not delete this
 
   
   // Function to handle the next image
@@ -87,7 +88,7 @@ function Home() {
         </div>
       </main>
 
-
+  {/* Do not delete this */}
  {/* Button to navigate to Agent side */}
           <button
             onClick={handleAgentButtonClick}
