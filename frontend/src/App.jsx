@@ -49,6 +49,7 @@ function App() {
         <Route path="/order/:id" element={<Order_Details />} />
         <Route path="/reset-password" element={<Reset_Password />} />
         <Route path="/feedbackForm" element={<FeedbackForm />} />
+       
         {/* the pages for the agent */}
         <Route path="/agent" element={<AgentHome />} />
         <Route path="/dashboard" element={<Dashboard />} />
