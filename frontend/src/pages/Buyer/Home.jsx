@@ -1,6 +1,8 @@
 
 import React, { useState, useEffect } from "react";
 
+import { useNavigate } from "react-router-dom";
+
 // images for the slider
 const images = [
   "https://plus.unsplash.com/premium_photo-1683121269108-1bd195cd18cf?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8c2hvcHBpbmd8ZW58MHx8MHx8fDA%3D",
@@ -11,6 +13,16 @@ const images = [
 function Home() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+
+  // useNavigate hook for navigation
+  const navigate = useNavigate();
+
+  // Function to handle agent button click
+  const handleAgentButtonClick = () => {
+    navigate("/agent"); // Navigate to the Agent page
+  };
+
+  
   // Function to handle the next image
   const nextImage = () => {
     setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -30,6 +42,8 @@ function Home() {
 
     return () => clearInterval(interval);
   }, [nextImage]);
+
+
 
   return (
     <>
@@ -72,6 +86,17 @@ function Home() {
           </p>
         </div>
       </main>
+
+
+ {/* Button to navigate to Agent side */}
+          <button
+            onClick={handleAgentButtonClick}
+            className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Show me the Agent Side
+          </button>
+
+
 
       <footer className="bg-blue-800 text-white p-4 text-center">
         <p>&copy; 2024 Parcelpoa. All rights reserved.</p>
