@@ -65,6 +65,12 @@ def register():
     )
     db.session.add(new_user)
     db.session.commit()
+    if data['user_role'] == 'Business':
+        return jsonify({"message": "Business registered successfully"}), 201
+    elif data['user_role'] == 'Agent':
+        return jsonify({"message": "Agent registered successfully"}), 201
+    elif data['user_role'] == 'Client':
+        return jsonify({"message": "Client user registered successfully"}), 201
     return jsonify({"message": "User registered successfully"}), 201
 
 @app.route('/login', methods=['POST'])
@@ -379,7 +385,9 @@ def reset_password(token):
     if not user:
         return jsonify({"message": "User with this email does not exist"}), 404
     
-    user.password = generate_password_hash(new_password)
+    # hash new password
+    hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+    user.password_hash = hashed_password
     db.session.commit()
     
     return jsonify({"message": "Password has been reset successfully"}), 200
