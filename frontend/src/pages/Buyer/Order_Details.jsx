@@ -55,6 +55,7 @@ export default function Order_Details() {
       <div className="total-amount text-right">
         <h3 className="text-lg font-bold">Total: ${totalAmount.toFixed(2)}</h3>
       </div>
+      
     </div>
   );
 }
