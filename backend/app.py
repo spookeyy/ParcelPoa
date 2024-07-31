@@ -20,9 +20,10 @@ bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 
 # scheduler configurations
-scheduler = APScheduler()
-scheduler.init_app(app)
-scheduler.start()
+# with app.app_context():
+#     scheduler = APScheduler()
+#     scheduler.init_app(app)
+#     scheduler.start()
 
 blacklist = set()
 
@@ -63,10 +64,7 @@ def login():
     data = request.get_json()
     user = User.query.filter_by(email=data['email']).first()
     if user and bcrypt.check_password_hash(user.password_hash, data['password']):
-        access_token = create_access_token(
-            identity={
-            'user_id': user.user_id, 
-            'user_role': user.user_role})
+        access_token = create_access_token(identity=user.user_id)
         return jsonify({"access_token": access_token}), 200
     else:
         return jsonify({"message": "Invalid credentials"}), 401
@@ -123,6 +121,8 @@ def delete_user(user_id):
 def profile():
     current_user_id = get_jwt_identity()
     user = User.query.get(current_user_id)
+    if user is None:
+        return jsonify({"message": "User not found"}), 404
     return jsonify({
         'user_id': user.user_id,
         'name': user.name,
@@ -201,14 +201,19 @@ def update_parcel_location(parcel_id):
     return jsonify({"message": "Parcel location updated successfully"}), 200
 
 # scheduler implementation
-@scheduler.task('interval', id='update_locations', seconds=300)  # Run every 5 minutes
-def update_locations():
-    parcels = Parcel.query.filter(Parcel.status != 'Delivered').all()
-    for parcel in parcels:
-        new_location = simulate_new_location(parcel)
-        parcel.current_location = new_location
-        parcel.updated_at = datetime.now()
-    db.session.commit()
+# @scheduler.task('interval', id='update_locations', seconds=300)  # Run every 5 minutes
+# def update_locations():
+#     parcels = Parcel.query.filter(Parcel.status != 'Delivered').all()
+#     for parcel in parcels:
+#         new_location = simulate_new_location(parcel)
+#         parcel.current_location = new_location
+#         parcel.updated_at = datetime.now()
+#     db.session.commit()
+
+#     print('Parcels updated successfully')
+
+#     return jsonify({"message": "Parcels updated successfully"}), 200
+# scheduler.add_job(func=update_locations, trigger='interval', seconds=300, id='update_locations')
 
 def simulate_new_location(parcel):
     locations = ['In transit', 'Local distribution center', 'Out for delivery']
@@ -287,4 +292,4 @@ def update_delivery_status(delivery_id):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)
