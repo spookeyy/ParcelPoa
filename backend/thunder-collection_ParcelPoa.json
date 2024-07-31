@@ -1,0 +1,234 @@
+{
+    "clientName": "Thunder Client",
+    "collectionName": "ParcelPoa",
+    "collectionId": "446f9b26-deaf-4c56-8b9e-251488388daa",
+    "dateExported": "2024-07-31T16:13:56.687Z",
+    "version": "1.2",
+    "folders": [
+        {
+            "_id": "6b9f98ac-24a9-4b5a-b8b0-378cdeace5e1",
+            "name": "user",
+            "containerId": "",
+            "created": "2024-07-29T14:23:48.476Z",
+            "sortNum": 10000
+        },
+        {
+            "_id": "46e5a593-d112-4998-9e8c-f0c5ebb68202",
+            "name": "Parcel",
+            "containerId": "",
+            "created": "2024-07-31T10:20:13.360Z",
+            "sortNum": 20000
+        },
+        {
+            "_id": "b44c7db4-59f8-45be-8287-adc6fa22a669",
+            "name": "Deliveries",
+            "containerId": "",
+            "created": "2024-07-31T15:26:07.586Z",
+            "sortNum": 30000
+        }
+    ],
+    "requests": [
+        {
+            "_id": "f67d89ce-3a6d-4a09-aaad-45e3c195d315",
+            "colId": "446f9b26-deaf-4c56-8b9e-251488388daa",
+            "containerId": "6b9f98ac-24a9-4b5a-b8b0-378cdeace5e1",
+            "name": "login",
+            "url": "http://127.0.0.1:5000/login",
+            "method": "POST",
+            "sortNum": 20000,
+            "created": "2024-07-29T14:23:55.179Z",
+            "modified": "2024-07-31T15:56:56.651Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"email\": \"spookie@gmail.com\",\n  \"password\": \"spookie\"\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "bc11a176-7ed0-4034-ad69-bf9a0beeae85",
+            "colId": "446f9b26-deaf-4c56-8b9e-251488388daa",
+            "containerId": "6b9f98ac-24a9-4b5a-b8b0-378cdeace5e1",
+            "name": "register",
+            "url": "http://127.0.0.1:5000/register",
+            "method": "POST",
+            "sortNum": 30000,
+            "created": "2024-07-29T14:24:03.854Z",
+            "modified": "2024-07-31T15:37:50.536Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"name\": \"store1\",\n  \"email\": \"store1@gmail.com\",\n  \"phone_number\": \"+254 792157720\",\n  \"user_role\": \"Business\",\n  \"password\": \"store1\"\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "a9efbed2-e479-4179-a05c-4bef7d8410a9",
+            "colId": "446f9b26-deaf-4c56-8b9e-251488388daa",
+            "containerId": "6b9f98ac-24a9-4b5a-b8b0-378cdeace5e1",
+            "name": "logged_in",
+            "url": "http://127.0.0.1:5000/users",
+            "method": "GET",
+            "sortNum": 40000,
+            "created": "2024-07-29T14:24:28.840Z",
+            "modified": "2024-07-30T18:10:43.008Z",
+            "headers": [],
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcyMjM2Mjk2NywianRpIjoiOTE1YmIwZDMtZmZhYi00MTAwLWE0YjktZDJhMjM5MjQwOTYzIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6eyJ1c2VyX2lkIjoxMywidXNlcl9yb2xlIjoiQWdlbnQifSwibmJmIjoxNzIyMzYyOTY3LCJjc3JmIjoiNzM5ZDRlMGEtZWMxOC00ZWM3LTk4YTEtYzhjYzUzMzJiZGRjIiwiZXhwIjoxNzIyMzYzODY3fQ.WgZMeNAdWccNB_rKzbPHg4vYkL7kKNBh2241vKdK92U"
+            }
+        },
+        {
+            "_id": "2ec993ea-ccbe-4268-b661-680636a60210",
+            "colId": "446f9b26-deaf-4c56-8b9e-251488388daa",
+            "containerId": "6b9f98ac-24a9-4b5a-b8b0-378cdeace5e1",
+            "name": "logout",
+            "url": "http://127.0.0.1:8000/logout",
+            "method": "DELETE",
+            "sortNum": 50000,
+            "created": "2024-07-29T14:24:39.713Z",
+            "modified": "2024-07-29T14:27:00.123Z",
+            "headers": []
+        },
+        {
+            "_id": "8c052240-3617-475b-b53b-e0865f9baa81",
+            "colId": "446f9b26-deaf-4c56-8b9e-251488388daa",
+            "containerId": "6b9f98ac-24a9-4b5a-b8b0-378cdeace5e1",
+            "name": "update_profile",
+            "url": "",
+            "method": "PUT",
+            "sortNum": 60000,
+            "created": "2024-07-29T14:24:50.033Z",
+            "modified": "2024-07-29T14:25:21.348Z",
+            "headers": []
+        },
+        {
+            "_id": "97821a5c-214c-47c3-b6c1-e8d441587705",
+            "colId": "446f9b26-deaf-4c56-8b9e-251488388daa",
+            "containerId": "6b9f98ac-24a9-4b5a-b8b0-378cdeace5e1",
+            "name": "profile",
+            "url": "http://127.0.0.1:5000/profile",
+            "method": "GET",
+            "sortNum": 70000,
+            "created": "2024-07-31T09:33:50.900Z",
+            "modified": "2024-07-31T10:09:38.152Z",
+            "headers": [],
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcyMjQyMDU2NywianRpIjoiNDMxOTViY2QtOGYxYS00MjEzLThiOGUtNjE5Mzc1OTg3NjAyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MTEsIm5iZiI6MTcyMjQyMDU2NywiY3NyZiI6ImE2MjMzN2UwLWMzYjEtNGExMi04OWJhLWE0MTE2NWQxM2FmMyIsImV4cCI6MTcyMjQyMTQ2N30.sPsXwU3ohHryg41VRrWFheQLs4EjKdpJL6HUJV-2phY"
+            }
+        },
+        {
+            "_id": "50961de9-19fe-4ee2-8d79-1ecce3f5b64e",
+            "colId": "446f9b26-deaf-4c56-8b9e-251488388daa",
+            "containerId": "46e5a593-d112-4998-9e8c-f0c5ebb68202",
+            "name": "create_parcel",
+            "url": "http://127.0.0.1:5000/parcels",
+            "method": "POST",
+            "sortNum": 80000,
+            "created": "2024-07-31T10:21:03.799Z",
+            "modified": "2024-07-31T11:04:40.758Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"sender_id\": \"Kathy Harris\",\n  \"tracking_number\": \"C6XY67ASD2\",\n  \"recipient_name\": \"Jose Lewis\",\n  \"recipient_address\": \"Nairobi CBD\",\n  \"recipient_phone\": \"+254 745344556\",\n  \"description\": \"Parcel description\",\n  \"weight\": \"7.8\",\n  \"current_location\": \"Distribution store\",\n  \"created_at\": \"2024-07-31 08:31:39.171628\",\n  \"updated_at\": \"2024-07-31 08:31:39.171631\",\n  \"status\": \"Scheduled\"\n}",
+                "form": []
+            },
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcyMjQyMzg1OCwianRpIjoiNGFjZmYzYjQtNmI1Mi00YWVlLTkxMmEtMDI4MDE4MDQyM2E4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MTEsIm5iZiI6MTcyMjQyMzg1OCwiY3NyZiI6IjkyMWJmODA2LWFhODQtNDdhOS1hNzE4LTE5OGFkOWU2NzJmZiIsImV4cCI6MTcyMjQyNDc1OH0.UPjODutDhl9j2x49MiLFC2BpewQx4nwO5jCC4JI1tu0"
+            }
+        },
+        {
+            "_id": "8dde41ff-49b2-4f1a-9341-7ac6c028178b",
+            "colId": "446f9b26-deaf-4c56-8b9e-251488388daa",
+            "containerId": "46e5a593-d112-4998-9e8c-f0c5ebb68202",
+            "name": "parcels",
+            "url": "http://127.0.0.1:5000/parcels",
+            "method": "GET",
+            "sortNum": 90000,
+            "created": "2024-07-31T11:19:58.215Z",
+            "modified": "2024-07-31T13:48:56.292Z",
+            "headers": [],
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcyMjQzMzcyNywianRpIjoiY2FjNWRmMjAtYzk4ZS00YWMyLWIyMzYtZTdiNGRkOWRmYWRmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MTEsIm5iZiI6MTcyMjQzMzcyNywiY3NyZiI6ImZiZDhjZTNjLTU1NTQtNGUyOC04NTI0LWE5M2UwMTMxNWEwMyIsImV4cCI6MTcyMjQzNDYyN30.0u69-b6MwlLI6m0nNBgdpB-4ZEpagm6JHFX0ebNgzZA"
+            }
+        },
+        {
+            "_id": "55083b1b-6579-44b0-a59e-44a5d3fc54ec",
+            "colId": "446f9b26-deaf-4c56-8b9e-251488388daa",
+            "containerId": "46e5a593-d112-4998-9e8c-f0c5ebb68202",
+            "name": "parcel_status",
+            "url": "http://127.0.0.1:5000/parcels/2",
+            "method": "GET",
+            "sortNum": 100000,
+            "created": "2024-07-31T14:11:21.566Z",
+            "modified": "2024-07-31T14:45:04.096Z",
+            "headers": [],
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcyMjQzNzA5MiwianRpIjoiNWE5MTVlYWUtNDM3NC00NDlhLTgxYzctNzMwMTYxOGQ5ZTg3IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MTIsIm5iZiI6MTcyMjQzNzA5MiwiY3NyZiI6IjAyZmYwZjQzLWQ0YjQtNDZjYi04ZGRkLTViZGI0MjQ3ZTA3OCIsImV4cCI6MTcyMjQzNzk5Mn0.tB3o8jLW6Q4LuALKcgIc19HuvFovDjGMdVqp8TlNB9o"
+            }
+        },
+        {
+            "_id": "b22e3e40-2433-4ceb-8c17-da1ba37e714c",
+            "colId": "446f9b26-deaf-4c56-8b9e-251488388daa",
+            "containerId": "46e5a593-d112-4998-9e8c-f0c5ebb68202",
+            "name": "update_status",
+            "url": "http://127.0.0.1:5000/update_status/2",
+            "method": "PUT",
+            "sortNum": 110000,
+            "created": "2024-07-31T14:35:12.446Z",
+            "modified": "2024-07-31T15:16:36.128Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"status\": \"In Transit\",\n  \"timestamp\": \"2024-08-01 15:04:43.386756\",\n  \"location\": \"Nairobi CBD\"\n}",
+                "form": []
+            },
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcyMjQzODg2MSwianRpIjoiM2JmMTE0OTQtYzdkYi00NDRhLWJhNzYtODUxYTA2MjZkNDliIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MTEsIm5iZiI6MTcyMjQzODg2MSwiY3NyZiI6ImQ0MjljM2ExLWExZWItNGM4MS1iYjYxLTdlZGZjYjU0YjAwYiIsImV4cCI6MTcyMjQzOTc2MX0.PKoG9zn5s0HIgeuIpd59MRNJshNNovmtVngJSEUpcU4"
+            }
+        },
+        {
+            "_id": "91d7ef80-4957-4423-9905-f3aa4f72fcb2",
+            "colId": "446f9b26-deaf-4c56-8b9e-251488388daa",
+            "containerId": "b44c7db4-59f8-45be-8287-adc6fa22a669",
+            "name": "New_Delivery",
+            "url": "http://127.0.0.1:5000/deliveries",
+            "method": "POST",
+            "sortNum": 120000,
+            "created": "2024-07-31T15:26:24.752Z",
+            "modified": "2024-07-31T15:52:44.805Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"parcel_id\": 6,\n  \"agent_id\": 11,\n  \"pickup_time\": \"2024-07-31T10:00:00Z\",\n  \"delivery_time\": \"2024-07-31T14:00:00Z\",\n  \"status\": \"Scheduled\"\n}",
+                "form": []
+            },
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcyMjQ0MTE1MSwianRpIjoiY2Q5OWIxYzEtN2Y0YS00ODI2LTljMWEtNDU3OTAyNjg3NWUxIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MTMsIm5iZiI6MTcyMjQ0MTE1MSwiY3NyZiI6ImE5NzhhYjI5LTQ3MjAtNGMwOC1iODQxLWRhYmIxZDIwZGQxMSIsImV4cCI6MTcyMjQ0MjA1MX0.aXR-M7icXmiYNNtCmoy9nGb7QRSoYGxHQtwk2uttL8w"
+            }
+        },
+        {
+            "_id": "b41fa28f-5f99-47fe-bff3-e44fe848b32c",
+            "colId": "446f9b26-deaf-4c56-8b9e-251488388daa",
+            "containerId": "b44c7db4-59f8-45be-8287-adc6fa22a669",
+            "name": "assigned_deliveries",
+            "url": "http://127.0.0.1:5000/assigned_deliveries",
+            "method": "GET",
+            "sortNum": 130000,
+            "created": "2024-07-31T15:56:08.136Z",
+            "modified": "2024-07-31T16:07:44.527Z",
+            "headers": [],
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcyMjQ0MjA1NCwianRpIjoiNGU5NWY1MmEtY2ZkZS00MTVhLThhZmYtMmRhZjUxZWFmMjc5IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MTEsIm5iZiI6MTcyMjQ0MjA1NCwiY3NyZiI6IjI3M2I2YjEyLTBhZWUtNGIwMi04MzIzLTNmOWZiZDJjYTM2OCIsImV4cCI6MTcyMjQ0Mjk1NH0.OUud6N3WCfHheptWJg_6MYD26fKlET2Mj7_sur2qJ94"
+            }
+        }
+    ],
+    "ref": "cyigVIlPDfpILA68kC3xeKc9ji84WQVjuO-cVdo4Y9i8jFX7DenqunzdJhvUG_2BsDwJMxh00d5bUQdI8ccPgw"
+}
