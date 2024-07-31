@@ -29,6 +29,7 @@ import CommunicationTools from './pages/Agent/CommunicationTools';
 import UpdateParcelStatusPage from './pages/Agent/UpdateParcelStatusPage';
 import AgentLogin from './pages/Agent/AgentLogin';
 import AgentRegister from './pages/Agent/AgentRegister';
+import AgentProfile from './pages/Agent/AgentProfile'; 
 // end of the pages for the agent
 
 function App() {
@@ -62,6 +63,7 @@ function App() {
         <Route path="/update-parcel-status" element={<UpdateParcelStatusPage />} />
         <Route path="/agent-login" element={<AgentLogin />} />
         <Route path="/agent-register" element={<AgentRegister />} />
+        <Route path="/agent-profile" element={<AgentProfile />} /> 
         {/* end of the pages for the agent */}
       </Routes>
       <Footer />

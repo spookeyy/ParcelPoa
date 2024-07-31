@@ -1,3 +1,4 @@
+// src/pages/IssueReporting.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,42 +10,74 @@ export default function IssueReporting() {
 
   // Fetch existing issues when component mounts
   useEffect(() => {
-    const fetchIssues = async () => {
-      try {
-        // Replace with your API call
-        const response = await fetch('/api/issues');
-        const data = await response.json();
-        setIssues(data);
-      } catch (error) {
-        console.error('Error fetching issues:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchIssues();
   }, []);
 
+  // Fetch issues using plain fetch API
+  const fetchIssues = () => {
+    // Simulate data fetching
+    const fetchedIssues = [
+      { id: 1, description: 'Delayed delivery', status: 'Open' },
+      { id: 2, description: 'Parcel damaged', status: 'Resolved' },
+    ];
+
+    // Simulate an API call using setTimeout
+    setTimeout(() => {
+      setIssues(fetchedIssues);
+      setLoading(false);
+    }, 1000);
+
+    // Uncomment below code when you have API endpoint ready
+    // fetch('/api/issues')
+    //   .then((response) => {
+    //     if (!response.ok) {
+    //       throw new Error('Network response was not ok');
+    //     }
+    //     return response.json();
+    //   })
+    //   .then((data) => {
+    //     setIssues(data);
+    //     setLoading(false);
+    //   })
+    //   .catch((error) => {
+    //     console.error('Error fetching issues:', error);
+    //     setLoading(false);
+    //   });
+  };
+
   // Handle issue reporting
-  const handleReportIssue = async (e) => {
+  const handleReportIssue = (e) => {
     e.preventDefault();
-    try {
-      // Replace with your API call
-      const response = await fetch('/api/report-issue', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ description: issueDescription }),
-      });
-      if (response.ok) {
-        // Clear the form field and refresh the issue list
-        setIssueDescription('');
-        const newIssue = await response.json();
-        setIssues((prevIssues) => [newIssue, ...prevIssues]);
-      } else {
-        console.error('Failed to report issue');
-      }
-    } catch (error) {
-      console.error('Error reporting issue:', error);
-    }
+
+    // Simulate reporting issue
+    const newIssue = {
+      id: issues.length + 1,
+      description: issueDescription,
+      status: 'Open',
+    };
+
+    setIssueDescription('');
+    setIssues((prevIssues) => [newIssue, ...prevIssues]);
+
+    // Uncomment below code when you have API endpoint ready
+    // fetch('/api/report-issue', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ description: issueDescription }),
+    // })
+    //   .then((response) => {
+    //     if (!response.ok) {
+    //       throw new Error('Failed to report issue');
+    //     }
+    //     return response.json();
+    //   })
+    //   .then((newIssue) => {
+    //     setIssueDescription('');
+    //     setIssues((prevIssues) => [newIssue, ...prevIssues]);
+    //   })
+    //   .catch((error) => {
+    //     console.error('Error reporting issue:', error);
+    //   });
   };
 
   return (
@@ -61,7 +94,10 @@ export default function IssueReporting() {
       <p className="mb-8">Report and manage issues related to deliveries.</p>
 
       {/* Issue Reporting Form */}
-      <form onSubmit={handleReportIssue} className="bg-white p-6 rounded shadow mb-8">
+      <form
+        onSubmit={handleReportIssue}
+        className="bg-white p-6 rounded shadow mb-8"
+      >
         <h2 className="text-2xl font-semibold mb-4">Report a New Issue</h2>
         <div className="mb-4">
           <label className="block text-gray-700 mb-2">Describe the Issue:</label>
