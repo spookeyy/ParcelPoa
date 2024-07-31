@@ -31,7 +31,7 @@ import AgentLogin from "./pages/Agent/AgentLogin";
 import AgentRegister from "./pages/Agent/AgentRegister";
 import AgentProfile from "./pages/Agent/AgentProfile";
 // end of the pages for the agent
-import UserProvider from './pages/Context/UserContext';
+import UserProvider from './Context/UserContext';
 function App() {
   return (
     <Router>
