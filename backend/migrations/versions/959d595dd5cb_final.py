@@ -1,8 +1,8 @@
 """final
 
-Revision ID: 2298e1f8925e
+Revision ID: 959d595dd5cb
 Revises: 
-Create Date: 2024-07-30 17:27:51.903129
+Create Date: 2024-07-31 11:28:48.685400
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '2298e1f8925e'
+revision = '959d595dd5cb'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -52,6 +52,8 @@ def upgrade():
     sa.Column('weight', sa.DECIMAL(), nullable=False),
     sa.Column('created_at', sa.TIMESTAMP(), nullable=False),
     sa.Column('updated_at', sa.TIMESTAMP(), nullable=False),
+    sa.Column('current_location', sa.String(length=255), nullable=True),
+    sa.Column('status', sa.Enum('Scheduled', 'In Transit', 'Delivered', name='delivery_statuses'), nullable=False),
     sa.ForeignKeyConstraint(['sender_id'], ['users.user_id'], ),
     sa.PrimaryKeyConstraint('parcel_id'),
     sa.UniqueConstraint('tracking_number')
