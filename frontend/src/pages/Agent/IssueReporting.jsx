@@ -1,9 +1,9 @@
 // src/pages/IssueReporting.jsx
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function IssueReporting() {
-  const [issueDescription, setIssueDescription] = useState('');
+  const [issueDescription, setIssueDescription] = useState("");
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -17,8 +17,8 @@ export default function IssueReporting() {
   const fetchIssues = () => {
     // Simulate data fetching
     const fetchedIssues = [
-      { id: 1, description: 'Delayed delivery', status: 'Open' },
-      { id: 2, description: 'Parcel damaged', status: 'Resolved' },
+      { id: 1, description: "Delayed delivery", status: "Open" },
+      { id: 2, description: "Parcel damaged", status: "Resolved" },
     ];
 
     // Simulate an API call using setTimeout
@@ -53,10 +53,10 @@ export default function IssueReporting() {
     const newIssue = {
       id: issues.length + 1,
       description: issueDescription,
-      status: 'Open',
+      status: "Open",
     };
 
-    setIssueDescription('');
+    setIssueDescription("");
     setIssues((prevIssues) => [newIssue, ...prevIssues]);
 
     // Uncomment below code when you have API endpoint ready
@@ -84,7 +84,7 @@ export default function IssueReporting() {
     <div className="p-6 bg-gray-100 min-h-screen relative">
       {/* Go Back to Dashboard Button */}
       <button
-        onClick={() => navigate('/dashboard')}
+        onClick={() => navigate("/dashboard")}
         className="absolute top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
       >
         Go Back to Dashboard
@@ -100,7 +100,9 @@ export default function IssueReporting() {
       >
         <h2 className="text-2xl font-semibold mb-4">Report a New Issue</h2>
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Describe the Issue:</label>
+          <label className="block text-gray-700 mb-2">
+            Describe the Issue:
+          </label>
           <textarea
             value={issueDescription}
             onChange={(e) => setIssueDescription(e.target.value)}
@@ -132,7 +134,9 @@ export default function IssueReporting() {
                 <li key={issue.id} className="bg-white p-4 rounded shadow">
                   <p className="font-semibold">Issue ID: {issue.id}</p>
                   <p className="mt-2">{issue.description}</p>
-                  <p className="mt-2 text-sm text-gray-600">Status: {issue.status}</p>
+                  <p className="mt-2 text-sm text-gray-600">
+                    Status: {issue.status}
+                  </p>
                 </li>
               ))}
             </ul>

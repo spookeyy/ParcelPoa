@@ -1,31 +1,31 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function AddDelivery() {
-  const [parcel, setParcel] = useState('');
-  const [status, setStatus] = useState('Pending');
+  const [parcel, setParcel] = useState("");
+  const [status, setStatus] = useState("Pending");
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // Handle the form submission here, e.g., send data to an API
-    console.log('Adding delivery:', { parcel, status });
+    console.log("Adding delivery:", { parcel, status });
 
     // Simulate a successful API call using fetch with promises
-    fetch('/api/add-delivery', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    fetch("/api/add-delivery", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ parcel, status }),
     })
       .then((response) => {
         if (response.ok) {
-          navigate('/manage-deliveries'); // Redirect after successful submission
+          navigate("/manage-deliveries"); // Redirect after successful submission
         } else {
-          console.error('Failed to add delivery');
+          console.error("Failed to add delivery");
         }
       })
       .catch((error) => {
-        console.error('Error:', error);
+        console.error("Error:", error);
       });
   };
 
@@ -66,7 +66,7 @@ export default function AddDelivery() {
 
       {/* Button to Navigate to Manage Deliveries */}
       <button
-        onClick={() => navigate('/manage-deliveries')}
+        onClick={() => navigate("/manage-deliveries")}
         className="absolute bottom-4 right-4 bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
       >
         Manage Deliveries
@@ -74,7 +74,7 @@ export default function AddDelivery() {
 
       {/* Back Button */}
       <button
-        onClick={() => navigate('/dashboard')}
+        onClick={() => navigate("/dashboard")}
         className="absolute bottom-4 left-4 bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
       >
         Back

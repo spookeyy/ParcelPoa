@@ -1,11 +1,11 @@
 // src/pages/UpdateParcelStatusPage.jsx
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function UpdateParcelStatusPage() {
-  const [parcelId, setParcelId] = useState('');
-  const [status, setStatus] = useState('');
-  const [message, setMessage] = useState('');
+  const [parcelId, setParcelId] = useState("");
+  const [status, setStatus] = useState("");
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   const handleUpdate = (e) => {
@@ -13,7 +13,7 @@ export default function UpdateParcelStatusPage() {
 
     // Validate inputs
     if (!parcelId || !status) {
-      setMessage('Please enter a Parcel ID and select a status.');
+      setMessage("Please enter a Parcel ID and select a status.");
       return;
     }
 
@@ -26,8 +26,8 @@ export default function UpdateParcelStatusPage() {
     // Simulate a server response with a success message
     setTimeout(() => {
       setMessage(`Parcel ID ${parcelId} updated to status ${status}`);
-      setParcelId('');
-      setStatus('');
+      setParcelId("");
+      setStatus("");
     }, 1000);
 
     // Uncomment below code when you have the API endpoint ready
@@ -96,7 +96,7 @@ export default function UpdateParcelStatusPage() {
       {message && <div className="mt-4 text-green-500">{message}</div>}
 
       <button
-        onClick={() => navigate('/dashboard')}
+        onClick={() => navigate("/dashboard")}
         className="mt-6 bg-gray-500 text-white px-4 py-2 rounded shadow hover:bg-gray-600"
       >
         Back to Dashboard
@@ -104,4 +104,3 @@ export default function UpdateParcelStatusPage() {
     </div>
   );
 }
-

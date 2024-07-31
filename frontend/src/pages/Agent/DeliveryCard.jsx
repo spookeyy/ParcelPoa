@@ -1,7 +1,5 @@
-import React from 'react'
+import React from "react";
 
 export default function DeliveryCard() {
-  return (
-    <div>DeliveryCard</div>
-  )
+  return <div>DeliveryCard</div>;
 }

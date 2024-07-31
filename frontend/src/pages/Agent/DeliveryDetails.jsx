@@ -1,6 +1,6 @@
 // src/pages/DeliveryDetails.jsx
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
 export default function DeliveryDetails() {
   const { id } = useParams(); // Retrieve the delivery ID from the URL
@@ -19,10 +19,10 @@ export default function DeliveryDetails() {
     // Simulating a network request with setTimeout
     const fetchedDelivery = {
       id: id,
-      recipientName: 'John Doe',
-      status: 'Delivered',
-      address: '1234 Elm Street, Springfield, USA',
-      estimatedDeliveryTime: '2024-08-01 14:30',
+      recipientName: "John Doe",
+      status: "Delivered",
+      address: "1234 Elm Street, Springfield, USA",
+      estimatedDeliveryTime: "2024-08-01 14:30",
     };
 
     // Simulate an API call using promises
@@ -31,7 +31,7 @@ export default function DeliveryDetails() {
         if (id) {
           resolve(fetchedDelivery);
         } else {
-          reject('Failed to fetch delivery details');
+          reject("Failed to fetch delivery details");
         }
       }, 1000);
     })
@@ -77,7 +77,7 @@ export default function DeliveryDetails() {
           <strong>Address:</strong> {delivery.address}
         </p>
         <p>
-          <strong>Estimated Delivery Time:</strong>{' '}
+          <strong>Estimated Delivery Time:</strong>{" "}
           {delivery.estimatedDeliveryTime}
         </p>
       </div>
@@ -91,7 +91,7 @@ export default function DeliveryDetails() {
           Edit
         </button>
         <button
-          onClick={() => console.log('Delete delivery')}
+          onClick={() => console.log("Delete delivery")}
           className="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600"
         >
           Delete

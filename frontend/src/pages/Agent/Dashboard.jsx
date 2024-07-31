@@ -1,31 +1,53 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Line } from 'react-chartjs-2';
-import Chart from 'chart.js/auto';
-import DeliveryConfirmation from './DeliveryConfirmation'; // Import the DeliveryConfirmation component
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Line } from "react-chartjs-2";
+import Chart from "chart.js/auto";
+import DeliveryConfirmation from "./DeliveryConfirmation"; // Import the DeliveryConfirmation component
 
 // DeliveryCard component code
-function DeliveryCard({ orderID, payment, product, trackingNumber, status, orderDate }) {
-  const statusColor = {
-    Delivered: 'bg-green-500',
-    Pending: 'bg-yellow-500',
-    'In Transit': 'bg-blue-500'
-  }[status] || 'bg-gray-500';
+function DeliveryCard({
+  orderID,
+  payment,
+  product,
+  trackingNumber,
+  status,
+  orderDate,
+}) {
+  const statusColor =
+    {
+      Delivered: "bg-green-500",
+      Pending: "bg-yellow-500",
+      "In Transit": "bg-blue-500",
+    }[status] || "bg-gray-500";
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex flex-col items-center">
-      <div className="text-sm font-semibold text-gray-800">ORDER ID: {orderID}</div>
-      <div className="text-sm font-semibold text-gray-800">Payment: {payment}</div>
+      <div className="text-sm font-semibold text-gray-800">
+        ORDER ID: {orderID}
+      </div>
+      <div className="text-sm font-semibold text-gray-800">
+        Payment: {payment}
+      </div>
       <div className="flex items-center">
-        <img src="/path/to/your/product/image.png" alt="Product Image" className="w-16 h-16 rounded-full" />
+        <img
+          src="/path/to/your/product/image.png"
+          alt="Product Image"
+          className="w-16 h-16 rounded-full"
+        />
         <div className="ml-4">
           <p className="text-sm">{product}</p>
         </div>
       </div>
-      <div className="text-sm font-semibold text-gray-800">Tracking Number: {trackingNumber}</div>
-      <div className="text-sm font-semibold text-gray-800">Order Date: {orderDate}</div>
+      <div className="text-sm font-semibold text-gray-800">
+        Tracking Number: {trackingNumber}
+      </div>
+      <div className="text-sm font-semibold text-gray-800">
+        Order Date: {orderDate}
+      </div>
       <div className="flex items-center mt-2">
-        <div className={`${statusColor} text-white px-4 py-2 rounded-lg shadow-sm`}>
+        <div
+          className={`${statusColor} text-white px-4 py-2 rounded-lg shadow-sm`}
+        >
           {status}
         </div>
       </div>
@@ -35,38 +57,38 @@ function DeliveryCard({ orderID, payment, product, trackingNumber, status, order
 
 // Deliveries component code
 function Deliveries() {
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState("all");
 
   const deliveries = [
     {
-      orderID: '764',
-      payment: 'Tocipopas x 7',
-      product: 'Product Image',
-      trackingNumber: 'DB7YTE',
-      status: 'in transit',
-      orderDate: 'MAY 11, 2023, 04:30 PM',
+      orderID: "764",
+      payment: "Tocipopas x 7",
+      product: "Product Image",
+      trackingNumber: "DB7YTE",
+      status: "in transit",
+      orderDate: "MAY 11, 2023, 04:30 PM",
     },
     {
-      orderID: '765',
-      payment: 'Tocipopas x 3',
-      product: 'Product Image',
-      trackingNumber: 'DB8YTE',
-      status: 'delivered',
-      orderDate: 'JUNE 5, 2023, 10:00 AM',
+      orderID: "765",
+      payment: "Tocipopas x 3",
+      product: "Product Image",
+      trackingNumber: "DB8YTE",
+      status: "delivered",
+      orderDate: "JUNE 5, 2023, 10:00 AM",
     },
     {
-      orderID: '766',
-      payment: 'Tocipopas x 1',
-      product: 'Product Image',
-      trackingNumber: 'DB9YTE',
-      status: 'pending',
-      orderDate: 'JULY 2, 2023, 01:30 PM',
+      orderID: "766",
+      payment: "Tocipopas x 1",
+      product: "Product Image",
+      trackingNumber: "DB9YTE",
+      status: "pending",
+      orderDate: "JULY 2, 2023, 01:30 PM",
     },
     // Add more delivery data here
   ];
 
   const handleViewAll = () => {
-    setActiveTab('all');
+    setActiveTab("all");
   };
 
   return (
@@ -82,27 +104,41 @@ function Deliveries() {
       </div>
       <div className="flex space-x-4 mb-4">
         <button
-          onClick={() => setActiveTab('pending')}
-          className={`px-4 py-2 rounded-lg ${activeTab === 'pending' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+          onClick={() => setActiveTab("pending")}
+          className={`px-4 py-2 rounded-lg ${
+            activeTab === "pending"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 text-gray-700"
+          }`}
         >
           Pending
         </button>
         <button
-          onClick={() => setActiveTab('in transit')}
-          className={`px-4 py-2 rounded-lg ${activeTab === 'in transit' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+          onClick={() => setActiveTab("in transit")}
+          className={`px-4 py-2 rounded-lg ${
+            activeTab === "in transit"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 text-gray-700"
+          }`}
         >
           In Transit
         </button>
         <button
-          onClick={() => setActiveTab('delivered')}
-          className={`px-4 py-2 rounded-lg ${activeTab === 'delivered' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+          onClick={() => setActiveTab("delivered")}
+          className={`px-4 py-2 rounded-lg ${
+            activeTab === "delivered"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 text-gray-700"
+          }`}
         >
           Delivered
         </button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
         {deliveries
-          .filter(delivery => activeTab === 'all' || delivery.status === activeTab)
+          .filter(
+            (delivery) => activeTab === "all" || delivery.status === activeTab
+          )
           .map((delivery, index) => (
             <DeliveryCard key={index} {...delivery} />
           ))}
@@ -114,15 +150,16 @@ function Deliveries() {
 // Dashboard component code
 export default function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [showDeliveryConfirmation, setShowDeliveryConfirmation] = useState(false);
+  const [showDeliveryConfirmation, setShowDeliveryConfirmation] =
+    useState(false);
   const [data, setData] = useState({
-    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     datasets: [
       {
-        label: 'Deliveries Over Time',
+        label: "Deliveries Over Time",
         data: [12, 19, 3, 5, 2, 3, 9],
-        borderColor: '#4F46E5',
-        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+        borderColor: "#4F46E5",
+        backgroundColor: "rgba(79, 70, 229, 0.1)",
       },
     ],
   });
@@ -134,17 +171,17 @@ export default function Dashboard() {
   }, []);
 
   const fetchData = () => {
-    fetch('/api/deliveries-data')
-      .then(response => response.json())
-      .then(fetchedData => {
+    fetch("/api/deliveries-data")
+      .then((response) => response.json())
+      .then((fetchedData) => {
         if (fetchedData && fetchedData.datasets) {
           setData(fetchedData);
         } else {
-          console.error('Fetched data is missing datasets');
+          console.error("Fetched data is missing datasets");
         }
       })
-      .catch(error => {
-        console.error('Error fetching data:', error);
+      .catch((error) => {
+        console.error("Error fetching data:", error);
       });
   };
 
@@ -153,15 +190,12 @@ export default function Dashboard() {
       {/* Sidebar */}
       <div
         className={`fixed top-0 left-0 w-64 h-full bg-white shadow-lg transform ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-300 z-40`}
       >
         <div className="bg-blue-600 text-white p-4 flex items-center justify-between">
           <span className="text-2xl font-bold">Dashboard</span>
-          <button
-            onClick={() => setIsSidebarOpen(false)}
-            className="text-2xl"
-          >
+          <button onClick={() => setIsSidebarOpen(false)} className="text-2xl">
             &times;
           </button>
         </div>
@@ -210,7 +244,7 @@ export default function Dashboard() {
             </li>
             <li>
               <button
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate("/dashboard")}
                 className="flex items-center text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-100 p-2 rounded transition"
               >
                 <i className="fas fa-home mr-3"></i> Go to Dashboard
@@ -218,7 +252,7 @@ export default function Dashboard() {
             </li>
             <li>
               <button
-                onClick={() => navigate('/add-delivery')}
+                onClick={() => navigate("/add-delivery")}
                 className="flex items-center text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-100 p-2 rounded transition"
               >
                 <i className="fas fa-plus mr-3"></i> Create New Delivery
@@ -226,7 +260,7 @@ export default function Dashboard() {
             </li>
             <li>
               <button
-                onClick={() => navigate('/update-parcel-status')}
+                onClick={() => navigate("/update-parcel-status")}
                 className="flex items-center text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-100 p-2 rounded transition"
               >
                 <i className="fas fa-edit mr-3"></i> Update Parcel Status
@@ -243,7 +277,7 @@ export default function Dashboard() {
           </ul>
         </nav>
         <button
-          onClick={() => navigate('/dashboard')}
+          onClick={() => navigate("/dashboard")}
           className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md mb-6 mx-4 absolute bottom-4 left-4"
         >
           Back
@@ -265,7 +299,9 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 flex flex-col items-center">
             <i className="fas fa-truck text-2xl text-gray-500 mb-2"></i>
-            <h3 className="text-xl font-semibold text-gray-800">Total Deliveries</h3>
+            <h3 className="text-xl font-semibold text-gray-800">
+              Total Deliveries
+            </h3>
             <p className="text-3xl font-bold text-gray-900">125</p>
           </div>
 
@@ -277,7 +313,9 @@ export default function Dashboard() {
 
           <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 flex flex-col items-center">
             <i className="fas fa-clock text-2xl text-yellow-500 mb-2"></i>
-            <h3 className="text-xl font-semibold text-gray-800">Pending Deliveries</h3>
+            <h3 className="text-xl font-semibold text-gray-800">
+              Pending Deliveries
+            </h3>
             <p className="text-3xl font-bold text-gray-900">3</p>
           </div>
 
@@ -289,12 +327,13 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-200">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">Deliveries Over Time</h3>
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">
+            Deliveries Over Time
+          </h3>
           <Line data={data} options={{ responsive: true }} />
         </div>
 
         <Deliveries />
-        
       </div>
 
       {showDeliveryConfirmation && (

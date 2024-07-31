@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function CommunicationTools() {
-  const [message, setMessage] = useState('');
-  const [recipient, setRecipient] = useState('');
-  const [sendingMethod, setSendingMethod] = useState('platform'); // 'platform' or 'sms'
+  const [message, setMessage] = useState("");
+  const [recipient, setRecipient] = useState("");
+  const [sendingMethod, setSendingMethod] = useState("platform"); // 'platform' or 'sms'
   const navigate = useNavigate();
 
   const handleSendMessage = (e) => {
     e.preventDefault();
     // Handle sending message logic here
-    console.log('Sending message:', { recipient, message, sendingMethod });
+    console.log("Sending message:", { recipient, message, sendingMethod });
 
     // After sending the message, you might want to redirect or clear the form
-    setMessage('');
-    setRecipient('');
+    setMessage("");
+    setRecipient("");
     // For demonstration, let's just navigate back
-    navigate('/dashboard');
+    navigate("/dashboard");
   };
 
   return (
@@ -64,21 +64,25 @@ export default function CommunicationTools() {
               id="platform"
               name="sendingMethod"
               value="platform"
-              checked={sendingMethod === 'platform'}
-              onChange={() => setSendingMethod('platform')}
+              checked={sendingMethod === "platform"}
+              onChange={() => setSendingMethod("platform")}
               className="mr-2"
             />
-            <label htmlFor="platform" className="text-gray-700">Send via Platform</label>
+            <label htmlFor="platform" className="text-gray-700">
+              Send via Platform
+            </label>
             <input
               type="radio"
               id="sms"
               name="sendingMethod"
               value="sms"
-              checked={sendingMethod === 'sms'}
-              onChange={() => setSendingMethod('sms')}
+              checked={sendingMethod === "sms"}
+              onChange={() => setSendingMethod("sms")}
               className="ml-4 mr-2"
             />
-            <label htmlFor="sms" className="text-gray-700">Send via SMS</label>
+            <label htmlFor="sms" className="text-gray-700">
+              Send via SMS
+            </label>
           </div>
         </div>
 

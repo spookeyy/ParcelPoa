@@ -1,26 +1,31 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function DeliveryConfirmation() {
-  const [deliveryId, setDeliveryId] = useState('');
-  const [customerName, setCustomerName] = useState('');
-  const [confirmationDate, setConfirmationDate] = useState('');
-  const [notes, setNotes] = useState('');
+  const [deliveryId, setDeliveryId] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [confirmationDate, setConfirmationDate] = useState("");
+  const [notes, setNotes] = useState("");
   const navigate = useNavigate();
 
   const handleConfirmDelivery = (e) => {
     e.preventDefault();
     // Handle delivery confirmation logic here
-    console.log('Confirming delivery:', { deliveryId, customerName, confirmationDate, notes });
+    console.log("Confirming delivery:", {
+      deliveryId,
+      customerName,
+      confirmationDate,
+      notes,
+    });
 
     // Clear form fields after submission (if needed)
-    setDeliveryId('');
-    setCustomerName('');
-    setConfirmationDate('');
-    setNotes('');
+    setDeliveryId("");
+    setCustomerName("");
+    setConfirmationDate("");
+    setNotes("");
 
     // Navigate to another page or show a success message
-    navigate('/dashboard');
+    navigate("/dashboard");
   };
 
   return (
