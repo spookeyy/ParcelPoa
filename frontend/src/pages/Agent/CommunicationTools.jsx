@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FloatingWhatsApp } from "react-floating-whatsapp";
 
 export default function CommunicationTools() {
   const [message, setMessage] = useState("");
@@ -93,6 +94,25 @@ export default function CommunicationTools() {
           Send Message
         </button>
       </form>
+
+      <FloatingWhatsApp
+        phoneNumber="+254715333522"
+        accountName="ParcelPoa"
+        statusMessage="A Trusted parcel tracking partner"
+        avatar="./src/assets/favicon.ico"
+        banner="./src/assets/favicon.ico"
+        chatMessage="Hello, how can we help you?"
+        darkMode
+        allowEsc
+        allowClickAway
+        notification
+        notificationSound
+        notificationColor="green"
+        notificationTitle="Chat with us"
+        notificationMessage="Thank you for your message"
+        notificationTimestamp="Just now"
+        notificationDuration={2000}
+      />
     </div>
   );
 }
