@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default function Order_Details() {
-  // Sample order data
+  
   const orderData = {
     orderNumber: 'ORD-001',
     date: '2024-07-31',
@@ -11,8 +11,8 @@ export default function Order_Details() {
       { name: 'Product C', quantity: 3, price: 5.00 },
     ],
     shippingInfo: {
-      name: 'John Doe',
-      address: '123 Main St, Anytown, USA',
+      name: 'Scarlet Sarah',
+      address: '279 Main St, Anytown, Nairobi',
       phone: '555-1234',
     },
     total: 65.00,
