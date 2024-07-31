@@ -123,66 +123,6 @@ def delete_user(user_id):
     db.session.commit()
     return jsonify({"message": "User deleted successfully"})
 
-# reset password
-@app.route('/request-reset-password', methods=['POST'])
-def request_reset_password():
-    data = request.get_json()
-    email = data.get('email')
-    user = User.query.filter_by(email=email).first()
-    
-    if not user:
-        return jsonify({"message": "User with this email does not exist"}), 404
-    
-    token = s.dumps(email, salt='password-reset-salt')
-    
-    reset_url = url_for('reset_password', token=token, _external=True)
-    
-    send_email(user.email, reset_url)
-    
-    return jsonify({"message": "Password reset email sent"}), 200
-
-@app.route('/reset-password/<token>', methods=['POST'])
-def reset_password(token):
-    try:
-        email = s.loads(token, salt='password-reset-salt', max_age=3600)
-    except (SignatureExpired, BadSignature):
-        return jsonify({"message": "The reset link is invalid or has expired"}), 400
-    
-    data = request.get_json()
-    new_password = data.get('new_password')
-    
-    user = User.query.filter_by(email=email).first()
-    if not user:
-        return jsonify({"message": "User with this email does not exist"}), 404
-    
-    # Update the user's password
-    user.password = generate_password_hash(new_password)
-    db.session.commit()
-    
-    return jsonify({"message": "Password has been reset successfully"}), 200# send email
-def send_email(to_email, reset_url):
-    smtp_server = "live.smtp.mailtrap.io"
-    smtp_port = 587
-    from_email = os.environ.get("EMAIL_USER", "shisiawhitney215@gmail.com")
-    from_password = os.environ.get("EMAIL_PASS", "@Whit2050")
-
-    subject = "Password Reset Request"
-    message = f"Click the link to reset your password: {reset_url}"
-
-    msg = MIMEMultipart()
-    msg['From'] = from_email
-    msg['To'] = to_email
-    msg['Subject'] = subject
-    msg.attach(MIMEText(message, 'plain'))
-
-    try:
-        server = smtplib.SMTP_SSL(smtp_server, smtp_port)
-        server.login(from_email, from_password)
-        server.send_message(msg)
-        server.quit()
-    except Exception as e:
-        raise Exception(f"Failed to send email: {str(e)}")
-
 
 # user profile
 @app.route('/profile', methods=['GET'])
@@ -396,6 +336,82 @@ def update_delivery_status(delivery_id):
     return jsonify({"message": "Delivery status updated successfully"}), 200
 
 
+
+
+
+
+# reset password
+@app.route('/request-reset-password', methods=['POST'])
+def request_reset_password():
+    data = request.get_json()
+    email = data.get('email')
+    user = User.query.filter_by(email=email).first()
+    
+    if not user:
+        return jsonify({"message": "User with this email does not exist"}), 404
+    
+    token = s.dumps(email, salt='password-reset-salt')
+    
+    reset_url = url_for('reset_password', token=token, _external=True)
+    
+    try:
+        send_email(user.email, reset_url)
+        return jsonify({"message": "Password reset email sent"}), 200
+    except Exception as e:
+        return jsonify({"message": f"Failed to send email: {str(e)}"}), 500
+
+@app.route('/reset-password/<token>', methods=['POST'])
+def reset_password(token):
+    try:
+        email = s.loads(token, salt='password-reset-salt', max_age=3600)
+    except SignatureExpired:
+        return jsonify({"message": "The reset link has expired"}), 400
+    except BadSignature:
+        return jsonify({"message": "The reset link is invalid"}), 400
+    
+    data = request.get_json()
+    new_password = data.get('new_password')
+    
+    if not new_password:
+        return jsonify({"message": "New password is required"}), 400
+    
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"message": "User with this email does not exist"}), 404
+    
+    user.password = generate_password_hash(new_password)
+    db.session.commit()
+    
+    return jsonify({"message": "Password has been reset successfully"}), 200
+
+def send_email(to_email, reset_url):
+    smtp_server = "sandbox.smtp.mailtrap.io"
+    smtp_port = 2525
+    from_email = os.environ.get("EMAIL_USER", "5605461f9a945e")
+    from_password = os.environ.get("EMAIL_PASS", "58f3ad6503a063")
+
+    subject = "Password Reset Request"
+    message = f"Click the link to reset your password: {reset_url}"
+
+    msg = MIMEMultipart()
+    msg['From'] = from_email
+    msg['To'] = to_email
+    msg['Subject'] = subject
+    msg.attach(MIMEText(message, 'plain'))
+
+    try:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.set_debuglevel(1)
+        server.starttls()
+        server.login(from_email, from_password)
+        server.send_message(msg)
+        server.quit()
+    except smtplib.SMTPAuthenticationError as e:
+        raise Exception(f"SMTP Authentication failed: {str(e)}")
+    except Exception as e:
+        raise Exception(f"Failed to send email: {str(e)}")
+    
+    return jsonify({"message": "Password reset email sent"}), 200
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)
