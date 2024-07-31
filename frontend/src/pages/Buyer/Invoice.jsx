@@ -1,7 +1,6 @@
 import React from 'react';
 
 export default function Invoice() {
-  
   const invoiceData = {
     invoiceNumber: 'INV-001',
     date: '2024-07-30',
@@ -17,7 +16,6 @@ export default function Invoice() {
     ],
   };
 
-  
   const totalAmount = invoiceData.items.reduce((total, item) => total + item.price * item.quantity, 0);
 
   return (

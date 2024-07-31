@@ -3,9 +3,9 @@ import React, { useState, useEffect } from "react";
 
 // images for the slider
 const images = [
-  "https://plus.unsplash.com/premium_photo-1683121269108-1bd195cd18cf?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8c2hvcHBpbmd8ZW58MHx8MHx8fDA%3D",
-  "https://plus.unsplash.com/premium_photo-1672883551967-ab11316526b4?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8c2hvcHBpbmd8ZW58MHx8MHx8fDA%3D",
-  "https://images.unsplash.com/photo-1534452203293-494d7ddbf7e0?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c2hvcHBpbmd8ZW58MHx8MHx8fDA%3D",
+  "https://images.unsplash.com/photo-1609143739217-01b60dad1c67?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTE5fHxkZWxpdmVyeXxlbnwwfHwwfHx8MA%3D%3D",
+  "https://plus.unsplash.com/premium_photo-1682129768936-c5b7c3033cdc?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGRlbGl2ZXJ5fGVufDB8fDB8fHww",
+  "https://images.unsplash.com/photo-1580674285054-bed31e145f59?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjEwfHxkZWxpdmVyeXxlbnwwfHwwfHx8MA%3D%3D",
 ];
 
 function Home() {
