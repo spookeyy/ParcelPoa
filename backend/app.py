@@ -167,27 +167,6 @@ def change_password():
     return jsonify({"message": "Password changed successfully"})
 
 
-# TRACKING ROUTES
-@app.route('/tracking_number', methods=['POST'])
-@jwt_required()
-def track_parcel(tracking_number):
-    parcel = Parcel.query.filter_by(tracking_number=tracking_number).first()
-    if not parcel:
-        return jsonify({"message": "Parcel not found"}), 404
-    
-    status = get_parcel_status(parcel)
-    return jsonify({"status": status})
-
-# current parcel location
-@app.route('/parcels/<int:parcel_id>/location', methods=['GET'])
-@jwt_required()
-def get_current_location(parcel_id):
-    parcel = Parcel.query.get_or_404(parcel_id)
-    return jsonify({"location": parcel.current_location})
-
-
-
-
 # PARCEL ROUTES
 @app.route('/parcels', methods=['POST'])
 @jwt_required()
@@ -237,19 +216,19 @@ def get_parcel_status(parcel_id):
     return jsonify({"status": "Scheduled"})
     # return jsonify(parcel.to_dict())
 
-# update parcel location
-@app.route('/parcels/<int:parcel_id>/location', methods=['PUT'])
-@jwt_required()
-def update_parcel_location(parcel_id):
-    user = User.query.get(get_jwt_identity())
-    if user.user_role != 'Agent':
-        return jsonify({"message": "Only agents can update parcel location"}), 403
-    data = request.get_json()
-    parcel = Parcel.query.get_or_404(parcel_id)
-    parcel.current_location = data['location']
-    parcel.updated_at = datetime.now()
-    db.session.commit()
-    return jsonify({"message": "Parcel location updated successfully"}), 200
+# # update parcel location
+# @app.route('/parcels/<int:parcel_id>/location', methods=['PUT'])
+# @jwt_required()
+# def update_parcel_location(parcel_id):
+#     user = User.query.get(get_jwt_identity())
+#     if user.user_role != 'Agent':
+#         return jsonify({"message": "Only agents can update parcel location"}), 403
+#     data = request.get_json()
+#     parcel = Parcel.query.get_or_404(parcel_id)
+#     parcel.current_location = data['location']
+#     parcel.updated_at = datetime.now()
+#     db.session.commit()
+#     return jsonify({"message": "Parcel location updated successfully"}), 200
 
 # scheduler implementation
 # @scheduler.task('interval', id='update_locations', seconds=300)  # Run every 5 minutes
@@ -274,50 +253,14 @@ def simulate_new_location(parcel):
 @jwt_required()
 def delete_parcel(parcel_id):
     parcel = Parcel.query.get_or_404(parcel_id)
+    user = User.query.get(get_jwt_identity())
+    if user.user_role != 'Agent':
+        return jsonify({"message": "Only agents can delete parcels"}), 403
     if parcel.status == 'Delivered':
         return jsonify({"message": "Cannot delete delivered parcel"}), 400
     db.session.delete(parcel)
     db.session.commit()
     return jsonify({"message": "Parcel deleted successfully"}), 200
-
-
-# DELIVERY ROUTES
-@app.route('/deliveries', methods=['POST'])
-@jwt_required()
-def create_delivery():
-    user = User.query.get(get_jwt_identity())
-    if user.user_role != 'Business':
-        return jsonify({"message": "Only businesses can create deliveries"}), 403
-    
-    data = request.get_json()
-    
-    # Parse the date strings into datetime objects
-    pickup_time = datetime.fromisoformat(data['pickup_time'].replace('Z', '+00:00'))
-    delivery_time = datetime.fromisoformat(data['delivery_time'].replace('Z', '+00:00'))
-    
-    delivery = Delivery(
-        parcel_id=data['parcel_id'],
-        agent_id=data['agent_id'],
-        pickup_time=pickup_time,
-        delivery_time=delivery_time,
-        status=data['status'],
-        created_at=datetime.now(timezone.utc),
-        updated_at=datetime.now(timezone.utc)
-    )
-    db.session.add(delivery)
-    db.session.commit()
-    return jsonify({"message": "Delivery created successfully"}), 201
-
-# get assigned deliveries
-# TODO: check on this later
-@app.route('/assigned_deliveries', methods=['GET'])
-@jwt_required()
-def get_assigned_deliveries():
-    user = User.query.get(get_jwt_identity())
-    if user.user_role != 'Agent':
-        return jsonify({"message": "Only agents can get assigned deliveries"}), 403
-    deliveries = Delivery.query.filter_by(agent_id=user.user_id).all()
-    return jsonify([delivery.to_dict() for delivery in deliveries])
 
 # update parcel status
 @app.route('/update_status/<int:parcel_id>', methods=['PUT'])
@@ -348,6 +291,45 @@ def update_parcel_status(parcel_id):
     return jsonify({"message": "Parcel status updated successfully"}), 200
 
 
+
+# DELIVERY ROUTES
+@app.route('/deliveries', methods=['POST'])
+@jwt_required()
+def create_delivery():
+    user = User.query.get(get_jwt_identity())
+    if user.user_role != 'Business':
+        return jsonify({"message": "Only businesses can create deliveries"}), 403
+    
+    data = request.get_json()
+    
+    # Parse the date strings into datetime objects
+    pickup_time = datetime.fromisoformat(data['pickup_time'].replace('Z', '+00:00'))
+    delivery_time = datetime.fromisoformat(data['delivery_time'].replace('Z', '+00:00'))
+    
+    delivery = Delivery(
+        parcel_id=data['parcel_id'],
+        agent_id=data['agent_id'],
+        pickup_time=pickup_time,
+        delivery_time=delivery_time,
+        status=data['status'],
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc)
+    )
+    db.session.add(delivery)
+    db.session.commit()
+    return jsonify({"message": "Delivery created successfully"}), 201
+
+# get assigned deliveries
+@app.route('/assigned_deliveries', methods=['GET'])
+@jwt_required()
+def get_assigned_deliveries():
+    user = User.query.get(get_jwt_identity())
+    if user.user_role != 'Agent':
+        return jsonify({"message": "Only agents can get assigned deliveries"}), 403
+    deliveries = Delivery.query.filter_by(agent_id=user.user_id).all()
+    return jsonify([delivery.to_dict() for delivery in deliveries])
+
+
 @app.route('/update_delivery_status/<int:delivery_id>', methods=['PUT'])
 @jwt_required()
 def update_delivery_status(delivery_id):
@@ -361,9 +343,49 @@ def update_delivery_status(delivery_id):
     db.session.commit()
     return jsonify({"message": "Delivery status updated successfully"}), 200
 
+# mark parcel as delivered
+@app.route('/mark_as_delivered/<int:parcel_id>', methods=['PUT'])
+@jwt_required()
+def mark_as_delivered(parcel_id):
+    current_user = User.query.get(get_jwt_identity())
+    if current_user.user_role != 'Agent':
+        return jsonify({"message": "Only agents can mark parcel as delivered"}), 403
+    parcel = Parcel.query.get_or_404(parcel_id)
+    if parcel.status == 'Delivered':
+        return jsonify({"message": "Parcel already marked as delivered"}), 400
+    parcel.status = 'Delivered'
+    parcel.updated_at = datetime.now()
+    db.session.commit()
+    return jsonify({"message": "Parcel marked as delivered successfully"}), 200
 
 
 
+#TODO: TRACKING ROUTES
+@app.route('/tracking_number', methods=['POST'])
+@jwt_required()
+def track_parcel(tracking_number):
+    parcel = Parcel.query.filter_by(tracking_number=tracking_number).first()
+    if not parcel:
+        return jsonify({"message": "Parcel not found"}), 404
+    
+    status = get_parcel_status(parcel)
+    return jsonify({"status": status})
+
+# current parcel location
+@app.route('/parcels/<int:parcel_id>/location', methods=['GET'])
+@jwt_required()
+def get_current_location(parcel_id):
+    parcel = Parcel.query.get_or_404(parcel_id)
+    return jsonify({"location": parcel.current_location})
+
+
+
+
+# TODO: ORDER ROUTES
+
+
+
+# TODO: NOTIFICATION ROUTES
 
 
 # reset password
