@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
-export default function AgentProfile() {
+export default function AgentProfile({ onClose }) {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [agentOption, setAgentOption] = useState("");
   const [message, setMessage] = useState("");
-  const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch profile data
     fetch("/api/profile")
       .then((response) => response.json())
       .then((profile) => {
@@ -35,6 +32,7 @@ export default function AgentProfile() {
       .then((response) => {
         if (response.ok) {
           setMessage("Profile updated successfully");
+          setTimeout(() => onClose(), 2000); // Close modal after a delay
         } else {
           console.error("Profile update failed");
         }
@@ -97,25 +95,7 @@ export default function AgentProfile() {
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
             />
           </div>
-          <div className="mb-4">
-            <label
-              htmlFor="agent-option"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Agent Option
-            </label>
-            <select
-              id="agent-option"
-              value={agentOption}
-              onChange={(e) => setAgentOption(e.target.value)}
-              required
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
-            >
-              <option value="">Select an option</option>
-              <option value="agent">Agent</option>
-              {/* Add additional options here if needed */}
-            </select>
-          </div>
+
           <button
             type="submit"
             className="w-full bg-blue-500 text-white py-2 rounded-md shadow hover:bg-blue-600"
@@ -126,20 +106,10 @@ export default function AgentProfile() {
         {message && (
           <div className="mt-4 text-green-500 text-center">{message}</div>
         )}
-        <div className="mt-4 text-center">
-          <p className="text-sm text-gray-600">
-            Want to log out?{" "}
-            <button
-              onClick={() => navigate("/agent-login")}
-              className="text-blue-500 hover:underline"
-            >
-              Log out
-            </button>
-          </p>
-        </div>
+
         <div className="mt-6 text-center">
           <button
-            onClick={() => navigate("/dashboard")}
+            onClick={onClose}
             className="w-full bg-gray-500 text-white py-2 rounded-md shadow hover:bg-gray-600"
           >
             Back to Dashboard
