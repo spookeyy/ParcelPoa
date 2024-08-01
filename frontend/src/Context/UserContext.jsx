@@ -7,155 +7,206 @@ import { server } from "../../config";
 
 export const UserContext = createContext();
 
-export default function UserProvider({ children }) {
-    const [authToken, setAuthToken] = useState(() => sessionStorage.getItem("authToken") || null);
-    const [currentUser, setCurrentUser] = useState(null);
-    const navigate = useNavigate();
 
-    useEffect(() => {
-        if (authToken) {
-            fetchCurrentUser();
-        }
-    }, [authToken]);
+export const UserProvider = ({ children }) =>
+     {
+        const nav = useNavigate();
 
-    function fetchCurrentUser() {
-        fetch(`${server}/current_user`, {
-            headers: {
-                Authorization: `Bearer ${authToken}`,
-            },
-        })
-        .then(response => response.json())
-        .then(data => setCurrentUser(data))
-        .catch(error => console.error("Failed to fetch current user", error));
-    }
-
-    function addUser(name, email, phone_number, password, user_role) {
+        const [currentUser, setCurrentUser] = useState();
+        const[onChange, setOnChange] = useState(false)
+        const [authToken, setAuthToken] = useState(() => localStorage.getItem("access_token")? localStorage.getItem("access_token"): null )
+        
+    // REGISTER USER
+    const addUser = (name, email, phone_number, password, user_role) => {
         fetch(`${server}/register`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
             body: JSON.stringify({
-                name,
-                email,
-                phone_number,
-                password,
-                user_role,
+                name : name,
+                email: email,
+                phone_number : phone_number,
+                password : password,
+                user_role : user_role,
             }),
+            headers: {
+                "Content-type": "application/json",
+            },
         })
-        .then(response => {
-            if (response.ok) {
-                toast.success("User registered successfully");
-                navigate("/login");
-            } else {
-                return response.json().then(errorData => {
-                    toast.error(errorData.message || "Failed to register user");
-                });
-            }
-        })
-        .catch(error => {
-            toast.error("Failed to register user");
-            console.error("Failed to register user", error);
-        });
-    }
+        .then((response) => response.json())
+        .then(res => {
+            if(res.success)
+                {
+                    toast.success(res.success)
+                    nav("/login")
+                }
+                else if(res.error)
+                {
+                    toast.error(res.error)
+                }
+                else {
+                    toast.error("An error occured")
+                }
+    
+            });
+        
+        }
 
-    function updateUser(user_id, updates) {
-        fetch(`${server}/users/${user_id}`, {
-            method: "PUT",
+// LOGIN USER
+function login(email, password) {
+    fetch(`${server}/login`, {
+        method: "POST",
+        body: JSON.stringify({ 
+            email: email,
+            password: password
+        }),
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+    .then(response => response.json())
+    .then(res => {
+        if (res.access_token) {
+            setAuthToken(res.access_token);
+            localStorage.setItem("access_token", res.access_token);
+
+            fetch(`${server}/current_user`, {
+                headers: {
+                    Authorization: `Bearer ${res.access_token}`,
+                },
+            })
+            .then(response => response.json())
+            .then(user => {
+                if (user.role === "Agent") {
+                    toast.success("Logged in Successfully as Agent!");
+                    nav("/agent");
+                } else if (user.role === "Business") {
+                    toast.success("Logged in Successfully as Business!");
+                    nav("/business-dashboard");
+                } else {
+                    toast.error("Unknown role");
+                }
+            })
+            .catch(error => {
+                toast.error("Failed to fetch user role");
+                console.error("Failed to fetch user role", error);
+            });
+        } else if (res.error) {
+            toast.error(res.error);
+        } else {
+            toast.error("An error occurred");
+        }
+    })
+    .catch(error => {
+        toast.error("An error occurred during login");
+        console.error("An error occurred during login", error);
+    });
+}
+
+
+// UPDATE USER
+        function updateUser(name,email,phone_number,updated_at) {
+            fetch(`${server}/profile`, {
+                method: "PUT",
+                body: JSON.stringify({
+                    name: name,
+                    email: email,
+                    phone_number: phone_number,
+                    updated_at: updated_at
+            }),
+            headers: {
+                "Content-type": "application/json",
+                'Authorization': `Bearer ${authToken}`,
+            },
+            })
+            .then((response) => response.json())
+                .then((res) =>{
+                if(res.success)
+                    {
+                        toast.success(res.success)
+                    }
+                    else if(res.error)
+                    {
+                        toast.error(res.error)
+                    }
+                    else {
+                        toast.error("An error occured")
+                    }
+
+                });
+            
+            }
+            
+    // LOGOUT
+
+    const logout = () => {
+        fetch(`${server}/logout`, {
+            method:'DELETE',
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${authToken}`,
+                'Authorization': `Bearer ${authToken}`,
             },
-            body: JSON.stringify(updates),
-        })
-        .then(response => {
-            if (response.ok) {
-                fetchCurrentUser();
-                toast.success("User profile updated successfully");
-            } else {
-                return response.json().then(errorData => {
-                    toast.error(errorData.message || "Failed to update user profile");
-                });
-            }
-        })
-        .catch(error => {
-            toast.error("Failed to update user profile");
-            console.error("Failed to update user profile", error);
-        });
-    }
+    })
 
-    function login(email, password) {
-        fetch(`${server}/login`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email, password }),
-        })
-        .then(response => {
-            if (response.ok) {
-                return response.json().then(data => {
-                    setAuthToken(data.access_token);
-                    sessionStorage.setItem("authToken", data.access_token);
-                    fetchCurrentUser();
-                    toast.success("Logged in successfully");
-                    navigate("/");
-                });
-            } else {
-                return response.json().then(errorData => {
-                    toast.error(errorData.message || "Invalid credentials");
-                });
+    .then((response) => response.json())
+        .then((res) =>{
+            if(res.success)
+            {
+                toast.success(res.success)
+                localStorage.removeItem("access_token")
+                setAuthToken(null)
+                setCurrentUser(null)
+                setOnChange(!onChange)
+                nav("/login")
             }
-        })
-        .catch(error => {
-            toast.error("Failed to log in");
-            console.error("Failed to log in", error);
-        });
-    }
-
-    function logout() {
-        setAuthToken(null);
-        sessionStorage.removeItem("authToken");
-        setCurrentUser(null);
-        toast.success("Logged out successfully");
-        navigate("/login");
-    }
-
-    function deleteUser(user_id) {
-        fetch(`${server}/users/${user_id}`, {
-            method: "DELETE",
-            headers: {
-                Authorization: `Bearer ${authToken}`,
-            },
-        })
-        .then(response => {
-            if (response.ok) {
-                logout();
-                toast.success("User deleted successfully");
-            } else {
-                return response.json().then(errorData => {
-                    toast.error(errorData.message || "Failed to delete user");
-                });
+            else if(res.error)
+            {
+                toast.error(res.error)
             }
-        })
-        .catch(error => {
-            toast.error("Failed to delete user");
-            console.error("Failed to delete user", error);
-        });
-    }
+            else {
+                toast.error("An error occured")
+            }
+    
+  });
+}
+    useEffect(() => {
+
+        if (authToken) {
+            fetch(`${server}/current_user`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    'Authorization': `Bearer ${authToken}`,
+                }
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                if(data.email){
+                    setCurrentUser(data)
+                }
+                else{
+                    localStorage.removeItem("access_token")
+                    setCurrentUser(null)
+                    setAuthToken(null)
+                    nav("/login")
+                }
+            
+            })
+        }
+
+},[authToken, onChange])
+
+const contextData = {
+    currentUser,
+    setCurrentUser,
+    authToken,
+    login,
+    logout,
+    addUser,
+    updateUser
+}
+
 
     return (
         <UserContext.Provider
-            value={{
-                authToken,
-                currentUser,
-                addUser,
-                updateUser,
-                login,
-                logout,
-                deleteUser,
-            }}
-        >
+            value={ contextData }>
             {children}
         </UserContext.Provider>
     );
