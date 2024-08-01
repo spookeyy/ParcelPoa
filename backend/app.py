@@ -1,23 +1,34 @@
 import random
-from flask import Flask, request, jsonify
+import smtplib
+from flask import Flask, request, jsonify,url_for
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
-from datetime import datetime
+from flask_cors import CORS
+from datetime import datetime, timezone
 from flask_apscheduler import APScheduler
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+from werkzeug.security import generate_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, get_jwt
 from models import db, User, Parcel, Delivery, Notification, Tracking, Order
+import os
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["JWT_SECRET_KEY"] = "super-secret-key" 
-app.config["SECRET-KEY"] = "secret-key"
+app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "super-secret-key")
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "another-secret-key")
+
+CORS(app)
 
 migrate = Migrate(app, db)
 db.init_app(app)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
+
+s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
 # scheduler configurations
 # with app.app_context():
@@ -30,7 +41,7 @@ blacklist = set()
 # JWT Configurations
 @jwt.token_in_blocklist_loader
 def check_if_token_in_blacklist(jwt_header, jwt_payload):
-    return jwt_payload["jti"] in blacklist
+    return jwt_payload['jti'] in blacklist
 
 # user routes
 @app.route('/register', methods=['POST'])
@@ -57,6 +68,11 @@ def register():
     )
     db.session.add(new_user)
     db.session.commit()
+    if data['user_role'] == 'Business':
+        return jsonify({"message": "Business registered successfully"}), 201
+    elif data['user_role'] == 'Agent':
+        return jsonify({"message": "Agent registered successfully"}), 201
+    
     return jsonify({"message": "User registered successfully"}), 201
 
 @app.route('/login', methods=['POST'])
@@ -88,17 +104,6 @@ def get_user(user_id):
     user = User.query.get_or_404(user_id)
     return jsonify(user.to_dict())
 
-@app.route('/users/<int:user_id>', methods=['PUT'])
-@jwt_required()
-def update_user(user_id):
-    data = request.get_json()
-    user = User.query.get_or_404(user_id)
-    user.name = data.get('name', user.name)
-    user.email = data.get('email', user.email)
-    user.phone_number = data.get('phone_number', user.phone_number)
-    user.updated_at = datetime.now()
-    db.session.commit()
-    return jsonify({"message": "User updated successfully"})
 
 @app.route('/users/<int:user_id>', methods=['DELETE'])
 @jwt_required()
@@ -114,6 +119,7 @@ def delete_user(user_id):
     db.session.delete(user)
     db.session.commit()
     return jsonify({"message": "User deleted successfully"})
+
 
 # user profile
 @app.route('/profile', methods=['GET'])
@@ -131,26 +137,36 @@ def profile():
         'user_role': user.user_role
     })
 
-
-# TRACKING ROUTES
-@app.route('/tracking_number', methods=['POST'])
+# update profile
+@app.route('/profile', methods=['PUT'])
 @jwt_required()
-def track_parcel(tracking_number):
-    parcel = Parcel.query.filter_by(tracking_number=tracking_number).first()
-    if not parcel:
-        return jsonify({"message": "Parcel not found"}), 404
-    
-    status = get_parcel_status(parcel)
-    return jsonify({"status": status})
+def update_profile():
+    data = request.get_json()
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    if user is None:
+        return jsonify({"message": "User not found"}), 404
+    user.name = data.get('name', user.name)
+    user.email = data.get('email', user.email)
+    user.phone_number = data.get('phone_number', user.phone_number)
+    user.updated_at = datetime.now()
+    db.session.commit()
+    return jsonify({"message": "Profile updated successfully"})
 
-# current parcel location
-@app.route('/parcels/<int:parcel_id>/location', methods=['GET'])
+# change password
+@app.route('/change_password', methods=['PUT'])
 @jwt_required()
-def get_current_location(parcel_id):
-    parcel = Parcel.query.get_or_404(parcel_id)
-    return jsonify({"location": parcel.current_location})
-
-
+def change_password():
+    data = request.get_json()
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    if user is None:
+        return jsonify({"message": "User not found"}), 404
+    if not bcrypt.check_password_hash(user.password_hash, data['old_password']):
+        return jsonify({"message": "Old password is incorrect"}), 400
+    user.password_hash = bcrypt.generate_password_hash(data['new_password']).decode('utf-8')
+    db.session.commit()
+    return jsonify({"message": "Password changed successfully"})
 
 
 # PARCEL ROUTES
@@ -186,27 +202,35 @@ def get_parcels():
     if user.user_role != 'Agent':
         return jsonify({"message": "Only agents can view parcels"}), 403
     parcels = Parcel.query.all()
-    return jsonify([parcel for parcel in parcels]) 
+    return jsonify([parcel.to_dict() for parcel in parcels])
 
 @app.route('/parcels/<int:parcel_id>', methods=['GET'])
 @jwt_required()
 def get_parcel_status(parcel_id):
     parcel = Parcel.query.get_or_404(parcel_id)
-    return jsonify(parcel.to_dict())
-
-# update parcel location
-@app.route('/parcels/<int:parcel_id>/location', methods=['PUT'])
-@jwt_required()
-def update_parcel_location(parcel_id):
     user = User.query.get(get_jwt_identity())
-    if user.user_role != 'Agent':
-        return jsonify({"message": "Only agents can update parcel location"}), 403
-    data = request.get_json()
-    parcel = Parcel.query.get_or_404(parcel_id)
-    parcel.current_location = data['location']
-    parcel.updated_at = datetime.now()
-    db.session.commit()
-    return jsonify({"message": "Parcel location updated successfully"}), 200
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+    if parcel.status == 'Delivered':
+        return jsonify({"status": "Delivered"})
+    elif parcel.status == "in Transit":
+        return jsonify({"status": "In Transit"})
+    return jsonify({"status": "Scheduled"})
+    # return jsonify(parcel.to_dict())
+
+# # update parcel location
+# @app.route('/parcels/<int:parcel_id>/location', methods=['PUT'])
+# @jwt_required()
+# def update_parcel_location(parcel_id):
+#     user = User.query.get(get_jwt_identity())
+#     if user.user_role != 'Agent':
+#         return jsonify({"message": "Only agents can update parcel location"}), 403
+#     data = request.get_json()
+#     parcel = Parcel.query.get_or_404(parcel_id)
+#     parcel.current_location = data['location']
+#     parcel.updated_at = datetime.now()
+#     db.session.commit()
+#     return jsonify({"message": "Parcel location updated successfully"}), 200
 
 # scheduler implementation
 # @scheduler.task('interval', id='update_locations', seconds=300)  # Run every 5 minutes
@@ -231,11 +255,43 @@ def simulate_new_location(parcel):
 @jwt_required()
 def delete_parcel(parcel_id):
     parcel = Parcel.query.get_or_404(parcel_id)
+    user = User.query.get(get_jwt_identity())
+    if user.user_role != 'Agent':
+        return jsonify({"message": "Only agents can delete parcels"}), 403
     if parcel.status == 'Delivered':
         return jsonify({"message": "Cannot delete delivered parcel"}), 400
     db.session.delete(parcel)
     db.session.commit()
     return jsonify({"message": "Parcel deleted successfully"}), 200
+
+# update parcel status
+@app.route('/update_status/<int:parcel_id>', methods=['PUT'])
+@jwt_required()
+def update_parcel_status(parcel_id):
+    current_user = User.query.get(get_jwt_identity())
+    if current_user.user_role != 'Agent':
+        return jsonify({"message": "Only agents can update parcel status"}), 403
+    
+    data = request.get_json()
+    parcel = Parcel.query.get_or_404(parcel_id)
+    if parcel.status == 'Delivered':
+        return jsonify({"message": "Cannot update delivered parcel status"}), 400
+    if data['status'] not in ['Scheduled', 'In Transit', 'Delivered']:
+        return jsonify({"message": "Invalid status"}), 400
+    
+    parcel.status = data['status']
+    parcel.updated_at = datetime.now()
+    
+    new_tracking = Tracking(
+        parcel_id=parcel.parcel_id,
+        location=parcel.current_location,
+        status=parcel.status,
+        timestamp=datetime.now()
+    )
+    db.session.add(new_tracking)
+    db.session.commit()
+    return jsonify({"message": "Parcel status updated successfully"}), 200
+
 
 
 # DELIVERY ROUTES
@@ -245,22 +301,27 @@ def create_delivery():
     user = User.query.get(get_jwt_identity())
     if user.user_role != 'Business':
         return jsonify({"message": "Only businesses can create deliveries"}), 403
+    
     data = request.get_json()
+    
+    # Parse the date strings into datetime objects
+    pickup_time = datetime.fromisoformat(data['pickup_time'].replace('Z', '+00:00'))
+    delivery_time = datetime.fromisoformat(data['delivery_time'].replace('Z', '+00:00'))
+    
     delivery = Delivery(
         parcel_id=data['parcel_id'],
         agent_id=data['agent_id'],
-        pickup_time=data['pickup_time'],
-        delivery_time=data['delivery_time'],
+        pickup_time=pickup_time,
+        delivery_time=delivery_time,
         status=data['status'],
-        created_at=datetime.now(),
-        updated_at=datetime.now()
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc)
     )
     db.session.add(delivery)
     db.session.commit()
     return jsonify({"message": "Delivery created successfully"}), 201
 
 # get assigned deliveries
-# TODO: add pagination check on this later
 @app.route('/assigned_deliveries', methods=['GET'])
 @jwt_required()
 def get_assigned_deliveries():
@@ -270,19 +331,6 @@ def get_assigned_deliveries():
     deliveries = Delivery.query.filter_by(agent_id=user.user_id).all()
     return jsonify([delivery.to_dict() for delivery in deliveries])
 
-# update parcel status
-@app.route('/update_status/<int:parcel_id>', methods=['PUT'])
-@jwt_required()
-def update_parcel_status(parcel_id):
-    current_user = User.query.get(get_jwt_identity())
-    if current_user.user_role != 'Agent':
-        return jsonify({"message": "Only agents can update parcel status"}), 403
-    data = request.get_json()
-    parcel = Parcel.query.get_or_404(parcel_id)
-    parcel.status = data['status']
-    parcel.updated_at = datetime.now()
-    db.session.commit()
-    return jsonify({"message": "Parcel status updated successfully"}), 200
 
 @app.route('/update_delivery_status/<int:delivery_id>', methods=['PUT'])
 @jwt_required()
@@ -297,7 +345,149 @@ def update_delivery_status(delivery_id):
     db.session.commit()
     return jsonify({"message": "Delivery status updated successfully"}), 200
 
+# mark parcel as delivered
+@app.route('/mark_as_delivered/<int:parcel_id>', methods=['PUT'])
+@jwt_required()
+def mark_as_delivered(parcel_id):
+    current_user = User.query.get(get_jwt_identity())
+    if current_user.user_role != 'Agent':
+        return jsonify({"message": "Only agents can mark parcel as delivered"}), 403
+    parcel = Parcel.query.get_or_404(parcel_id)
+    if parcel.status == 'Delivered':
+        return jsonify({"message": "Parcel already marked as delivered"}), 400
+    parcel.status = 'Delivered'
+    parcel.updated_at = datetime.now()
+    db.session.commit()
+    return jsonify({"message": "Parcel marked as delivered successfully"}), 200
 
+
+
+#TODO: TRACKING ROUTES
+<<<<<<< HEAD
+# this is a tracking route for a single parcel , this is for you meshack
+# @app.route('/track-parcel/<int:parcel_id>', methods=['GET'])
+# @jwt_required()
+# def track_parcel(parcel_id):
+#     tracking_info = Tracking.query.filter_by(parcel_id=parcel_id).order_by(Tracking.timestamp).all()
+#     if not tracking_info:
+#         return jsonify({"message": "No tracking information found for this parcel"}), 404
+    
+#     return jsonify([info.to_dict() for info in tracking_info]), 200
+
+@app.route('/tracking_number', methods=['POST'])
+@jwt_required()
+=======
+@app.route('/parcels-tracking/<string:tracking_number>', methods=['GET'])
+>>>>>>> a692a5cb2d8c0e754a2168158c0cd2e0f8b48794
+def track_parcel(tracking_number):
+    parcel = Parcel.query.filter_by(tracking_number=tracking_number).first()
+    if not parcel:
+        return jsonify({"message": "Parcel not found"}), 404
+    
+    status = get_parcel_status(parcel)
+    return jsonify({"status": status})
+
+# current parcel location
+@app.route('/parcels/<int:parcel_id>/location', methods=['GET'])
+@jwt_required()
+def get_current_location(parcel_id):
+    parcel = Parcel.query.get_or_404(parcel_id)
+    return jsonify({"location": parcel.current_location})
+
+
+
+
+# TODO: ORDER ROUTES
+
+# get all orders
+@app.route('/orders', methods=['GET'])
+@jwt_required()
+def get_orders():
+    user = User.query.get(get_jwt_identity())
+    if user.user_role != 'Business':
+        return jsonify({"message": "Only businesses can get orders"}), 403
+    orders = Order.query.all()
+    return jsonify([order.to_dict() for order in orders])
+
+
+
+# TODO: NOTIFICATION ROUTES
+
+
+# reset password
+@app.route('/request-reset-password', methods=['POST'])
+def request_reset_password():
+    data = request.get_json()
+    email = data.get('email')
+    user = User.query.filter_by(email=email).first()
+    
+    if not user:
+        return jsonify({"message": "User with this email does not exist"}), 404
+    
+    token = s.dumps(email, salt='password-reset-salt')
+    
+    reset_url = url_for('reset_password', token=token, _external=True)
+    
+    try:
+        send_email(user.email, reset_url)
+        return jsonify({"message": "Password reset email sent"}), 200
+    except Exception as e:
+        return jsonify({"message": f"Failed to send email: {str(e)}"}), 500
+
+@app.route('/reset-password/<token>', methods=['POST'])
+def reset_password(token):
+    try:
+        email = s.loads(token, salt='password-reset-salt', max_age=3600)
+    except SignatureExpired:
+        return jsonify({"message": "The reset link has expired"}), 400
+    except BadSignature:
+        return jsonify({"message": "The reset link is invalid"}), 400
+    
+    data = request.get_json()
+    new_password = data.get('new_password')
+    
+    if not new_password:
+        return jsonify({"message": "New password is required"}), 400
+    
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"message": "User with this email does not exist"}), 404
+    
+    # hash new password
+    hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+    user.password_hash = hashed_password
+    db.session.commit()
+    
+    return jsonify({"message": "Password has been reset successfully"}), 200
+
+def send_email(to_email, reset_url):
+    smtp_server = "sandbox.smtp.mailtrap.io"
+    smtp_port = 2525
+    from_email = os.environ.get("EMAIL_USER", "5605461f9a945e")
+    from_password = os.environ.get("EMAIL_PASS", "58f3ad6503a063")
+
+    subject = "Password Reset Request"
+    message = f"Click the link to reset your password: {reset_url}"
+
+    msg = MIMEMultipart()
+    msg['From'] = from_email
+    msg['To'] = to_email
+    msg['Subject'] = subject
+    msg.attach(MIMEText(message, 'plain'))
+
+    try:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.set_debuglevel(1)
+        server.starttls()
+        server.login(from_email, from_password)
+        server.send_message(msg)
+        server.quit()
+    except smtplib.SMTPAuthenticationError as e:
+        raise Exception(f"SMTP Authentication failed: {str(e)}")
+    except Exception as e:
+        raise Exception(f"Failed to send email: {str(e)}")
+    
+    return jsonify({"message": "Password reset email sent"}), 200
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)

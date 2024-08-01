@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const deliveriesMockData = [
-  { id: 1, parcel: 'Parcel A', status: 'Pending' },
+  { id: 1, parcel: 'Parcel A', status: 'scheduled' },
   { id: 2, parcel: 'Parcel B', status: 'In Transit' },
   { id: 3, parcel: 'Parcel C', status: 'Delivered' },
   // Add more mock data as needed
@@ -26,14 +27,6 @@ export default function ManageDeliveries() {
 
   return (
     <div className="p-6 bg-white rounded shadow-md relative">
-      {/* Back Button */}
-      <button
-        onClick={() => navigate(-1)}
-        className="absolute top-4 left-4 bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
-      >
-        Back
-      </button>
-
       <h1 className="text-3xl font-bold mb-6">Manage Deliveries</h1>
 
       <table className="w-full border-collapse">
@@ -63,10 +56,10 @@ export default function ManageDeliveries() {
                   Mark as In Transit
                 </button>
                 <button
-                  onClick={() => handleStatusChange(delivery.id, 'Pending')}
+                  onClick={() => handleStatusChange(delivery.id, 'scheduled')}
                   className="bg-red-500 text-white px-2 py-1 rounded ml-2"
                 >
-                  Mark as Pending
+                  Mark as scheduled
                 </button>
               </td>
             </tr>
@@ -74,8 +67,8 @@ export default function ManageDeliveries() {
         </tbody>
       </table>
 
-      <Link to="/add-delivery" className="mt-6 inline-block bg-blue-500 text-white px-4 py-2 rounded">
-        Add New Delivery
+      <Link to="/dashboard" className="mt-6 inline-block bg-blue-500 text-white px-4 py-2 rounded">
+        Back to Dashboard
       </Link>
     </div>
   );

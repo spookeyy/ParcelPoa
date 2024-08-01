@@ -1,8 +1,9 @@
+/* eslint-disable react/prop-types */
 import React, { createContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-import { server } from "./config.json";
+import { server } from "../../config";
 
 export const UserContext = createContext();
 
