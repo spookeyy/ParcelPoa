@@ -1,4 +1,3 @@
-// src/pages/Agent/AgentLogin.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -29,10 +28,10 @@ export default function AgentLogin() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="max-w-md w-full bg-white p-8 rounded shadow-md">
-        <h2 className="text-2xl font-bold mb-6">Login</h2>
-        <form onSubmit={handleLogin}>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
+      <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-lg">
+        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+        <form onSubmit={handleLogin} className="space-y-6">
           <div className="mb-4">
             <label
               htmlFor="email"
@@ -72,6 +71,12 @@ export default function AgentLogin() {
             Login
           </button>
         </form>
+        <button
+          onClick={() => navigate("/dashboard")}
+          className="w-full mt-4 bg-green-500 text-white py-2 rounded-md shadow hover:bg-green-600"
+        >
+          Open Sidebar
+        </button>
         <p className="mt-4 text-center text-sm text-gray-600">
           Don't have an account?{" "}
           <a href="/agent-register" className="text-blue-500 hover:underline">

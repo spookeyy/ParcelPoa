@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
-export default function AgentProfile() {
+export default function AgentProfile({ onClose }) {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [agentOption, setAgentOption] = useState("");
   const [message, setMessage] = useState("");
-  const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch profile data
     fetch("/api/profile")
       .then((response) => response.json())
       .then((profile) => {
@@ -35,6 +32,7 @@ export default function AgentProfile() {
       .then((response) => {
         if (response.ok) {
           setMessage("Profile updated successfully");
+          setTimeout(() => onClose(), 2000); // Close modal after a delay
         } else {
           console.error("Profile update failed");
         }
@@ -45,10 +43,10 @@ export default function AgentProfile() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="max-w-md w-full bg-white p-8 rounded shadow-md">
-        <h2 className="text-2xl font-bold mb-6">Agent Profile</h2>
-        <form onSubmit={handleUpdateProfile}>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
+      <div className="max-w-lg w-full bg-white p-8 rounded-lg shadow-lg">
+        <h2 className="text-2xl font-bold mb-6 text-center">Agent Profile</h2>
+        <form onSubmit={handleUpdateProfile} className="space-y-6">
           <div className="mb-4">
             <label
               htmlFor="name"
@@ -108,20 +106,10 @@ export default function AgentProfile() {
         {message && (
           <div className="mt-4 text-green-500 text-center">{message}</div>
         )}
-        <div className="mt-4 text-center">
-          <p className="text-sm text-gray-600">
-            Want to log out?{" "}
-            <button
-              onClick={() => navigate("/agent-login")}
-              className="text-blue-500 hover:underline"
-            >
-              Log out
-            </button>
-          </p>
-        </div>
+
         <div className="mt-6 text-center">
           <button
-            onClick={() => navigate("/dashboard")}
+            onClick={onClose}
             className="w-full bg-gray-500 text-white py-2 rounded-md shadow hover:bg-gray-600"
           >
             Back to Dashboard
