@@ -33,14 +33,13 @@ import AgentLogin from "./pages/Agent/AgentLogin";
 import AgentRegister from "./pages/Agent/AgentRegister";
 import AgentProfile from "./pages/Agent/AgentProfile";
 // end of the pages for the agent
-import UserProvider from './Context/UserContext';
+import {UserProvider} from './Context/UserContext';
 import { TrackingProvider } from './Context/TrackingContext';
 function App() {
   return (
-    <UserProvider>
     <Router>
       <Header />
-      
+      <UserProvider>
       <TrackingProvider >
       <Routes>
         <Route path="/" element={<Home />} />
@@ -80,9 +79,9 @@ function App() {
         {/* end of the pages for the agent */}
       </Routes>
       </TrackingProvider> 
+      </UserProvider>
       <Footer />
     </Router>
-    </UserProvider>
   );
 }
 
