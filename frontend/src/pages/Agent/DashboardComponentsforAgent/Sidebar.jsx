@@ -43,6 +43,7 @@ export default function Sidebar({ isOpen, toggleSidebar, navigateTo }) {
               <i className="fas fa-sign-in-alt mr-3 text-lg sm:text-xl"></i> Login
             </Link>
           </li>
+        
           <li>
             <Link
               to="/agent-register"
@@ -82,6 +83,14 @@ export default function Sidebar({ isOpen, toggleSidebar, navigateTo }) {
             >
               <i className="fas fa-check-circle mr-3 text-lg sm:text-xl"></i> Confirm Delivery
             </button>
+          </li>
+            <li>
+            <Link
+              to="/update-status"
+              className="flex items-center text-gray-800 hover:text-blue-600 hover:bg-gray-100 p-3 rounded transition duration-200 text-sm sm:text-base"
+            >
+              <i className="fas fa-sign-in-alt mr-3 text-lg sm:text-xl"></i>Update Status
+            </Link>
           </li>
           <li>
             <button

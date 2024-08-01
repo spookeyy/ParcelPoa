@@ -6,6 +6,8 @@ export default function DeliveryCard({
   trackingNumber,
   status,
   orderDate,
+  quantity,
+  imageUrl, // Add imageUrl prop
 }) {
   const statusColor =
     {
@@ -22,12 +24,15 @@ export default function DeliveryCard({
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-x-4">
         <img
-          src="/path/to/your/product/image.png"
+          src={imageUrl} // Use imageUrl prop
           alt="Product Image"
           className="w-full sm:w-20 h-auto sm:h-20 object-cover rounded-lg"
         />
         <div className="flex-1">
           <p className="text-sm font-medium text-gray-800">{product}</p>
+          <p className="text-sm text-gray-600">
+            <span className="font-bold">Quantity:</span> {quantity}
+          </p>
         </div>
       </div>
       <div className="text-sm text-gray-700">
