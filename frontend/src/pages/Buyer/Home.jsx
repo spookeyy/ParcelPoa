@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Invoice from "./Invoice";
+
 
 // images for the slider
 const images = [
