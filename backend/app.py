@@ -3,6 +3,7 @@ import smtplib
 from flask import Flask, request, jsonify,url_for
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
+from flask_cors import CORS
 from datetime import datetime, timezone
 from flask_apscheduler import APScheduler
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
@@ -19,6 +20,8 @@ app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "super-secret-key")
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "another-secret-key")
+
+CORS(app)
 
 migrate = Migrate(app, db)
 db.init_app(app)
@@ -38,7 +41,7 @@ blacklist = set()
 # JWT Configurations
 @jwt.token_in_blocklist_loader
 def check_if_token_in_blacklist(jwt_header, jwt_payload):
-    return jwt_payload["jti"] in blacklist
+    return jwt_payload['jti'] in blacklist
 
 # user routes
 @app.route('/register', methods=['POST'])
@@ -69,8 +72,7 @@ def register():
         return jsonify({"message": "Business registered successfully"}), 201
     elif data['user_role'] == 'Agent':
         return jsonify({"message": "Agent registered successfully"}), 201
-    elif data['user_role'] == 'Client':
-        return jsonify({"message": "Client user registered successfully"}), 201
+    
     return jsonify({"message": "User registered successfully"}), 201
 
 @app.route('/login', methods=['POST'])
@@ -361,6 +363,7 @@ def mark_as_delivered(parcel_id):
 
 
 #TODO: TRACKING ROUTES
+<<<<<<< HEAD
 # this is a tracking route for a single parcel , this is for you meshack
 # @app.route('/track-parcel/<int:parcel_id>', methods=['GET'])
 # @jwt_required()
@@ -373,6 +376,9 @@ def mark_as_delivered(parcel_id):
 
 @app.route('/tracking_number', methods=['POST'])
 @jwt_required()
+=======
+@app.route('/parcels-tracking/<string:tracking_number>', methods=['GET'])
+>>>>>>> a692a5cb2d8c0e754a2168158c0cd2e0f8b48794
 def track_parcel(tracking_number):
     parcel = Parcel.query.filter_by(tracking_number=tracking_number).first()
     if not parcel:
@@ -392,6 +398,16 @@ def get_current_location(parcel_id):
 
 
 # TODO: ORDER ROUTES
+
+# get all orders
+@app.route('/orders', methods=['GET'])
+@jwt_required()
+def get_orders():
+    user = User.query.get(get_jwt_identity())
+    if user.user_role != 'Business':
+        return jsonify({"message": "Only businesses can get orders"}), 403
+    orders = Order.query.all()
+    return jsonify([order.to_dict() for order in orders])
 
 
 

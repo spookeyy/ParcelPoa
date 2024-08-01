@@ -1,0 +1,14 @@
+REGISTER USER
+{
+  "name": "spookie2",
+  "email": "spookie2@gmail.com",
+  "phone_number": "+254792136720",
+  "user_role": "Agent",
+  "password": "spookie"
+}
+
+LOGIN USER
+{
+  "email": "spookie2@gmail.com",
+  "password": "spookie"
+}
