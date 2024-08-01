@@ -7,6 +7,7 @@ import Footer from "./components/Footer";
 import Order_List from "./pages/Order_List";
 import Order_Details from "./pages/Order_Details";
 import Reset_Password from "./pages/Reset_Password";
+import ChangePassword from "./components/Change-Password";
 //Buyer pages
 import OrderTracking from "./pages/Buyer/OrderTracking";
 import TrackOrders from "./pages/Buyer/TrackOrders";
@@ -45,6 +46,7 @@ function App() {
             <Route path="/order-list" element={<Order_List />} />
             <Route path="/order/:id" element={<Order_Details />} />
             <Route path="/reset-password" element={<Reset_Password />} />
+            <Route path="/change-password" element={<ChangePassword />} />
             <Route path="/track/:parcelId" element={<OrderTracking />} />
             <Route path="/track-orders" element={<TrackOrders />} />
             {/* the pages for the agent */}

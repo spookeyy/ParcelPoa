@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -105,14 +105,13 @@ export const UserProvider = ({ children }) => {
   }
 
   // UPDATE USER
-  function updateUser(name, email, phone_number, updated_at) {
+  const updateUser = (name, email, phone_number) => {
     fetch(`${server}/profile`, {
       method: "PUT",
       body: JSON.stringify({
-        name: name,
-        email: email,
-        phone_number: phone_number,
-        updated_at: updated_at,
+        name,
+        email,
+        phone_number,
       }),
       headers: {
         "Content-type": "application/json",
@@ -121,18 +120,20 @@ export const UserProvider = ({ children }) => {
     })
       .then((response) => response.json())
       .then((res) => {
-        if (res.success) {
-          toast.success(res.success);
-        } else if (res.error) {
-          toast.error(res.error);
+        if (res.message) {
+          toast.success(res.message);
+          setOnChange(!onChange);
         } else {
-          toast.error("An error occured");
+          toast.error("An error occurred");
         }
+      })
+      .catch((error) => {
+        console.error("Error updating user profile:", error);
+        toast.error("An error occurred");
       });
-  }
+  };
 
   // LOGOUT
-
   const logout = () => {
     fetch(`${server}/logout`, {
       method: "DELETE",
@@ -143,41 +144,53 @@ export const UserProvider = ({ children }) => {
     })
       .then((response) => response.json())
       .then((res) => {
-        if (res.success) {
-          toast.success(res.success);
+        if (res.message) {
+          toast.success(res.message);
           localStorage.removeItem("access_token");
           setAuthToken(null);
           setCurrentUser(null);
           setOnChange(!onChange);
           nav("/login");
-        } else if (res.error) {
-          toast.error(res.error);
         } else {
-          toast.error("An error occured");
+          toast.error("An error occurred");
         }
+      })
+      .catch((error) => {
+        console.error("Error logging out:", error);
+        toast.error("An error occurred");
       });
   };
-  useEffect(() => {
-    if (authToken) {
-      fetch(`${server}/current_user`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
-        },
+
+  // fetch user profile
+  const fetchUserProfile = useCallback(() => {
+    fetch(`${server}/profile`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.user_id) {
+          setCurrentUser(data);
+        } else {
+          setAuthToken(null);
+          localStorage.removeItem("access_token");
+        }
       })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.email) {
-            setCurrentUser(data);
-          } else {
-            localStorage.removeItem("access_token");
-            setCurrentUser(null);
-            setAuthToken(null);
-            nav("/login");
-          }
-        });
+      .catch((error) => {
+        console.error("Error fetching user profile:", error);
+        setAuthToken(null);
+        localStorage.removeItem("access_token");
+      });
+  }, [authToken]);
+
+  useEffect(() => {
+    if (authToken) { 
+      fetchUserProfile();
     }
-  }, [authToken, onChange, nav]);
+  }, [authToken, onChange, fetchUserProfile]);
+
 
   const contextData = {
     currentUser,
