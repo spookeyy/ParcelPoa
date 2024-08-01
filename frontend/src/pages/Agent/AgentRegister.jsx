@@ -30,10 +30,10 @@ export default function AgentRegister() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="max-w-md w-full bg-white p-8 rounded shadow-md">
-        <h2 className="text-2xl font-bold mb-6">Register</h2>
-        <form onSubmit={handleRegister}>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-6">
+      <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-lg">
+        <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
+        <form onSubmit={handleRegister} className="space-y-6">
           <div className="mb-4">
             <label
               htmlFor="name"
@@ -112,7 +112,9 @@ export default function AgentRegister() {
               required
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
             >
-              <option value="">Agent</option>
+              <option value="">Select an option</option>
+              {/* Add additional options here if needed */}
+              <option value="agent">Agent</option>
             </select>
           </div>
           <button
@@ -122,6 +124,7 @@ export default function AgentRegister() {
             Register
           </button>
         </form>
+        
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-600">
             Already have an account?{" "}
