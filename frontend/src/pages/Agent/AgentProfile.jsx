@@ -45,10 +45,10 @@ export default function AgentProfile() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="max-w-md w-full bg-white p-8 rounded shadow-md">
-        <h2 className="text-2xl font-bold mb-6">Agent Profile</h2>
-        <form onSubmit={handleUpdateProfile}>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
+      <div className="max-w-lg w-full bg-white p-8 rounded-lg shadow-lg">
+        <h2 className="text-2xl font-bold mb-6 text-center">Agent Profile</h2>
+        <form onSubmit={handleUpdateProfile} className="space-y-6">
           <div className="mb-4">
             <label
               htmlFor="name"
@@ -97,7 +97,25 @@ export default function AgentProfile() {
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
             />
           </div>
-
+          <div className="mb-4">
+            <label
+              htmlFor="agent-option"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Agent Option
+            </label>
+            <select
+              id="agent-option"
+              value={agentOption}
+              onChange={(e) => setAgentOption(e.target.value)}
+              required
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+            >
+              <option value="">Select an option</option>
+              <option value="agent">Agent</option>
+              {/* Add additional options here if needed */}
+            </select>
+          </div>
           <button
             type="submit"
             className="w-full bg-blue-500 text-white py-2 rounded-md shadow hover:bg-blue-600"

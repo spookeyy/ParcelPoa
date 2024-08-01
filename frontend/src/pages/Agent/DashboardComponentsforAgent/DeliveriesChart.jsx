@@ -16,4 +16,3 @@ export default function DeliveriesChart({ data }) {
     </div>
   );
 }
-// /home/simon/phase 5/ParcelPoa/frontend/src/chartConfig.js

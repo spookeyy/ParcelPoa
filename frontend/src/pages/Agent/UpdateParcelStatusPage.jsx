@@ -1,4 +1,3 @@
-// src/pages/UpdateParcelStatusPage.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -53,54 +52,58 @@ export default function UpdateParcelStatusPage() {
   };
 
   return (
-    <div className="p-6 bg-white rounded shadow-md">
-      <h1 className="text-3xl font-bold mb-6">Update Parcel Status</h1>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-6">
+      <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-lg">
+        <h1 className="text-3xl font-bold mb-6 text-center">Update Parcel Status</h1>
 
-      <form onSubmit={handleUpdate}>
-        <div className="mb-4">
-          <label className="block text-gray-700">Parcel ID:</label>
-          <input
-            type="text"
-            value={parcelId}
-            onChange={(e) => setParcelId(e.target.value)}
-            className="border p-2 rounded w-full"
-            placeholder="Enter Parcel ID"
-            required
-          />
-        </div>
+        <form onSubmit={handleUpdate} className="space-y-6">
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Parcel ID</label>
+            <input
+              type="text"
+              value={parcelId}
+              onChange={(e) => setParcelId(e.target.value)}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+              placeholder="Enter Parcel ID"
+              required
+            />
+          </div>
 
-        <div className="mb-4">
-          <label className="block text-gray-700">Status:</label>
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="border p-2 rounded w-full"
-            required
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Status</label>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+              required
+            >
+              <option value="">Select Status</option>
+              <option value="scheduled">scheduled</option>
+              <option value="In Transit">In Transit</option>
+              <option value="Delivered">Delivered</option>
+              
+            </select>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white py-2 rounded-md shadow hover:bg-blue-600"
           >
-            <option value="">Select Status</option>
-            <option value="Pending">Pending</option>
-            <option value="In Transit">In Transit</option>
-            <option value="Delivered">Delivered</option>
-            <option value="Failed">Failed</option>
-          </select>
+            Update Status
+          </button>
+        </form>
+
+        {message && <div className="mt-4 text-green-500 text-center">{message}</div>}
+
+        <div className="mt-6 text-center">
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="w-full bg-gray-500 text-white py-2 rounded-md shadow hover:bg-gray-600"
+          >
+            Back to Dashboard
+          </button>
         </div>
-
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
-        >
-          Update Status
-        </button>
-      </form>
-
-      {message && <div className="mt-4 text-green-500">{message}</div>}
-
-      <button
-        onClick={() => navigate("/dashboard")}
-        className="mt-6 bg-gray-500 text-white px-4 py-2 rounded shadow hover:bg-gray-600"
-      >
-        Back to Dashboard
-      </button>
+      </div>
     </div>
   );
 }

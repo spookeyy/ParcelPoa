@@ -2,7 +2,6 @@ import React from "react";
 
 export default function DeliveryCard({
   orderID,
-  payment,
   product,
   trackingNumber,
   status,
@@ -16,20 +15,18 @@ export default function DeliveryCard({
     }[status] || "bg-gray-500";
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 flex flex-col space-y-4">
+    <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 flex flex-col space-y-4">
       <div className="text-lg font-semibold text-gray-800">
         <span className="font-bold">ORDER ID:</span> {orderID}
       </div>
-      <div className="text-sm text-gray-700">
-        <span className="font-bold">Payment:</span> {payment}
-      </div>
-      <div className="flex items-center space-x-4">
+
+      <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-x-4">
         <img
           src="/path/to/your/product/image.png"
           alt="Product Image"
-          className="w-20 h-20 object-cover rounded-lg"
+          className="w-full sm:w-20 h-auto sm:h-20 object-cover rounded-lg"
         />
-        <div>
+        <div className="flex-1">
           <p className="text-sm font-medium text-gray-800">{product}</p>
         </div>
       </div>
