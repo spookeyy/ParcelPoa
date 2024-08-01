@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
-import Messages_List from './Messages_List';
+import { UserContext } from '../../Context/UserContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -80,7 +80,7 @@ export default function Login() {
           </button>
         </p>
       </div>
-      <Messages_List></Messages_List>
+     
     </div>
   );
 }
