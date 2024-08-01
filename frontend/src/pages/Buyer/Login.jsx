@@ -1,38 +1,35 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
+import { useNavigate } from 'react-router-dom';
+import { useUser } from './UserContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-
-  // Hardcoded credentials for demonstration purposes
-  const validEmail = 'user@gmail.com';
-  const validPassword = 'password123';
-
-  const navigate = useNavigate(); // Initialize useNavigate
+  const { loginUser } = useUser();
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!email || !password) {
       setError('Please enter both email and password.');
       return;
     }
 
-    // Validate email and password
-    if (email !== validEmail || password !== validPassword) {
-      setError('Incorrect email or password.');
-      return;
-    }
-
-    setError('');
-    console.log('Logging in with:', { email, password });
-    // Proceed with login (e.g., redirect or fetch user data)
+    // Handle the login without using async/await
+    loginUser(email, password)
+      .then(() => {
+        setError('');
+        navigate('/buyers-page');
+      })
+      .catch((err) => {
+        setError(err.message);
+      });
   };
 
   const handleResetPassword = () => {
-    navigate('/reset-password'); // Navigate to the reset password page
+    navigate('/reset-password');
   };
 
   return (

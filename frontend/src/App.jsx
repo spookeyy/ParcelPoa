@@ -15,7 +15,9 @@ import Invoice from "./pages/Buyer/Invoice";
 import Messages_List from "./pages/Buyer/Messages_List";
 import Messages_Details from "./pages/Buyer/Messages_Details";
 import Order_Details from "./pages/Buyer/Order_Details";
-import FeedbackForm from "./pages/Buyer/FeedbackForm"; //End
+import FeedbackForm from "./pages/Buyer/FeedbackForm";
+import OrderTracking from "./pages/Buyer/OrderTracking";
+//End
 // the pages for the agent
 import AgentHome from "./pages/Agent/AgentHome";
 import Dashboard from "./pages/Agent/Dashboard";
@@ -24,7 +26,7 @@ import DeliveryConfirmation from "./pages/Agent/DeliveryConfirmation";
 import PerformanceMetrics from "./pages/Agent/PerformanceMetrics";
 import IssueReporting from "./pages/Agent/IssueReporting";
 import ManageDeliveries from "./pages/Agent/ManageDeliveries";
-import AddDelivery from "./pages/Agent/AddDelivery";
+// import AddDelivery from "./pages/Agent/AddDelivery";
 import CommunicationTools from "./pages/Agent/CommunicationTools";
 import UpdateParcelStatusPage from "./pages/Agent/UpdateParcelStatusPage";
 import AgentLogin from "./pages/Agent/AgentLogin";
@@ -32,11 +34,13 @@ import AgentRegister from "./pages/Agent/AgentRegister";
 import AgentProfile from "./pages/Agent/AgentProfile";
 // end of the pages for the agent
 import UserProvider from './Context/UserContext';
+import { TrackingProvider } from './Context/TrackingContext';
 function App() {
   return (
     <Router>
       <Header />
       <UserProvider>
+      <TrackingProvider >
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -51,6 +55,7 @@ function App() {
         <Route path="/order/:id" element={<Order_Details />} />
         <Route path="/reset-password" element={<Reset_Password />} />
         <Route path="/feedbackForm" element={<FeedbackForm />} />
+        <Route path="/track/:parcelId" element={<OrderTracking />} />
         {/* the pages for the agent */}
         <Route path="/agent" element={<AgentHome />} />
         <Route path="/dashboard" element={<Dashboard />} />
@@ -62,7 +67,7 @@ function App() {
         <Route path="/performance-metrics" element={<PerformanceMetrics />} />
         <Route path="/issue-reporting" element={<IssueReporting />} />
         <Route path="/manage-deliveries" element={<ManageDeliveries />} />
-        <Route path="/add-delivery" element={<AddDelivery />} />
+        {/* <Route path="/add-delivery" element={<AddDelivery />} /> */}
         <Route path="/communication-tools" element={<CommunicationTools />} />
         <Route
           path="/update-parcel-status"
@@ -73,6 +78,7 @@ function App() {
         <Route path="/agent-profile" element={<AgentProfile />} />
         {/* end of the pages for the agent */}
       </Routes>
+      </TrackingProvider> 
       </UserProvider>
       <Footer />
     </Router>
