@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String, Enum, ForeignKey, Text, DECIMAL, TIMESTAMP
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash,check_password_hash
-from flask_bcrypt import generate_password_hash, check_password_hash
 db = SQLAlchemy()
 
 class User(db.Model):
@@ -13,9 +12,9 @@ class User(db.Model):
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     phone_number = Column(String, unique=True, nullable=False)
-    user_role = Column(Enum('Business','Agent', name='user_roles'), nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-    updated_at = Column(TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
+    user_role = Column(Enum('Client','Business','Agent', name='user_roles'), nullable=False)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow)
+    updated_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     password_hash = Column(String(128), nullable=False)
 
     parcels = relationship('Parcel', back_populates='sender', foreign_keys='Parcel.sender_id')
@@ -24,7 +23,7 @@ class User(db.Model):
     orders = relationship('Order', back_populates='user', foreign_keys='Order.user_id')
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password).decode('utf-8')
+        self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
@@ -51,9 +50,9 @@ class Parcel(db.Model):
     recipient_phone = Column(String, nullable=False)
     description = Column(Text)
     weight = Column(DECIMAL, nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-    updated_at = Column(TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
-    current_location = Column(String(255), nullable=False)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow)
+    updated_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    current_location = db.Column(db.String(255))
     status = Column(Enum('Scheduled', 'In Transit', 'Delivered', name='delivery_statuses'), nullable=False)
 
     
@@ -62,24 +61,6 @@ class Parcel(db.Model):
     tracking = relationship('Tracking', back_populates='parcel', uselist=False)
     orders = relationship('Order', back_populates='parcel', foreign_keys='Order.parcel_id')
 
-    def to_dict(self):
-        return {
-            'parcel_id': self.parcel_id,
-            'sender_id': self.sender_id,
-            'tracking_number': self.tracking_number,
-            'recipient_name': self.recipient_name,
-            'recipient_address': self.recipient_address,
-            'recipient_phone': self.recipient_phone,
-            'description': self.description,
-            'weight': float(self.weight),  # Convert Decimal to float for JSON serialization
-            'created_at': self.created_at.isoformat(),
-            'updated_at': self.updated_at.isoformat(),
-            'current_location': self.current_location,
-            'status': self.status
-        }
-
-
-from datetime import datetime, timezone
 
 class Delivery(db.Model):
     __tablename__ = 'deliveries'
@@ -90,24 +71,12 @@ class Delivery(db.Model):
     pickup_time = Column(TIMESTAMP, nullable=False)
     delivery_time = Column(TIMESTAMP)
     status = Column(Enum('Scheduled', 'In Transit', 'Delivered', name='delivery_statuses'), nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, default=lambda: datetime.now(timezone.utc))
-    updated_at = Column(TIMESTAMP, nullable=False, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow)
+    updated_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     parcel = relationship('Parcel', back_populates='delivery', foreign_keys=[parcel_id])
     agent = relationship('User', back_populates='deliveries', foreign_keys=[agent_id])
 
-
-    def to_dict(self):
-        return {
-            'delivery_id': self.delivery_id,
-            'parcel_id': self.parcel_id,
-            'agent_id': self.agent_id,
-            'pickup_time': self.pickup_time.isoformat(),
-            'delivery_time': self.delivery_time.isoformat() if self.delivery_time else None,
-            'status': self.status,
-            'created_at': self.created_at.isoformat(),
-            'updated_at': self.updated_at.isoformat()
-        }
 
 class Notification(db.Model):
     __tablename__ = 'notifications'
@@ -117,7 +86,7 @@ class Notification(db.Model):
     message = Column(Text, nullable=False)
     type = Column(Enum('SMS', 'Email', 'App', name='notification_types'), nullable=False)
     status = Column(Enum('Sent', 'Delivered', 'Read', name='notification_statuses'), nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow)
 
     user = relationship('User', back_populates='notifications', foreign_keys=[user_id])
 
@@ -129,7 +98,7 @@ class Tracking(db.Model):
     parcel_id = Column(Integer, ForeignKey('parcels.parcel_id'), nullable=False)
     location = Column(String, nullable=False)
     status = Column(String, nullable=False)
-    timestamp = Column(TIMESTAMP, nullable=False, default=datetime.now)
+    timestamp = Column(TIMESTAMP, nullable=False, default=datetime.utcnow)
 
     parcel = relationship('Parcel', back_populates='tracking', foreign_keys=[parcel_id])
 
@@ -140,8 +109,8 @@ class Order(db.Model):
     order_id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
     parcel_id = Column(Integer, ForeignKey('parcels.parcel_id'), nullable=False)
-    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
-    updated_at = Column(TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow)
+    updated_at = Column(TIMESTAMP, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     user = relationship('User', back_populates='orders', foreign_keys=[user_id])
     parcel = relationship('Parcel', back_populates='orders', foreign_keys=[parcel_id])

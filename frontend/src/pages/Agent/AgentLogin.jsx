@@ -1,31 +1,31 @@
 // src/pages/Agent/AgentLogin.jsx
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function AgentLogin() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     // Replace with your login logic
-    fetch("/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    })
-      .then((response) => {
-        if (response.ok) {
-          navigate("/dashboard"); // Redirect to the dashboard after successful login
-        } else {
-          console.error("Login failed");
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
+
+      if (response.ok) {
+        navigate('/dashboard');
+      } else {
+        console.error('Login failed');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   return (
@@ -34,10 +34,7 @@ export default function AgentLogin() {
         <h2 className="text-2xl font-bold mb-6">Login</h2>
         <form onSubmit={handleLogin}>
           <div className="mb-4">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
               Email
             </label>
             <input
@@ -50,10 +47,7 @@ export default function AgentLogin() {
             />
           </div>
           <div className="mb-6">
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
               Password
             </label>
             <input
@@ -73,11 +67,7 @@ export default function AgentLogin() {
           </button>
         </form>
         <p className="mt-4 text-center text-sm text-gray-600">
-          Don't have an account?{" "}
-          <a href="/agent-register" className="text-blue-500 hover:underline">
-            Sign up here
-          </a>
-          .
+          Don't have an account? <a href="/agent-register" className="text-blue-500 hover:underline">Sign up here</a>.
         </p>
       </div>
     </div>

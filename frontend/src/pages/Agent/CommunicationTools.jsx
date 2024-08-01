@@ -1,23 +1,22 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { FloatingWhatsApp } from "react-floating-whatsapp";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function CommunicationTools() {
-  const [message, setMessage] = useState("");
-  const [recipient, setRecipient] = useState("");
-  const [sendingMethod, setSendingMethod] = useState("platform"); // 'platform' or 'sms'
+  const [message, setMessage] = useState('');
+  const [recipient, setRecipient] = useState('');
+  const [sendingMethod, setSendingMethod] = useState('platform'); // 'platform' or 'sms'
   const navigate = useNavigate();
 
   const handleSendMessage = (e) => {
     e.preventDefault();
     // Handle sending message logic here
-    console.log("Sending message:", { recipient, message, sendingMethod });
+    console.log('Sending message:', { recipient, message, sendingMethod });
 
     // After sending the message, you might want to redirect or clear the form
-    setMessage("");
-    setRecipient("");
+    setMessage('');
+    setRecipient('');
     // For demonstration, let's just navigate back
-    navigate("/dashboard");
+    navigate('/dashboard');
   };
 
   return (
@@ -65,25 +64,21 @@ export default function CommunicationTools() {
               id="platform"
               name="sendingMethod"
               value="platform"
-              checked={sendingMethod === "platform"}
-              onChange={() => setSendingMethod("platform")}
+              checked={sendingMethod === 'platform'}
+              onChange={() => setSendingMethod('platform')}
               className="mr-2"
             />
-            <label htmlFor="platform" className="text-gray-700">
-              Send via Platform
-            </label>
+            <label htmlFor="platform" className="text-gray-700">Send via Platform</label>
             <input
               type="radio"
               id="sms"
               name="sendingMethod"
               value="sms"
-              checked={sendingMethod === "sms"}
-              onChange={() => setSendingMethod("sms")}
+              checked={sendingMethod === 'sms'}
+              onChange={() => setSendingMethod('sms')}
               className="ml-4 mr-2"
             />
-            <label htmlFor="sms" className="text-gray-700">
-              Send via SMS
-            </label>
+            <label htmlFor="sms" className="text-gray-700">Send via SMS</label>
           </div>
         </div>
 
@@ -94,25 +89,6 @@ export default function CommunicationTools() {
           Send Message
         </button>
       </form>
-
-      <FloatingWhatsApp
-        phoneNumber="+254715333522"
-        accountName="ParcelPoa"
-        statusMessage="A Trusted parcel tracking partner"
-        avatar="./src/assets/favicon.ico"
-        banner="./src/assets/favicon.ico"
-        chatMessage="Hello, how can we help you?"
-        darkMode
-        allowEsc
-        allowClickAway
-        notification
-        notificationSound
-        notificationColor="green"
-        notificationTitle="Chat with us"
-        notificationMessage="Thank you for your message"
-        notificationTimestamp="Just now"
-        notificationDuration={2000}
-      />
     </div>
   );
 }

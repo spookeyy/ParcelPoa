@@ -1,32 +1,36 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function AgentRegister() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [agentOption, setAgentOption] = useState(""); // State for dropdown
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
 
-    fetch("/api/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, name, phoneNumber, agentOption }),
-    })
-      .then((response) => {
-        if (response.ok) {
-          navigate("/login");
-        } else {
-          console.error("Registration failed");
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
+    if (password !== confirmPassword) {
+      console.error('Passwords do not match');
+      return;
+    }
+
+    // Replace with your registration logic
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
+
+      if (response.ok) {
+        navigate('/login');
+      } else {
+        console.error('Registration failed');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   return (
@@ -35,26 +39,7 @@ export default function AgentRegister() {
         <h2 className="text-2xl font-bold mb-6">Register</h2>
         <form onSubmit={handleRegister}>
           <div className="mb-4">
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
               Email
             </label>
             <input
@@ -67,26 +52,7 @@ export default function AgentRegister() {
             />
           </div>
           <div className="mb-4">
-            <label
-              htmlFor="phone"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Phone Number
-            </label>
-            <input
-              type="tel"
-              id="phone"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              required
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
               Password
             </label>
             <input
@@ -99,21 +65,17 @@ export default function AgentRegister() {
             />
           </div>
           <div className="mb-6">
-            <label
-              htmlFor="agent-option"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Select Agent Type
+            <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700">
+              Confirm Password
             </label>
-            <select
-              id="agent-option"
-              value={agentOption}
-              onChange={(e) => setAgentOption(e.target.value)}
+            <input
+              type="password"
+              id="confirm-password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               required
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
-            >
-              <option value="">Agent</option>
-            </select>
+            />
           </div>
           <button
             type="submit"
@@ -124,7 +86,7 @@ export default function AgentRegister() {
         </form>
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-600">
-            Already have an account?{" "}
+            Already have an account?{' '}
             <a href="/agent-login" className="text-blue-500 hover:underline">
               Login here
             </a>
@@ -134,3 +96,4 @@ export default function AgentRegister() {
     </div>
   );
 }
+
