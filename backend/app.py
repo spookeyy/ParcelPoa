@@ -37,9 +37,8 @@ s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 #     scheduler.init_app(app)
 #     scheduler.start()
 
-blacklist = set()
-
 # JWT Configurations
+blacklist = set()
 @jwt.token_in_blocklist_loader
 def check_if_token_in_blacklist(jwt_header, jwt_payload):
     return jwt_payload['jti'] in blacklist
@@ -50,19 +49,30 @@ def register():
     data = request.get_json()
     if User.query.filter_by(email=data['email']).first():
         return jsonify({'message': 'Email already exists'}), 400
+
+    phone_number = data.get("phone_number")
+    phone_number_exists = User.query.filter_by(phone_number=phone_number).first()
+    if phone_number_exists:
+        return jsonify({"error": "Phone number already exists"}), 400
+
     
     required_fields = ['name', 'email', 'phone_number', 'user_role', 'password']
     
     for field in required_fields:
         if field not in data:
             return jsonify({"error": f"'{field}' is required"}), 400
-    
-    hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+    password = data.get("password")
+    if not password:
+        return jsonify({"error": "Password is required and must not be empty"}), 400
+
+    # if len(password) < 8:
+    #     return jsonify({"error": "Password must be at least 8 characters long"}), 400
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
     new_user = User(
-        name=data['name'],
-        email=data['email'],
-        phone_number=data['phone_number'],
-        user_role=data['user_role'],
+        name=data.get('name'),
+        email=data.get('email'),
+        phone_number=data.get('phone_number'),
+        user_role=data.get('user_role'),
         created_at=datetime.now(),
         updated_at=datetime.now(),
         password_hash=hashed_password
@@ -82,14 +92,27 @@ def login():
     user = User.query.filter_by(email=data['email']).first()
     if user and bcrypt.check_password_hash(user.password_hash, data['password']):
         access_token = create_access_token(identity=user.user_id)
-        return jsonify({"access_token": access_token}), 200
+        return jsonify({
+            "access_token": access_token,
+            "user": {
+                "id": user.user_id,
+                "email": user.email,
+                "role": user.user_role
+            }
+        }), 200
     else:
         return jsonify({"message": "Invalid credentials"}), 401
-    
+
+
+@app.route('/current_user', methods=['GET'])
+@jwt_required()
+def get_current_user():
+    current_user = User.query.get(get_jwt_identity())
+    return jsonify(current_user.to_dict())
 
     
 #logout
-@app.route('/logout', methods=['POST'])
+@app.route('/logout', methods=['DELETE'])
 @jwt_required()
 def logout():
     jti = get_jwt()["jti"]
@@ -411,7 +434,9 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from flask import current_app
-s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+
+with app.app_context():
+    s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
 
 # SendGrid settings
 SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
