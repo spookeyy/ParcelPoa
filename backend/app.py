@@ -361,6 +361,16 @@ def mark_as_delivered(parcel_id):
 
 
 #TODO: TRACKING ROUTES
+# this is a tracking route for a single parcel , this is for you meshack
+# @app.route('/track-parcel/<int:parcel_id>', methods=['GET'])
+# @jwt_required()
+# def track_parcel(parcel_id):
+#     tracking_info = Tracking.query.filter_by(parcel_id=parcel_id).order_by(Tracking.timestamp).all()
+#     if not tracking_info:
+#         return jsonify({"message": "No tracking information found for this parcel"}), 404
+    
+#     return jsonify([info.to_dict() for info in tracking_info]), 200
+
 @app.route('/tracking_number', methods=['POST'])
 @jwt_required()
 def track_parcel(tracking_number):
