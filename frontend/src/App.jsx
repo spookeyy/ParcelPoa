@@ -24,18 +24,19 @@ import DeliveryConfirmation from "./pages/Agent/DeliveryConfirmation";
 import PerformanceMetrics from "./pages/Agent/PerformanceMetrics";
 import IssueReporting from "./pages/Agent/IssueReporting";
 import ManageDeliveries from "./pages/Agent/ManageDeliveries";
-import AddDelivery from "./pages/Agent/AddDelivery";
+// import AddDelivery from "./pages/Agent/AddDelivery";
 import CommunicationTools from "./pages/Agent/CommunicationTools";
 import UpdateParcelStatusPage from "./pages/Agent/UpdateParcelStatusPage";
 import AgentLogin from "./pages/Agent/AgentLogin";
 import AgentRegister from "./pages/Agent/AgentRegister";
 import AgentProfile from "./pages/Agent/AgentProfile";
 // end of the pages for the agent
-
+import UserProvider from './Context/UserContext';
 function App() {
   return (
     <Router>
       <Header />
+      <UserProvider>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -61,7 +62,7 @@ function App() {
         <Route path="/performance-metrics" element={<PerformanceMetrics />} />
         <Route path="/issue-reporting" element={<IssueReporting />} />
         <Route path="/manage-deliveries" element={<ManageDeliveries />} />
-        <Route path="/add-delivery" element={<AddDelivery />} />
+        {/* <Route path="/add-delivery" element={<AddDelivery />} /> */}
         <Route path="/communication-tools" element={<CommunicationTools />} />
         <Route
           path="/update-parcel-status"
@@ -72,6 +73,7 @@ function App() {
         <Route path="/agent-profile" element={<AgentProfile />} />
         {/* end of the pages for the agent */}
       </Routes>
+      </UserProvider>
       <Footer />
     </Router>
   );
