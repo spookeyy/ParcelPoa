@@ -13,7 +13,7 @@ class User(db.Model):
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     phone_number = Column(String, unique=True, nullable=False)
-    user_role = Column(Enum('Client','Business','Agent', name='user_roles'), nullable=False)
+    user_role = Column(Enum('Business','Agent', name='user_roles'), nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     password_hash = Column(String(128), nullable=False)
