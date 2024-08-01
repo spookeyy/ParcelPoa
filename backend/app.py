@@ -85,6 +85,8 @@ def login():
     else:
         return jsonify({"message": "Invalid credentials"}), 401
     
+
+    
 #logout
 @app.route('/logout', methods=['POST'])
 @jwt_required()
@@ -399,6 +401,20 @@ def get_orders():
 # TODO: NOTIFICATION ROUTES
 
 
+
+
+
+
+# RESET PASSWORD
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+from flask import current_app
+s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+
+# SendGrid settings
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
+FROM_EMAIL = os.environ.get('FROM_EMAIL')
 # reset password
 @app.route('/request-reset-password', methods=['POST'])
 def request_reset_password():
@@ -407,7 +423,7 @@ def request_reset_password():
     user = User.query.filter_by(email=email).first()
     
     if not user:
-        return jsonify({"message": "User with this email does not exist"}), 404
+        return jsonify({"message": "If a user with this email exists, a password reset link has been sent."}), 200
     
     token = s.dumps(email, salt='password-reset-salt')
     
@@ -415,9 +431,10 @@ def request_reset_password():
     
     try:
         send_email(user.email, reset_url)
-        return jsonify({"message": "Password reset email sent"}), 200
+        return jsonify({"message": "If a user with this email exists, a password reset link has been sent."}), 200
     except Exception as e:
-        return jsonify({"message": f"Failed to send email: {str(e)}"}), 500
+        print(f"Error sending email: {str(e)}")
+        return jsonify({"message": "An error occurred while processing your request."}), 500
 
 @app.route('/reset-password/<token>', methods=['POST'])
 def reset_password(token):
@@ -446,33 +463,35 @@ def reset_password(token):
     return jsonify({"message": "Password has been reset successfully"}), 200
 
 def send_email(to_email, reset_url):
-    smtp_server = "sandbox.smtp.mailtrap.io"
-    smtp_port = 2525
-    from_email = os.environ.get("EMAIL_USER", "5605461f9a945e")
-    from_password = os.environ.get("EMAIL_PASS", "58f3ad6503a063")
-
     subject = "Password Reset Request"
-    message = f"Click the link to reset your password: {reset_url}"
+    content = f"""
+    Hello,
 
-    msg = MIMEMultipart()
-    msg['From'] = from_email
-    msg['To'] = to_email
-    msg['Subject'] = subject
-    msg.attach(MIMEText(message, 'plain'))
+    You have requested to reset your password. Please click on the following link to reset your password:
 
-    try:
-        server = smtplib.SMTP(smtp_server, smtp_port)
-        server.set_debuglevel(1)
-        server.starttls()
-        server.login(from_email, from_password)
-        server.send_message(msg)
-        server.quit()
-    except smtplib.SMTPAuthenticationError as e:
-        raise Exception(f"SMTP Authentication failed: {str(e)}")
-    except Exception as e:
-        raise Exception(f"Failed to send email: {str(e)}")
+    {reset_url}
+
+    If you did not request this, please ignore this email and your password will remain unchanged.
+
+    Best regards,
+    Your Application Team
+    """
     
-    return jsonify({"message": "Password reset email sent"}), 200
+    message = Mail(
+        from_email=FROM_EMAIL,
+        to_emails=to_email,
+        subject=subject,
+        plain_text_content=content)
+    
+    try:
+        sg = SendGridAPIClient(SENDGRID_API_KEY)
+        response = sg.send(message)
+        print(f"Email sent successfully to {to_email}. Status code: {response.status_code}")
+    except Exception as e:
+        print(f"Failed to send email: {str(e)}")
+        raise
+
+    return True
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)

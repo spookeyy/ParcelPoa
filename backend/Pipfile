@@ -8,6 +8,7 @@ python-dotenv = "*"
 psycopg2-binary = "*"
 flask-cors = "*"
 flask-apscheduler = "*"
+sendgrid = "*"
 
 [dev-packages]
 
