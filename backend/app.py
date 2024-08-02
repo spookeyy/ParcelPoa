@@ -3,6 +3,7 @@ import smtplib
 from flask import Flask, request, jsonify,url_for
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
+from flask_cors import CORS
 from datetime import datetime, timezone
 from flask_apscheduler import APScheduler
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
@@ -21,6 +22,8 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "super-secret-key")
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "another-secret-key")
 
+CORS(app)
+
 migrate = Migrate(app, db)
 db.init_app(app)
 bcrypt = Bcrypt(app)
@@ -34,12 +37,11 @@ s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 #     scheduler.init_app(app)
 #     scheduler.start()
 
-blacklist = set()
-
 # JWT Configurations
+blacklist = set()
 @jwt.token_in_blocklist_loader
 def check_if_token_in_blacklist(jwt_header, jwt_payload):
-    return jwt_payload["jti"] in blacklist
+    return jwt_payload['jti'] in blacklist
 
 # user routes
 @app.route('/register', methods=['POST'])
@@ -47,19 +49,30 @@ def register():
     data = request.get_json()
     if User.query.filter_by(email=data['email']).first():
         return jsonify({'message': 'Email already exists'}), 400
+
+    phone_number = data.get("phone_number")
+    phone_number_exists = User.query.filter_by(phone_number=phone_number).first()
+    if phone_number_exists:
+        return jsonify({"error": "Phone number already exists"}), 400
+
     
     required_fields = ['name', 'email', 'phone_number', 'user_role', 'password']
     
     for field in required_fields:
         if field not in data:
             return jsonify({"error": f"'{field}' is required"}), 400
-    
-    hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+    password = data.get("password")
+    if not password:
+        return jsonify({"error": "Password is required and must not be empty"}), 400
+
+    # if len(password) < 8:
+    #     return jsonify({"error": "Password must be at least 8 characters long"}), 400
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
     new_user = User(
-        name=data['name'],
-        email=data['email'],
-        phone_number=data['phone_number'],
-        user_role=data['user_role'],
+        name=data.get('name'),
+        email=data.get('email'),
+        phone_number=data.get('phone_number'),
+        user_role=data.get('user_role'),
         created_at=datetime.now(),
         updated_at=datetime.now(),
         password_hash=hashed_password
@@ -70,8 +83,7 @@ def register():
         return jsonify({"message": "Business registered successfully"}), 201
     elif data['user_role'] == 'Agent':
         return jsonify({"message": "Agent registered successfully"}), 201
-    elif data['user_role'] == 'Client':
-        return jsonify({"message": "Client user registered successfully"}), 201
+    
     return jsonify({"message": "User registered successfully"}), 201
 
 @app.route('/login', methods=['POST'])
@@ -80,12 +92,27 @@ def login():
     user = User.query.filter_by(email=data['email']).first()
     if user and bcrypt.check_password_hash(user.password_hash, data['password']):
         access_token = create_access_token(identity=user.user_id)
-        return jsonify({"access_token": access_token}), 200
+        return jsonify({
+            "access_token": access_token,
+            "user": {
+                "id": user.user_id,
+                "email": user.email,
+                "role": user.user_role
+            }
+        }), 200
     else:
         return jsonify({"message": "Invalid credentials"}), 401
+
+
+@app.route('/current_user', methods=['GET'])
+@jwt_required()
+def get_current_user():
+    current_user = User.query.get(get_jwt_identity())
+    return jsonify(current_user.to_dict())
+
     
 #logout
-@app.route('/logout', methods=['POST'])
+@app.route('/logout', methods=['DELETE'])
 @jwt_required()
 def logout():
     jti = get_jwt()["jti"]
@@ -362,18 +389,7 @@ def mark_as_delivered(parcel_id):
 
 
 #TODO: TRACKING ROUTES
-# this is a tracking route for a single parcel , this is for you meshack
-# @app.route('/track-parcel/<int:parcel_id>', methods=['GET'])
-# @jwt_required()
-# def track_parcel(parcel_id):
-#     tracking_info = Tracking.query.filter_by(parcel_id=parcel_id).order_by(Tracking.timestamp).all()
-#     if not tracking_info:
-#         return jsonify({"message": "No tracking information found for this parcel"}), 404
-    
-#     return jsonify([info.to_dict() for info in tracking_info]), 200
-
-@app.route('/tracking_number', methods=['POST'])
-@jwt_required()
+@app.route('/parcels-tracking/<string:tracking_number>', methods=['GET'])
 def track_parcel(tracking_number):
     parcel = Parcel.query.filter_by(tracking_number=tracking_number).first()
     if not parcel:
@@ -394,11 +410,37 @@ def get_current_location(parcel_id):
 
 # TODO: ORDER ROUTES
 
+# get all orders
+@app.route('/orders', methods=['GET'])
+@jwt_required()
+def get_orders():
+    user = User.query.get(get_jwt_identity())
+    if user.user_role != 'Business':
+        return jsonify({"message": "Only businesses can get orders"}), 403
+    orders = Order.query.all()
+    return jsonify([order.to_dict() for order in orders])
+
 
 
 # TODO: NOTIFICATION ROUTES
 
 
+
+
+
+
+# RESET PASSWORD
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+from flask import current_app
+
+with app.app_context():
+    s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+
+# SendGrid settings
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
+FROM_EMAIL = os.environ.get('FROM_EMAIL')
 # reset password
 @app.route('/request-reset-password', methods=['POST'])
 def request_reset_password():
@@ -407,7 +449,7 @@ def request_reset_password():
     user = User.query.filter_by(email=email).first()
     
     if not user:
-        return jsonify({"message": "User with this email does not exist"}), 404
+        return jsonify({"message": "If a user with this email exists, a password reset link has been sent."}), 200
     
     token = s.dumps(email, salt='password-reset-salt')
     
@@ -415,9 +457,10 @@ def request_reset_password():
     
     try:
         send_email(user.email, reset_url)
-        return jsonify({"message": "Password reset email sent"}), 200
+        return jsonify({"message": "If a user with this email exists, a password reset link has been sent."}), 200
     except Exception as e:
-        return jsonify({"message": f"Failed to send email: {str(e)}"}), 500
+        print(f"Error sending email: {str(e)}")
+        return jsonify({"message": "An error occurred while processing your request."}), 500
 
 @app.route('/reset-password/<token>', methods=['POST'])
 def reset_password(token):
@@ -446,33 +489,35 @@ def reset_password(token):
     return jsonify({"message": "Password has been reset successfully"}), 200
 
 def send_email(to_email, reset_url):
-    smtp_server = "sandbox.smtp.mailtrap.io"
-    smtp_port = 2525
-    from_email = os.environ.get("EMAIL_USER", "5605461f9a945e")
-    from_password = os.environ.get("EMAIL_PASS", "58f3ad6503a063")
-
     subject = "Password Reset Request"
-    message = f"Click the link to reset your password: {reset_url}"
+    content = f"""
+    Hello,
 
-    msg = MIMEMultipart()
-    msg['From'] = from_email
-    msg['To'] = to_email
-    msg['Subject'] = subject
-    msg.attach(MIMEText(message, 'plain'))
+    You have requested to reset your password. Please click on the following link to reset your password:
 
-    try:
-        server = smtplib.SMTP(smtp_server, smtp_port)
-        server.set_debuglevel(1)
-        server.starttls()
-        server.login(from_email, from_password)
-        server.send_message(msg)
-        server.quit()
-    except smtplib.SMTPAuthenticationError as e:
-        raise Exception(f"SMTP Authentication failed: {str(e)}")
-    except Exception as e:
-        raise Exception(f"Failed to send email: {str(e)}")
+    {reset_url}
+
+    If you did not request this, please ignore this email and your password will remain unchanged.
+
+    Best regards,
+    Your Application Team
+    """
     
-    return jsonify({"message": "Password reset email sent"}), 200
+    message = Mail(
+        from_email=FROM_EMAIL,
+        to_emails=to_email,
+        subject=subject,
+        plain_text_content=content)
+    
+    try:
+        sg = SendGridAPIClient(SENDGRID_API_KEY)
+        response = sg.send(message)
+        print(f"Email sent successfully to {to_email}. Status code: {response.status_code}")
+    except Exception as e:
+        print(f"Failed to send email: {str(e)}")
+        raise
+
+    return True
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)
