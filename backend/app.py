@@ -430,38 +430,52 @@ def get_orders():
 
 
 # RESET PASSWORD
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
-from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
-from flask import current_app
+from flask_mail import Mail, Message
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = os.environ.get('GMAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('GMAIL_APP_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = 'parcelpoa@gmail.com'
+
+mail = Mail(app)
 
 with app.app_context():
-    s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+    # serializer for generating secure tokens
+    s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
-# SendGrid settings
-SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
-FROM_EMAIL = os.environ.get('FROM_EMAIL')
+
 # reset password
 @app.route('/request-reset-password', methods=['POST'])
 def request_reset_password():
     data = request.get_json()
     email = data.get('email')
-    user = User.query.filter_by(email=email).first()
+    frontend_url = data.get('frontend_url')  # Get rontend URL from request
     
+    user = User.query.filter_by(email=email).first()
+
     if not user:
         return jsonify({"message": "If a user with this email exists, a password reset link has been sent."}), 200
-    
+
     token = s.dumps(email, salt='password-reset-salt')
-    
-    reset_url = url_for('reset_password', token=token, _external=True)
-    
+
+    # set the reset URL to use frontend URL
+    reset_url = f"{frontend_url}/reset-password/{token}"
+
     try:
         send_email(user.email, reset_url)
         return jsonify({"message": "If a user with this email exists, a password reset link has been sent."}), 200
     except Exception as e:
         print(f"Error sending email: {str(e)}")
         return jsonify({"message": "An error occurred while processing your request."}), 500
-
+    
+    
 @app.route('/reset-password/<token>', methods=['POST'])
 def reset_password(token):
     try:
@@ -488,6 +502,7 @@ def reset_password(token):
     
     return jsonify({"message": "Password has been reset successfully"}), 200
 
+
 def send_email(to_email, reset_url):
     subject = "Password Reset Request"
     content = f"""
@@ -500,21 +515,22 @@ def send_email(to_email, reset_url):
     If you did not request this, please ignore this email and your password will remain unchanged.
 
     Best regards,
-    Your Application Team
+    The parcelpoa Team
     """
     
-    message = Mail(
-        from_email=FROM_EMAIL,
-        to_emails=to_email,
-        subject=subject,
-        plain_text_content=content)
+    msg = Message(subject=subject,
+                  recipients=[to_email],
+                  body=content)
     
     try:
-        sg = SendGridAPIClient(SENDGRID_API_KEY)
-        response = sg.send(message)
-        print(f"Email sent successfully to {to_email}. Status code: {response.status_code}")
+        print(f"Attempting to send email to {to_email}")
+        mail.send(msg)
+        print(f"Email sent successfully to {to_email}.")
     except Exception as e:
         print(f"Failed to send email: {str(e)}")
+        print(f"Error type: {type(e).__name__}")
+        print(f"MAIL_USERNAME: {app.config['MAIL_USERNAME']}")
+        print(f"MAIL_PASSWORD set: {'Yes' if app.config['MAIL_PASSWORD'] else 'No'}")
         raise
 
     return True

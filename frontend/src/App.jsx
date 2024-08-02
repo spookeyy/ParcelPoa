@@ -3,6 +3,8 @@ import { ToastContainer } from "react-toastify";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Footer from "./components/Footer";
 import Header from './components/Header';
+import RequestResetPassword from "./components/RequestResetPassword";
+import ResetPassword from "./components/ResetPassword";
 import ChangePassword from "./components/Change-Password";
 
 // Seller Pages
@@ -48,73 +50,80 @@ import { UserProvider } from "./Context/UserContext";
 import { TrackingProvider } from "./Context/TrackingContext";
 function App() {
   return (
-
     <Router>
-
       <UserProvider>
-      <Header></Header>
-        <ToastContainer />
+      <Header />
         <TrackingProvider>
           <Routes>
      
-          {/* Seller Routes  Start*/}
-          
-          <Route path="/" element={<Home />} />
-        <Route path="/signup" element={<Create_Account />} />
-        <Route path="/agents" element={<Agents />} />
-        <Route path="/agent-requests" element={<Agent_Requests />} />
-        <Route path="/agent/:id" element={<Agent_Details />} />
-        <Route path="/agent-trends/:id" element={<Agent_Trends />} /> 
-        <Route path="/invoice/:id" element={<Invoice />} />
-        <Route path="/messages-list" element={<Messages_List />} />
-        <Route path="/message/:id" element={<Messages_Details />} />
-        <Route path="/order-list" element={<Order_List />} />
-        <Route path="/order/:id" element={<Order_Details />} />
-        <Route path="/tracking" element={<Tracking />} />
-        <Route path="/dashboard-part" element={<Dashboard_Part />} />
-      {/* Seller Routes  */}
-      
-
+            {/* Seller Routes  Start*/}
+            <Route path="/" element={<Home />} />
+            <Route path="/signup" element={<Create_Account />} />
+            <Route path="/agents" element={<Agents />} />
+            <Route path="/agent-requests" element={<Agent_Requests />} />
+            <Route path="/agent/:id" element={<Agent_Details />} />
+            <Route path="/agent-trends/:id" element={<Agent_Trends />} /> 
+            <Route path="/invoice/:id" element={<Invoice />} />
+            <Route path="/messages-list" element={<Messages_List />} />
+            <Route path="/message/:id" element={<Messages_Details />} />
+            <Route path="/order-list" element={<Order_List />} />
+            <Route path="/order/:id" element={<Order_Details />} />
+            <Route path="/tracking" element={<Tracking />} />
+            <Route path="/dashboard-part" element={<Dashboard_Part />} />
+            {/* Seller Routes  */}
 
             <Route path="/login" element={<Login />} />
             <Route path="/create-account" element={<Create_Account />} />
             <Route path="/agent-requests" element={<Agent_Requests />} />
             <Route path="/order-list" element={<Order_List />} />
             <Route path="/order/:id" element={<Order_Details />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/change-password" element={<ChangePassword />} />
             <Route path="/track/:parcelId" element={<OrderTracking />} />
             <Route path="/track-orders" element={<TrackOrders />} />
+              
             {/* the pages for the agent */}
             <Route path="/agent" element={<AgentHome />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/delivery-details/:id" element={<DeliveryDetails />} />
-            <Route
-              path="/delivery-confirmation"
-              element={<DeliveryConfirmation />}
-            />
-            <Route
-              path="/performance-metrics"
-              element={<PerformanceMetrics />}
-            />
+            <Route path="/delivery-confirmation" element={<DeliveryConfirmation />} />
+            <Route path="/performance-metrics" element={<PerformanceMetrics />} />
             <Route path="/issue-reporting" element={<IssueReporting />} />
             <Route path="/manage-deliveries" element={<ManageDeliveries />} />
             <Route path="/add-delivery" element={<AddDelivery />} />
-            <Route
-              path="/communication-tools"
-              element={<CommunicationTools />}
-            />
-            <Route
-              path="/update-parcel-status"
-              element={<UpdateParcelStatusPage />}
-            />
+            <Route path="/communication-tools" element={<CommunicationTools />} />
+            <Route path="/update-parcel-status" element={<UpdateParcelStatusPage />} />
             <Route path="/agent-login" element={<AgentLogin />} />
             <Route path="/agent-register" element={<AgentRegister />} />
             <Route path="/agent-profile" element={<AgentProfile />} />
             <Route path="/update-status" element={<UpdateStatus />} />
             {/* end of the pages for the agent */}
+
+            <Route path="/request-reset-password" element={<RequestResetPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
           </Routes>
         </TrackingProvider>
         <Footer />
+        <ToastContainer
+          position="top-center"
+          toastOptions={{
+            style: {
+              background: "rgb(51 65 85)",
+              color: "#000",
+              borderRadius: "4px",
+              boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
+              padding: "10px 20px",
+            },
+          }}
+          autoClose={2000}
+          hideProgressBar={true}
+          newestOnTop={true}
+          closeOnClick={true}
+          pauseOnHover={true}
+          draggable={true}
+          progress={undefined}
+          theme="dark"
+        />
       </UserProvider>
 
     </Router>

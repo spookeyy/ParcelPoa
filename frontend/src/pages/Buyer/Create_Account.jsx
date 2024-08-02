@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { UserContext } from '../../Context/UserContext';
 import { Link, useNavigate } from 'react-router-dom';
 import {toast} from 'react-toastify';
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 function Create_Account() {
   const nav = useNavigate();
@@ -19,6 +20,7 @@ function Create_Account() {
   const [repeatPasswordError, setRepeatPasswordError] = useState("");
   const [emailError, setEmailError] = useState(false);
   const [generalError, setGeneralError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
 
   function handleSubmit(e) {
@@ -93,12 +95,18 @@ function Create_Account() {
     return containsDigit && !isSequential;
   }
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-100 to-indigo-100 p-4 sm:p-6">
       <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg overflow-hidden sm:rounded-2xl">
         <div className="md:flex">
           <div className="md:w-1/2 bg-blue-800 p-8 text-white flex flex-col justify-center">
-            <h2 className="text-3xl italic font-bold mb-4">Welcome to ParcelPoa</h2>
+            <h2 className="text-3xl italic font-bold mb-4">
+              Welcome to ParcelPoa
+            </h2>
             <p className="mb-4">
               Create your account and start your journey with us.
             </p>
@@ -195,7 +203,7 @@ function Create_Account() {
                   )}
                 </div>
 
-                <div>
+                <div className="relative">
                   <label
                     htmlFor="password"
                     className="block text-sm font-medium text-gray-700 mb-1"
@@ -203,14 +211,14 @@ function Create_Account() {
                     Password
                   </label>
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     id="password"
-                    value={password}
+                    value={password || ""}
                     onChange={(e) => {
                       setPassword(e.target.value);
                       setPasswordError(isPasswordValid(e.target.value));
                     }}
-                    className={`w-full px-3 py-2 border ${
+                    className={`w-full px-3 py-2 pr-10 border ${
                       passwordError ? "border-red-500" : "border-gray-300"
                     } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm ${
                       passwordError ? "text-red-500" : ""
@@ -218,12 +226,24 @@ function Create_Account() {
                     placeholder="password"
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-gray-600 hover:text-gray-800"
+                    style={{ top: '24px' }} 
+                  >
+                    {showPassword ? (
+                      <EyeOffIcon className="h-5 w-5" />
+                    ) : (
+                      <EyeIcon className="h-5 w-5" />
+                    )}
+                  </button>
                   {passwordError && (
                     <p className="mt-1 text-xs text-red-600">{passwordError}</p>
                   )}
                 </div>
 
-                <div>
+                <div className="relative">
                   <label
                     htmlFor="confirmPassword"
                     className="block text-sm font-medium text-gray-700 mb-1"
@@ -231,9 +251,9 @@ function Create_Account() {
                     Confirm Password
                   </label>
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     id="confirmPassword"
-                    value={repeatPassword}
+                    value={repeatPassword || ""}
                     onChange={(e) => {
                       setRepeatPassword(e.target.value);
                       setRepeatPasswordError(
@@ -242,19 +262,33 @@ function Create_Account() {
                           : ""
                       );
                     }}
-                    className={`w-full px-3 py-2 border ${
+                    className={`w-full px-3 py-2 pr-10 border ${
                       repeatPasswordError ? "border-red-500" : "border-gray-300"
                     } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm ${
                       repeatPasswordError ? "text-red-500" : ""
                     }`}
-                    placeholder="password"
+                    placeholder="confirm password"
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-gray-600 hover:text-gray-800"
+                    style={{ top: '24px' }}
+                  >
+                    {showPassword ? (
+                      <EyeOffIcon className="h-5 w-5" />
+                    ) : (
+                      <EyeIcon className="h-5 w-5" />
+                    )}
+                  </button>
                   {repeatPasswordError && (
                     <p className="mt-1 text-xs text-red-600">
                       {repeatPasswordError}
                     </p>
                   )}
+                </div>
+
                 </div>
 
                 <div>
@@ -278,8 +312,6 @@ function Create_Account() {
                     <option value="Business">Business</option>
                   </select>
                 </div>
-              </div>
-
               <button
                 type="submit"
                 className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out"
