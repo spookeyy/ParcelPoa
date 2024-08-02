@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { UserContext } from '../../Context/UserContext';
+import { UserContext } from '../Context/UserContext';
 import { Link, useNavigate } from 'react-router-dom';
 import {toast} from 'react-toastify';
 import { EyeIcon, EyeOffIcon } from "lucide-react";
