@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ChangePassword from "../../components/Change-Password";
 
 export default function AgentProfile({ onClose }) {
   const [email, setEmail] = useState("");
@@ -6,6 +7,7 @@ export default function AgentProfile({ onClose }) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [agentOption, setAgentOption] = useState("");
   const [message, setMessage] = useState("");
+  const [showChangePassword, setShowChangePassword] = useState(false);
 
   useEffect(() => {
     fetch("/api/profile")
@@ -48,12 +50,7 @@ export default function AgentProfile({ onClose }) {
         <h2 className="text-2xl font-bold mb-6 text-center">Agent Profile</h2>
         <form onSubmit={handleUpdateProfile} className="space-y-6">
           <div className="mb-4">
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Name
-            </label>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
             <input
               type="text"
               id="name"
@@ -64,12 +61,7 @@ export default function AgentProfile({ onClose }) {
             />
           </div>
           <div className="mb-4">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Email
-            </label>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
             <input
               type="email"
               id="email"
@@ -80,12 +72,7 @@ export default function AgentProfile({ onClose }) {
             />
           </div>
           <div className="mb-4">
-            <label
-              htmlFor="phone"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Phone Number
-            </label>
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number</label>
             <input
               type="tel"
               id="phone"
@@ -107,6 +94,15 @@ export default function AgentProfile({ onClose }) {
           <div className="mt-4 text-green-500 text-center">{message}</div>
         )}
 
+        <div className="mt-6 text-center">
+          <button
+            onClick={() => setShowChangePassword(!showChangePassword)}
+            className="w-full bg-yellow-500 text-white py-2 rounded-md shadow hover:bg-yellow-600"
+          >
+            Change Password
+          </button>
+        </div>
+        {showChangePassword && <ChangePassword />}
         <div className="mt-6 text-center">
           <button
             onClick={onClose}

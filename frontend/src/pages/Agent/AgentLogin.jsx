@@ -9,7 +9,6 @@ export default function AgentLogin() {
   const handleLogin = (e) => {
     e.preventDefault();
 
-    // Replace with your login logic
     fetch("/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -33,12 +32,7 @@ export default function AgentLogin() {
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
         <form onSubmit={handleLogin} className="space-y-6">
           <div className="mb-4">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Email
-            </label>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
             <input
               type="email"
               id="email"
@@ -49,12 +43,7 @@ export default function AgentLogin() {
             />
           </div>
           <div className="mb-6">
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Password
-            </label>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
             <input
               type="password"
               id="password"
@@ -72,17 +61,14 @@ export default function AgentLogin() {
           </button>
         </form>
         <button
-          onClick={() => navigate("/dashboard")}
+          onClick={() => navigate("/change-password")}
           className="w-full mt-4 bg-green-500 text-white py-2 rounded-md shadow hover:bg-green-600"
         >
-          Open Sidebar
+          Change Password
         </button>
         <p className="mt-4 text-center text-sm text-gray-600">
           Don't have an account?{" "}
-          <a href="/agent-register" className="text-blue-500 hover:underline">
-            Sign up here
-          </a>
-          .
+          <a href="/agent-register" className="text-blue-500 hover:underline">Sign up here</a>.
         </p>
       </div>
     </div>
