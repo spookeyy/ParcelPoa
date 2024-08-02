@@ -138,7 +138,7 @@ function Create_Account() {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                    placeholder="Enter full name"
+                    placeholder="full name"
                     required
                   />
                 </div>
@@ -163,7 +163,7 @@ function Create_Account() {
                     } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm ${
                       emailError ? "text-red-500" : ""
                     }`}
-                    placeholder="Enter email address"
+                    placeholder="email address"
                     required
                   />
                   {emailError && (
@@ -187,7 +187,7 @@ function Create_Account() {
                       setPhoneError(false);
                     }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                    placeholder="Enter phone number"
+                    placeholder="phone number"
                     required
                   />
                   {phoneError && (
@@ -215,7 +215,7 @@ function Create_Account() {
                     } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm ${
                       passwordError ? "text-red-500" : ""
                     }`}
-                    placeholder="Enter password"
+                    placeholder="password"
                     required
                   />
                   {passwordError && (
@@ -247,7 +247,7 @@ function Create_Account() {
                     } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm ${
                       repeatPasswordError ? "text-red-500" : ""
                     }`}
-                    placeholder="Confirm password"
+                    placeholder="password"
                     required
                   />
                   {repeatPasswordError && (
