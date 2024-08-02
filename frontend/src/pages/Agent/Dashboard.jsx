@@ -5,18 +5,15 @@ import Sidebar from "./DashboardComponentsforAgent/Sidebar";
 import StatsCard from "./DashboardComponentsforAgent/StatsCard";
 import DeliveriesChart from "./DashboardComponentsforAgent/DeliveriesChart";
 import Deliveries from "./DashboardComponentsforAgent/Deliveries";
-import ManageDeliveries from "./ManageDeliveries"; // Import the ManageDeliveries component
+import ManageDeliveries from "./ManageDeliveries";
 
 export default function Dashboard() {
-  // Sidebar state
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Function to toggle sidebar
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  // Function to open sidebar
   const openSidebar = () => {
     setSidebarOpen(true);
   };
@@ -35,24 +32,23 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-100">
+    <div className="flex h-full overflow-hidden bg-gray-100">
       {/* Sidebar component */}
-      <Sidebar
-        isOpen={sidebarOpen}
-        toggleSidebar={toggleSidebar}
-      />
+      <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
 
       <div
-        className={`flex-1 overflow-auto transition-transform duration-300 ${
+        className={`flex-1 flex flex-col overflow-y-auto transition-transform duration-300 ${
           sidebarOpen ? "ml-64" : ""
         }`}
       >
         <div className="relative">
           <button
             onClick={toggleSidebar}
-            className="bg-blue-500 text-white p-2 rounded-lg shadow-md absolute top-4 left-4 z-50"
+            className="bg-blue-500 text-white p-2 rounded-lg shadow-md absolute top-4 left-4 z-50 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-300"
+            aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+            aria-expanded={sidebarOpen}
           >
-            {sidebarOpen ? "Close Sidebar" : "Open Sidebar"}
+            <i className={`fas ${sidebarOpen ? "fa-times" : "fa-bars"} text-xl`}></i>
           </button>
         </div>
 
@@ -68,7 +64,7 @@ export default function Dashboard() {
           <Route
             path="/"
             element={
-              <div>
+              <div className="flex flex-col flex-1 overflow-y-auto">
                 <div className="flex flex-wrap justify-center gap-6 px-6 mb-8">
                   <StatsCard
                     icon="fa-chart-line"
