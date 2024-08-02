@@ -9,6 +9,7 @@ psycopg2-binary = "*"
 flask-cors = "*"
 flask-apscheduler = "*"
 sendgrid = "*"
+flask-mail = "*"
 
 [dev-packages]
 
