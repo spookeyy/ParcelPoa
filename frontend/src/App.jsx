@@ -37,7 +37,6 @@ function App() {
   return (
     <Router>
       <UserProvider>
-        <ToastContainer />
         <TrackingProvider>
           <Routes>
             <Route path="/login" element={<Login />} />
@@ -79,11 +78,34 @@ function App() {
             <Route path="/update-status" element={<UpdateStatus />} />
             {/* end of the pages for the agent */}
 
-            <Route path="/request-reset-password" element={<RequestResetPassword />}/>
+            <Route
+              path="/request-reset-password"
+              element={<RequestResetPassword />}
+            />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
           </Routes>
         </TrackingProvider>
         <Footer />
+        <ToastContainer
+          position="top-center"
+          toastOptions={{
+            style: {
+              background: "rgb(51 65 85)",
+              color: "#000",
+              borderRadius: "4px",
+              boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
+              padding: "10px 20px",
+            },
+          }}
+          autoClose={2000}
+          hideProgressBar={true}
+          newestOnTop={true}
+          closeOnClick={true}
+          pauseOnHover={true}
+          draggable={true}
+          progress={undefined}
+          theme="dark"
+        />
       </UserProvider>
     </Router>
   );
