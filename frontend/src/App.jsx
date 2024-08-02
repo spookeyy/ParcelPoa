@@ -6,7 +6,8 @@ import Agent_Requests from "./pages/Agent_Requests";
 import Footer from "./components/Footer";
 import Order_List from "./pages/Order_List";
 import Order_Details from "./pages/Order_Details";
-import Reset_Password from "./pages/Reset_Password";
+import RequestResetPassword from "./components/RequestResetPassword";
+import ResetPassword from "./components/ResetPassword";
 import ChangePassword from "./components/Change-Password";
 //Buyer pages
 import OrderTracking from "./pages/Buyer/OrderTracking";
@@ -45,7 +46,7 @@ function App() {
             <Route path="/agent-requests" element={<Agent_Requests />} />
             <Route path="/order-list" element={<Order_List />} />
             <Route path="/order/:id" element={<Order_Details />} />
-            <Route path="/reset-password" element={<Reset_Password />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/change-password" element={<ChangePassword />} />
             <Route path="/track/:parcelId" element={<OrderTracking />} />
             <Route path="/track-orders" element={<TrackOrders />} />
@@ -77,6 +78,9 @@ function App() {
             <Route path="/agent-profile" element={<AgentProfile />} />
             <Route path="/update-status" element={<UpdateStatus />} />
             {/* end of the pages for the agent */}
+
+            <Route path="/request-reset-password" element={<RequestResetPassword />}/>
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
           </Routes>
         </TrackingProvider>
         <Footer />
