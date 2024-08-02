@@ -75,10 +75,10 @@ function login(email, password) {
             })
             .then(response => response.json())
             .then(user => {
-                if (user.role === "Agent") {
+                if (user.user_role === "Agent") {
                     toast.success("Logged in Successfully as Agent!");
                     nav("/agent");
-                } else if (user.role === "Business") {
+                } else if (user.user_role === "Business") {
                     toast.success("Logged in Successfully as Business!");
                     nav("/business-dashboard");
                 } else {
