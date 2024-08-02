@@ -430,17 +430,24 @@ def get_orders():
 
 
 # RESET PASSWORD
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
-from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
-from flask import current_app
+from flask_mail import Mail, Message
+
+app.config['MAIL_SERVER'] = 'sandbox.smtp.mailtrap.io'
+app.config['MAIL_PORT'] = 2525
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = os.environ.get('MAILTRAP_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAILTRAP_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = 'parcelpoa@gmail.com'
+
+mail = Mail(app)
 
 with app.app_context():
-    s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+    # Create a serializer for generating secure tokens
+    s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
-# SendGrid settings
-SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
-FROM_EMAIL = os.environ.get('FROM_EMAIL')
+
+
 # reset password
 @app.route('/request-reset-password', methods=['POST'])
 def request_reset_password():
@@ -461,7 +468,7 @@ def request_reset_password():
     except Exception as e:
         print(f"Error sending email: {str(e)}")
         return jsonify({"message": "An error occurred while processing your request."}), 500
-
+    
 @app.route('/reset-password/<token>', methods=['POST'])
 def reset_password(token):
     try:
@@ -488,7 +495,9 @@ def reset_password(token):
     
     return jsonify({"message": "Password has been reset successfully"}), 200
 
-def send_email(to_email, reset_url):
+
+def send_email(to_email,
+                reset_url):
     subject = "Password Reset Request"
     content = f"""
     Hello,
@@ -503,16 +512,13 @@ def send_email(to_email, reset_url):
     Your Application Team
     """
     
-    message = Mail(
-        from_email=FROM_EMAIL,
-        to_emails=to_email,
-        subject=subject,
-        plain_text_content=content)
+    msg = Message(subject=subject,
+                  recipients=[to_email],
+                  body=content)
     
     try:
-        sg = SendGridAPIClient(SENDGRID_API_KEY)
-        response = sg.send(message)
-        print(f"Email sent successfully to {to_email}. Status code: {response.status_code}")
+        mail.send(msg)
+        print(f"Email sent successfully to {to_email}.")
     except Exception as e:
         print(f"Failed to send email: {str(e)}")
         raise
