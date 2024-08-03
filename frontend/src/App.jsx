@@ -6,6 +6,8 @@ import Header from './components/Header';
 import RequestResetPassword from "./components/RequestResetPassword";
 import ResetPassword from "./components/ResetPassword";
 import ChangePassword from "./components/Change-Password";
+import Login from "./components/Login";
+import Create_Account from "./components/Create_Account";
 
 // Seller Pages
 import Home from './pages/Seller/Home';
@@ -27,8 +29,6 @@ import Tracking from './pages/Seller/Tracking';
 //Buyer pages
 import OrderTracking from "./pages/Buyer/OrderTracking";
 import TrackOrders from "./pages/Buyer/TrackOrders";
-import Login from "./pages/Buyer/Login";
-import Create_Account from "./pages/Buyer/Create_Account";
 //End
 // the pages for the agent
 import AgentHome from "./pages/Agent/AgentHome";
