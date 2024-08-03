@@ -85,7 +85,7 @@ export const UserProvider = ({ children }) => {
           if (res.user.role === "Agent" || res.user.role === "Business") {
             toast.success(`Logged in Successfully as ${res.user.role}!`);
             // TODO: navigate to dashboards check on business from peter
-            nav(res.user.role === "Agent" ? "/agent" : "/seller/dashboard");
+            nav(res.user.role === "Agent" ? "/agent" : "/seller");
           } else {
             console.error("Unexpected role:", res.user.role);
             throw new Error(`Unexpected role: ${res.user.role}`);
