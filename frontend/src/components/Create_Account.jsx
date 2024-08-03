@@ -62,8 +62,8 @@ function Create_Account() {
         setPhone("");
         setPassword("");
         setRepeatPassword("");
+        setuser_role("");
 
-        // =navigate to login page after successful registration
         nav("/login");
       })
       .catch((error) => {
@@ -100,7 +100,7 @@ function Create_Account() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-100 to-indigo-100 p-4 sm:p-6">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-400 to-indigo-600 p-4 sm:p-6">
       <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg overflow-hidden sm:rounded-2xl">
         <div className="md:flex">
           <div className="md:w-1/2 bg-blue-800 p-8 text-white flex flex-col justify-center">
