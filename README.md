@@ -80,7 +80,7 @@ POST /login - Login and receive an access token
 - email ::  scarlet
 - phone :: +254 704 372525
 
-- email ::  peter
+- email ::  pmbugua276@gmail.com
 - phone :: +254 701 571745
 
 

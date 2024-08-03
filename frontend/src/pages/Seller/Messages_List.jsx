@@ -11,7 +11,7 @@ const initialMessages = [
 
 // Filter Component
 const FilterBar = ({ onFilterChange, onReset }) => (
-  <div className="bg-gray-100 p-4 rounded-lg shadow-md mb-6 flex flex-wrap gap-4 items-center">
+  <div className="bg-gray-100 p-4 rounded-lg shadow-md mb-6 flex flex-col sm:flex-row gap-4 sm:gap-6">
     <button
       onClick={() => alert('Filter Icon Clicked')}
       className="text-gray-700 hover:text-gray-900"
@@ -23,7 +23,7 @@ const FilterBar = ({ onFilterChange, onReset }) => (
     </button>
     <select
       onChange={(e) => onFilterChange('date', e.target.value)}
-      className="border rounded p-2"
+      className="border rounded p-2 text-sm sm:text-base"
       aria-label="Filter by date"
     >
       <option value="">Select Date</option>
@@ -33,7 +33,7 @@ const FilterBar = ({ onFilterChange, onReset }) => (
     </select>
     <select
       onChange={(e) => onFilterChange('sender', e.target.value)}
-      className="border rounded p-2"
+      className="border rounded p-2 text-sm sm:text-base"
       aria-label="Filter by sender"
     >
       <option value="">Select Sender</option>
@@ -43,7 +43,7 @@ const FilterBar = ({ onFilterChange, onReset }) => (
     </select>
     <select
       onChange={(e) => onFilterChange('status', e.target.value)}
-      className="border rounded p-2"
+      className="border rounded p-2 text-sm sm:text-base"
       aria-label="Filter by status"
     >
       <option value="">Select Status</option>
@@ -52,7 +52,7 @@ const FilterBar = ({ onFilterChange, onReset }) => (
     </select>
     <button
       onClick={onReset}
-      className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600"
+      className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 text-sm sm:text-base"
       aria-label="Reset filters"
     >
       Reset Filter
@@ -96,49 +96,57 @@ export default function Messages_List() {
   });
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6 lg:p-8">
       {/* Title */}
-      <h1 className="text-2xl font-semibold mb-4">Messages List</h1>
+      <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-4">Messages List</h1>
 
       <FilterBar onFilterChange={handleFilterChange} onReset={resetFilters} />
+
+      {/* Responsive table */}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
-          <thead>
-            <tr className="bg-gray-100 text-gray-600">
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Message ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Sender</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Content</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Actions</th>
+          <thead className="bg-gradient-to-r from-blue-500 to-blue-700 text-white text-xs sm:text-sm lg:text-base">
+            <tr>
+              <th className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 text-left font-medium border-b border-gray-300">Message ID</th>
+              <th className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 text-left font-medium border-b border-gray-300">Date</th>
+              <th className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 text-left font-medium border-b border-gray-300">Sender</th>
+              <th className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 text-left font-medium border-b border-gray-300">Content</th>
+              <th className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 text-left font-medium border-b border-gray-300">Status</th>
+              <th className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 text-left font-medium border-b border-gray-300">Actions</th>
             </tr>
           </thead>
-          <tbody className="text-gray-700">
-            {filteredMessages.map(message => (
-              <tr key={message.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 text-sm">{message.id}</td>
-                <td className="px-6 py-4 text-sm">{message.date}</td>
-                <td className="px-6 py-4 text-sm">{message.sender}</td>
-                <td className="px-6 py-4 text-sm">{message.content}</td>
-                <td className="px-6 py-4 text-sm">{message.status}</td>
-                <td className="px-6 py-4 text-sm flex items-center gap-2">
-                  <button
-                    onClick={() => handleViewDetails(message.id)}
-                    className="text-blue-500 hover:text-blue-700"
-                    aria-label={`View Details of Message ID: ${message.id}`}
-                  >
-                    <EyeIcon className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(message.id)}
-                    className="text-red-500 hover:text-red-700"
-                    aria-label={`Delete Message ID: ${message.id}`}
-                  >
-                    <TrashIcon className="w-5 h-5" />
-                  </button>
-                </td>
+          <tbody className="text-gray-700 text-xs sm:text-sm lg:text-base">
+            {filteredMessages.length > 0 ? (
+              filteredMessages.map(message => (
+                <tr key={message.id} className="hover:bg-gray-50">
+                  <td className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3">{message.id}</td>
+                  <td className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3">{message.date}</td>
+                  <td className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3">{message.sender}</td>
+                  <td className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3">{message.content}</td>
+                  <td className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3">{message.status}</td>
+                  <td className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 flex items-center gap-2">
+                    <button
+                      onClick={() => handleViewDetails(message.id)}
+                      className="text-blue-400 hover:text-blue-600 text-xs sm:text-sm lg:text-base"
+                      aria-label={`View Details of Message ID: ${message.id}`}
+                    >
+                      <EyeIcon className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(message.id)}
+                      className="text-red-400 hover:text-red-600 text-xs sm:text-sm lg:text-base"
+                      aria-label={`Delete Message ID: ${message.id}`}
+                    >
+                      <TrashIcon className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 text-center text-gray-500">No messages found</td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

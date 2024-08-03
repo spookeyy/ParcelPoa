@@ -19,49 +19,48 @@ export const UserProvider = ({ children }) => {
   );
 
   // REGISTER USER
- const addUser = (name, email, phone_number, password, user_role) => {
-   return new Promise((resolve, reject) => {
-     fetch(`${server}/register`, {
-       method: "POST",
-       body: JSON.stringify({
-         name: name,
-         email: email,
-         phone_number: phone_number,
-         password: password,
-         user_role: user_role,
-       }),
-       headers: {
-         "Content-type": "application/json",
-       },
-     })
-       .then((response) => {
-         if (!response.ok) {
-           throw new Error(`HTTP error! status: ${response.status}`);
-         }
-         return response.json();
-       })
-       .then((res) => {
-         console.log("Server response:", res);
-         if (res.message && res.message.includes("successfully")) {
-           toast.success(res.message);
-           resolve(res);
-         } else if (res.error) {
-           toast.error(res.error);
-           reject(new Error(res.error));
-         } else {
-           console.error("Unexpected response structure:", res);
-           toast.error("An unexpected error occurred");
-           reject(new Error("Unexpected response structure"));
-         }
-       })
-       .catch((error) => {
-         console.error("Fetch error:", error);
-         toast.error(`An error occurred: ${error.message}`);
-         reject(error);
-       });
-   });
- };
-
+  const addUser = (name, email, phone_number, password, user_role) => {
+    return new Promise((resolve, reject) => {
+      fetch(`${server}/register`, {
+        method: "POST",
+        body: JSON.stringify({
+          name: name,
+          email: email,
+          phone_number: phone_number,
+          password: password,
+          user_role: user_role,
+        }),
+        headers: {
+          "Content-type": "application/json",
+        },
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((res) => {
+          console.log("Server response:", res);
+          if (res.message && res.message.includes("successfully")) {
+            toast.success(res.message);
+            resolve(res);
+          } else if (res.error) {
+            toast.error(res.error);
+            reject(new Error(res.error));
+          } else {
+            console.error("Unexpected response structure:", res);
+            toast.error("An unexpected error occurred");
+            reject(new Error("Unexpected response structure"));
+          }
+        })
+        .catch((error) => {
+          console.error("Fetch error:", error);
+          toast.error(`An error occurred: ${error.message}`);
+          reject(error);
+        });
+    });
+  };
 
   // LOGIN USER
   function login(email, password) {
@@ -186,11 +185,56 @@ export const UserProvider = ({ children }) => {
   }, [authToken]);
 
   useEffect(() => {
-    if (authToken) { 
+    if (authToken) {
       fetchUserProfile();
     }
   }, [authToken, onChange, fetchUserProfile]);
 
+  // Request Password Reset
+  const requestPasswordReset = (email, frontendUrl) => {
+    return fetch(`${server}/request-reset-password`, {
+      method: "POST",
+      body: JSON.stringify({ email, frontend_url: frontendUrl }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        if (res.message) {
+          return res.message;
+        } else {
+          throw new Error("An unexpected error occurred");
+        }
+      })
+      .catch((error) => {
+        console.error("Error requesting password reset:", error);
+        throw error;
+      });
+  };
+
+  // Reset Password
+  const resetPassword = (token, newPassword) => {
+    return fetch(`${server}/reset-password/${token}`, {
+      method: "POST",
+      body: JSON.stringify({ new_password: newPassword }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        if (res.message) {
+          return res.message;
+        } else {
+          throw new Error("An unexpected error occurred");
+        }
+      })
+      .catch((error) => {
+        console.error("Error resetting password:", error);
+        throw error;
+      });
+  };
 
   const contextData = {
     currentUser,
@@ -200,6 +244,11 @@ export const UserProvider = ({ children }) => {
     logout,
     addUser,
     updateUser,
+    requestPasswordReset,
+    fetchUserProfile,
+    onChange,
+    setOnChange,
+    resetPassword,
   };
 
   return (
