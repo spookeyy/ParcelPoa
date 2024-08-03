@@ -63,7 +63,7 @@ function App() {
           <Routes>
      
             {/* Seller Routes  Start*/}
-            <Route path="/" element={<Home />} />
+            {/* <Route path="/" element={<Home />} /> */}
             <Route path="/signup" element={<Create_Account />} />
             <Route path="/agents" element={<Agents />} />
             <Route path="/agent-requests" element={<Agent_Requests />} />
@@ -107,6 +107,12 @@ function App() {
 
             <Route path="/request-reset-password" element={<RequestResetPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/returns" element={<Returns />} />
+            <Route path="/" element={<Landing />} />
           </Routes>
         </TrackingProvider>
         <Footer />
