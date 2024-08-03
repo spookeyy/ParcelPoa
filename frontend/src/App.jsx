@@ -116,7 +116,7 @@ function App() {
             },
           }}
           autoClose={2000}
-          hideProgressBar={true}
+          hideProgressBar={false}
           newestOnTop={true}
           closeOnClick={true}
           pauseOnHover={true}
