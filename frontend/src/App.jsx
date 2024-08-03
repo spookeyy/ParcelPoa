@@ -81,7 +81,7 @@ function App() {
 
 
       {/* Buyer Routes start */}
-      <Route path="Buyer" element = {<OrderTracking/>}/>
+      <Route path="Buyer" element = {<Buyer_Home/>}/>
       <Route path="Tracking" element={<OrderTracking/>}/>
       <Route path="TrackOrders" element={<TrackOrders/>}/>
       <Route path="Login" element = {<Login/>}/>
