@@ -46,7 +46,6 @@ class Parcel(db.Model):
     parcel_id = Column(Integer, primary_key=True)
     sender_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
     tracking_number = Column(String(20), unique=True, nullable=False)
-    
     recipient_name = Column(String, nullable=False)
     recipient_address = Column(String, nullable=False)
     recipient_phone = Column(String, nullable=False)

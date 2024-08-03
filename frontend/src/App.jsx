@@ -49,6 +49,12 @@ import UpdateStatus from "./pages/Agent/UpdateStatus";
 
 import { UserProvider } from "./Context/UserContext";
 import { TrackingProvider } from "./Context/TrackingContext";
+import  Landing from "./components/landing";
+import About from "./pages/About";
+import Contact from "./pages/Contacts";
+import PrivacyPolicy from "./pages/policy";
+import Terms from "./pages/terms";
+import Returns from "./pages/return";
 function App() {
   return (
     <Router>
@@ -57,7 +63,6 @@ function App() {
         <TrackingProvider>
           <Routes>
             {/* Seller Routes  Start*/}
-
             <Route path="/seller" element={<Home />} />
             <Route path="/signup" element={<Create_Account />} />
             <Route path="/agents" element={<Agents />} />
@@ -86,7 +91,7 @@ function App() {
             <Route path="/order/:id" element={<Order_Details />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/change-password" element={<ChangePassword />} />
-            <Route path="/track" element={<OrderTracking />} />
+            <Route path="/track/:trackingid" element={<OrderTracking />} />
             <Route path="/track-orders" element={<TrackOrders />} />
 
             {/* the pages for the agent */}
@@ -123,6 +128,12 @@ function App() {
               element={<RequestResetPassword />}
             />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/returns" element={<Returns />} />
+            <Route path="/" element={<Landing />} />
           </Routes>
         </TrackingProvider>
         <Footer />
