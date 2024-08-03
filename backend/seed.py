@@ -49,8 +49,9 @@ with app.app_context():
 
     def seed_parcels(users, num_parcels=20):
         parcels = []
+        categories = ['Small Electronic', 'Envelope', 'Big electronic', 'Food']
         for _ in range(num_parcels):
-            sender = random.choice([u for u in users if u.user_role in [ 'Business']])
+            sender = random.choice([u for u in users if u.user_role in ['Business']])
             recipient = random.choice(users)
             parcel = Parcel(
                 sender_id=sender.user_id,
@@ -63,7 +64,10 @@ with app.app_context():
                 status='Scheduled',
                 created_at=datetime.now(timezone.utc),
                 updated_at=datetime.now(timezone.utc),
-                current_location=faker.address()
+                current_location=faker.address(),
+                sender_email=sender.email,
+                recipient_email=recipient.email,
+                category=random.choice(categories)
             )
             parcels.append(parcel)
             db.session.add(parcel)
@@ -133,28 +137,24 @@ with app.app_context():
         statuses = ['Picked Up', 'In Transit', 'Out for Delivery', 'Delivered']
         
         for parcel in parcels:
-            # Generate 1 to 4 tracking entries for each parcel
             num_entries = random.randint(1, 4)
             current_status_index = 0
             
             for i in range(num_entries):
-                # Ensure status progresses logically
                 status = statuses[current_status_index]
                 
                 tracking = Tracking(
                     parcel_id=parcel.parcel_id,
                     location=faker.city(),
                     status=status,
-                    timestamp=datetime.now(timezone.utc) + timedelta(hours=i*6)  # Space out timestamps
+                    timestamp=datetime.now(timezone.utc) + timedelta(hours=i*6)
                 )
                 trackings.append(tracking)
                 db.session.add(tracking)
                 
-                # Move to next status for next entry, if any
                 if current_status_index < len(statuses) - 1:
                     current_status_index += 1
             
-            # Update parcel status to match its last tracking status
             parcel.status = trackings[-1].status
             
         db.session.commit()
