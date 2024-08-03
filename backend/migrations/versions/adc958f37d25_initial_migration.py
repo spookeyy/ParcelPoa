@@ -1,8 +1,8 @@
-"""final
+"""Initial migration
 
-Revision ID: 959d595dd5cb
+Revision ID: adc958f37d25
 Revises: 
-Create Date: 2024-07-31 11:28:48.685400
+Create Date: 2024-08-03 03:11:40.570491
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '959d595dd5cb'
+revision = 'adc958f37d25'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -23,7 +23,7 @@ def upgrade():
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('email', sa.String(), nullable=False),
     sa.Column('phone_number', sa.String(), nullable=False),
-    sa.Column('user_role', sa.Enum('Client', 'Business', 'Agent', name='user_roles'), nullable=False),
+    sa.Column('user_role', sa.Enum('Business', 'Agent', name='user_roles'), nullable=False),
     sa.Column('created_at', sa.TIMESTAMP(), nullable=False),
     sa.Column('updated_at', sa.TIMESTAMP(), nullable=False),
     sa.Column('password_hash', sa.String(length=128), nullable=False),
@@ -49,11 +49,14 @@ def upgrade():
     sa.Column('recipient_address', sa.String(), nullable=False),
     sa.Column('recipient_phone', sa.String(), nullable=False),
     sa.Column('description', sa.Text(), nullable=True),
-    sa.Column('weight', sa.DECIMAL(), nullable=False),
+    sa.Column('weight', sa.DECIMAL(), nullable=True),
     sa.Column('created_at', sa.TIMESTAMP(), nullable=False),
     sa.Column('updated_at', sa.TIMESTAMP(), nullable=False),
-    sa.Column('current_location', sa.String(length=255), nullable=True),
+    sa.Column('current_location', sa.String(length=255), nullable=False),
     sa.Column('status', sa.Enum('Scheduled', 'In Transit', 'Delivered', name='delivery_statuses'), nullable=False),
+    sa.Column('sender_email', sa.String(), nullable=False),
+    sa.Column('recipient_email', sa.String(), nullable=False),
+    sa.Column('category', sa.String(length=50), nullable=False),
     sa.ForeignKeyConstraint(['sender_id'], ['users.user_id'], ),
     sa.PrimaryKeyConstraint('parcel_id'),
     sa.UniqueConstraint('tracking_number')
