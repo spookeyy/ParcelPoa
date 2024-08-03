@@ -202,7 +202,7 @@ def create_parcel():
     data = request.get_json()
     user = User.query.get(get_jwt_identity())
     if user.user_role != 'Agent':
-        return jsonify({"message": "Only agentes can create parcels"}), 403
+        return jsonify({"message": "Only agents can create parcels"}), 403
     
     parcel = Parcel(
         sender_id=data['sender_id'],
@@ -214,11 +214,19 @@ def create_parcel():
         weight=data['weight'],
         status=data['status'],
         current_location=data['current_location'],
+        sender_email=data['sender_email'],
+        recipient_email=data['recipient_email'],
+        category=data['category'],
         created_at=datetime.now(),
         updated_at=datetime.now()
     )
     db.session.add(parcel)
     db.session.commit()
+
+    # Send notifications
+    send_notification(parcel.sender_email, 'Parcel Registered', f'Your parcel with tracking number {parcel.tracking_number} has been processed.')
+    send_notification(parcel.recipient_email, 'Parcel Coming Your Way', f'A parcel with tracking number {parcel.tracking_number} is on its way to you.')
+
     return jsonify({"message": "Parcel created successfully"}), 201
 
 @app.route('/parcels', methods=['GET'])
@@ -230,6 +238,7 @@ def get_parcels():
     parcels = Parcel.query.all()
     return jsonify([parcel.to_dict() for parcel in parcels])
 
+# TODO: check on this later
 @app.route('/parcels/<int:parcel_id>', methods=['GET'])
 @jwt_required()
 def get_parcel_status(parcel_id):
@@ -237,12 +246,10 @@ def get_parcel_status(parcel_id):
     user = User.query.get(get_jwt_identity())
     if not user:
         return jsonify({"message": "User not found"}), 404
-    if parcel.status == 'Delivered':
-        return jsonify({"status": "Delivered"})
-    elif parcel.status == "in Transit":
-        return jsonify({"status": "In Transit"})
-    return jsonify({"status": "Scheduled"})
-    # return jsonify(parcel.to_dict())
+    if user.user_role != 'Agent':
+        return jsonify({"message": "Only agents can view parcel status"}), 403
+    return jsonify({"status": parcel.status})
+
 
 # # update parcel location
 # @app.route('/parcels/<int:parcel_id>/location', methods=['PUT'])
@@ -302,20 +309,27 @@ def update_parcel_status(parcel_id):
     parcel = Parcel.query.get_or_404(parcel_id)
     if parcel.status == 'Delivered':
         return jsonify({"message": "Cannot update delivered parcel status"}), 400
-    if data['status'] not in ['Scheduled', 'In Transit', 'Delivered']:
+    if data['status'] not in ['Picked Up', 'Out for Delivery', 'In Transit', 'Delivered']:
         return jsonify({"message": "Invalid status"}), 400
     
+    old_status = parcel.status
     parcel.status = data['status']
     parcel.updated_at = datetime.now()
     
     new_tracking = Tracking(
         parcel_id=parcel.parcel_id,
-        location=parcel.current_location,
+        location=data['location'],
         status=parcel.status,
         timestamp=datetime.now()
     )
     db.session.add(new_tracking)
     db.session.commit()
+
+    # Send notifications
+    if old_status != parcel.status:
+        send_notification(parcel.sender_email, 'Parcel Status Update', f'Your parcel with tracking number {parcel.tracking_number} is now {parcel.status}.')
+        send_notification(parcel.recipient_email, 'Parcel Status Update', f'The parcel with tracking number {parcel.tracking_number} is now {parcel.status}.')
+
     return jsonify({"message": "Parcel status updated successfully"}), 200
 
 
@@ -389,14 +403,15 @@ def mark_as_delivered(parcel_id):
 
 
 #TODO: TRACKING ROUTES
-@app.route('/parcels-tracking/<string:tracking_number>', methods=['GET'])
+@app.route('/track/<string:tracking_number>', methods=['GET'])
 def track_parcel(tracking_number):
     parcel = Parcel.query.filter_by(tracking_number=tracking_number).first()
     if not parcel:
         return jsonify({"message": "Parcel not found"}), 404
     
-    status = get_parcel_status(parcel)
-    return jsonify({"status": status})
+    tracking_info = Tracking.query.filter_by(parcel_id=parcel.parcel_id).order_by(Tracking.timestamp.desc()).all()
+    return jsonify([track.to_dict() for track in tracking_info])
+
 
 # current parcel location
 @app.route('/parcels/<int:parcel_id>/location', methods=['GET'])
@@ -422,7 +437,11 @@ def get_orders():
 
 
 
-# TODO: NOTIFICATION ROUTES
+# TODO: NOTIFICATION
+
+def send_notification(email, subject, body):
+    msg = Message(subject, recipients=[email], body=body)
+    mail.send(msg)
 
 
 
@@ -456,7 +475,7 @@ with app.app_context():
 def request_reset_password():
     data = request.get_json()
     email = data.get('email')
-    frontend_url = data.get('frontend_url')  # Get rontend URL from request
+    frontend_url = data.get('frontend_url')
     
     user = User.query.filter_by(email=email).first()
 
@@ -506,7 +525,7 @@ def reset_password(token):
 def send_email(to_email, reset_url):
     subject = "Password Reset Request"
     content = f"""
-    Hello,
+    Hello from parcelpoa!,
 
     You have requested to reset your password. Please click on the following link to reset your password:
 
