@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { UserContext } from "../../Context/UserContext";
 import { Link, useNavigate } from "react-router-dom";
 // import { toast } from "react-toastify";
+import ForgotPassword from "../Reset_Password";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ export default function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -24,8 +26,9 @@ export default function Login() {
       });
   };
 
-  const handleResetPassword = () => {
-    navigate("/reset-password");
+  const handleResetPassword = (email) => {
+
+    setIsModalOpen(false);
   };
 
   return (
@@ -86,7 +89,7 @@ export default function Login() {
           </p>
           <p className="text-sm text-center">
             <button
-              onClick={handleResetPassword}
+              onClick={() => setIsModalOpen(true)}
               className="text-blue-600 hover:underline font-medium"
             >
               Forgot password?
@@ -94,6 +97,11 @@ export default function Login() {
           </p>
         </div>
       </div>
+      <ForgotPassword
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onResetPassword={handleResetPassword}
+      />
     </div>
   );
 }

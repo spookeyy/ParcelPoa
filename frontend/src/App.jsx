@@ -32,6 +32,12 @@ import UpdateStatus from "./pages/Agent/UpdateStatus";
 // end of the pages for the agent
 import { UserProvider } from "./Context/UserContext";
 import { TrackingProvider } from "./Context/TrackingContext";
+import  Landing from "./components/landing";
+import About from "./pages/About";
+import Contact from "./pages/Contacts";
+import PrivacyPolicy from "./pages/policy";
+import Terms from "./pages/terms";
+import Returns from "./pages/return";
 function App() {
   return (
     <Router>
@@ -39,6 +45,7 @@ function App() {
         <ToastContainer />
         <TrackingProvider>
           <Routes>
+            <Route path="/" element={<Landing />} /> 
             <Route path="/login" element={<Login />} />
             <Route path="/create-account" element={<Create_Account />} />
             <Route path="/agent-list" element={<Agent_List />} />
@@ -47,7 +54,7 @@ function App() {
             <Route path="/order/:id" element={<Order_Details />} />
             <Route path="/reset-password" element={<Reset_Password />} />
             <Route path="/change-password" element={<ChangePassword />} />
-            <Route path="/track/:parcelId" element={<OrderTracking />} />
+            <Route path="/track/:trackingid" element={<OrderTracking />} />
             <Route path="/track-orders" element={<TrackOrders />} />
             {/* the pages for the agent */}
             <Route path="/agent" element={<AgentHome />} />
@@ -77,6 +84,12 @@ function App() {
             <Route path="/agent-profile" element={<AgentProfile />} />
             <Route path="/update-status" element={<UpdateStatus />} />
             {/* end of the pages for the agent */}
+            <Route path="/landing" element = {<Landing/>} />
+            <Route path="/about" element = {<About/>} />
+            <Route path="/contact" element = {<Contact/>} />
+            <Route path="/privacy-policy" element = {<PrivacyPolicy/>} />
+            <Route path="/terms-of-service" element = {<Terms/>} />
+            <Route path="/returns" element = {<Returns/>} />
           </Routes>
         </TrackingProvider>
         <Footer />
