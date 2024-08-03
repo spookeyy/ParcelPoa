@@ -9,13 +9,12 @@ import ChangePassword from "./components/Change-Password";
 import Login from "./components/Login";
 import Create_Account from "./components/Create_Account";
 
-// Seller Pages
+// Seller Pages start
 import Home from './pages/Seller/Home';
 import Agents from './pages/Seller/Agents';
 import Agent_Requests from './pages/Seller/Agent_Requests';
 import Agent_Details from './pages/Seller/Agent_Details';
 import Agent_Trends from './pages/Seller/Agent_Trends'; 
-
 import Invoice from './pages/Seller/Invoice';
 import Messages_List from './pages/Seller/Messages_List';
 import Messages_Details from './pages/Seller/Messages_Details';
@@ -23,13 +22,16 @@ import Order_List from './pages/Seller/Order_List';
 import Order_Details from './pages/Seller/Order_Details';
 import Dashboard_Part from './pages/Seller/Dashboard_Part';
 import Tracking from './pages/Seller/Tracking';
-
+import SellerPofie from "./pages/Seller/SellerPofie";
 
 
 //Buyer pages
+import Buyer_Home from "./pages/Buyer/Buyer_Home";
 import OrderTracking from "./pages/Buyer/OrderTracking";
 import TrackOrders from "./pages/Buyer/TrackOrders";
 //End
+
+
 // the pages for the agent
 import AgentHome from "./pages/Agent/AgentHome";
 import Dashboard from "./pages/Agent/Dashboard";
@@ -46,6 +48,7 @@ import AgentRegister from "./pages/Agent/AgentRegister";
 import AgentProfile from "./pages/Agent/AgentProfile";
 import UpdateStatus from "./pages/Agent/UpdateStatus";
 // end of the pages for the agent
+
 import { UserProvider } from "./Context/UserContext";
 import { TrackingProvider } from "./Context/TrackingContext";
 function App() {
@@ -56,21 +59,33 @@ function App() {
         <TrackingProvider>
           <Routes>
      
-            {/* Seller Routes  Start*/}
-            <Route path="/" element={<Home />} />
-            <Route path="/signup" element={<Create_Account />} />
-            <Route path="/agents" element={<Agents />} />
-            <Route path="/agent-requests" element={<Agent_Requests />} />
-            <Route path="/agent/:id" element={<Agent_Details />} />
-            <Route path="/agent-trends/:id" element={<Agent_Trends />} /> 
-            <Route path="/invoice/:id" element={<Invoice />} />
-            <Route path="/messages-list" element={<Messages_List />} />
-            <Route path="/message/:id" element={<Messages_Details />} />
-            <Route path="/order-list" element={<Order_List />} />
-            <Route path="/order/:id" element={<Order_Details />} />
-            <Route path="/tracking" element={<Tracking />} />
-            <Route path="/dashboard-part" element={<Dashboard_Part />} />
-            {/* Seller Routes  */}
+
+          {/* Seller Routes  Start*/}
+          
+          <Route path="/seller" element={<Home />} />
+        <Route path="/signup" element={<Create_Account />} />
+        <Route path="/agents" element={<Agents />} />
+        <Route path="/agent-requests" element={<Agent_Requests />} />
+        <Route path="/agent/:id" element={<Agent_Details />} />
+        <Route path="/agent-trends/:id" element={<Agent_Trends />} /> 
+        <Route path="/invoice/:id" element={<Invoice />} />
+        <Route path="/messages-list" element={<Messages_List />} />
+        <Route path="/message/:id" element={<Messages_Details />} />
+        <Route path="/order-list" element={<Order_List />} />
+        <Route path="/order/:id" element={<Order_Details />} />
+        <Route path="/tracking" element={<Tracking />} />
+        <Route path="/dashboard-part" element={<Dashboard_Part />} />
+        <Route path="seller-profile" element={<SellerPofie/>}/>
+      {/* Seller Routes  */}
+      
+
+      {/* Buyer Routes start */}
+      <Route path="Buyer" element = {<Buyer_Home/>}/>
+      <Route path="Tracking" element={<OrderTracking/>}/>
+      <Route path="TrackOrders" element={<TrackOrders/>}/>
+      <Route path="Login" element = {<Login/>}/>
+      <Route path="Create_Account" element = {<Create_Account/>}/>
+      {/* Buyer Routes end*/}
 
             <Route path="/login" element={<Login />} />
             <Route path="/create-account" element={<Create_Account />} />

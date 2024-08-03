@@ -25,6 +25,11 @@ export default function Header() {
           <Link to="/login" className="text-white hover:text-blue-700 transition-colors">
             <FontAwesomeIcon icon={faUser} className="h-8 w-8" />
           </Link>
+
+          {/* Login Button */}
+          <Link to="/seller-profile" className="text-white hover:text-blue-700 transition-colors">
+            <FontAwesomeIcon icon={faUser} className="h-8 w-8" />
+          </Link>
         </div>
       </div>
     </header>
