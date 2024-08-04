@@ -2,11 +2,13 @@ import React, { useState, useContext } from "react";
 import { UserContext } from "../Context/UserContext";
 import { server } from "../../config";
 import { toast } from "react-toastify";
+import { FaCheckCircle } from "react-icons/fa";
 
 const ChangePassword = () => {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [passwordChanged, setPasswordChanged] = useState(false);
   const { authToken } = useContext(UserContext);
 
   const handleSubmit = async (e) => {
@@ -34,6 +36,7 @@ const ChangePassword = () => {
 
       if (response.ok) {
         toast.success(data.message);
+        setPasswordChanged(true);
         setOldPassword("");
         setNewPassword("");
         setConfirmNewPassword("");
@@ -109,6 +112,12 @@ const ChangePassword = () => {
           </button>
         </div>
       </form>
+      {passwordChanged && (
+        <div className="flex items-center justify-center mt-6 text-green-600 transition duration-150 ease-in-out">
+          <FaCheckCircle className="text-2xl mr-2" />
+          <span>Password changed successfully!</span>
+        </div>
+      )}
     </div>
   );
 };
