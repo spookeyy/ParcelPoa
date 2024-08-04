@@ -6,10 +6,12 @@ import Agent_Requests from "./pages/Agent_Requests";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import Order_List from "./pages/Order_List";
+import Order_Details from "./pages/Order_Details"
 import Reset_Password from "./pages/Reset_Password";
 //Buyer pages
 import OrderTracking from "./pages/Buyer/OrderTracking";
-import TrackOrders from "./Pages/Buyer/TrackOrders";
+import TrackOrders from "./pages/Buyer/TrackOrders";
+import Create_Account from "./pages/Buyer/Create_Account"
 //End
 // the pages for the agent
 import AgentHome from "./pages/Agent/AgentHome";
