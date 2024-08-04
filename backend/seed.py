@@ -1,5 +1,6 @@
 import random
 import string
+from decimal import Decimal
 from datetime import datetime, timedelta, timezone
 from faker import Faker
 from flask import Flask
@@ -16,10 +17,7 @@ def generate_phone_number():
     return f'{country_code}{mobile_network_code}{subscriber_number}'
 
 def generate_email(name):
-    # Convert the name to lowercase and remove spaces
-    username = name.lower().replace(' ', '')
-    # a random number to ensure uniqueness
-    username += str(random.randint(1, 9999))
+    username = name.lower().replace(' ', '') + str(random.randint(1, 9999))
     domain = 'gmail.com'
     return f'{username}@{domain}' 
 
@@ -28,7 +26,7 @@ with app.app_context():
     db.create_all()
 
     def seed_users(num_users=10):
-        user_roles = [ 'Business', 'Agent']
+        user_roles = ['Business', 'Agent']
         users = []
         for _ in range(num_users):
             name = faker.name()
@@ -37,10 +35,11 @@ with app.app_context():
                 email=generate_email(name),
                 phone_number=generate_phone_number(),
                 user_role=random.choice(user_roles),
-                password_hash='password',
                 created_at=datetime.now(timezone.utc),
-                updated_at=datetime.now(timezone.utc)
+                updated_at=datetime.now(timezone.utc),
+                password_hash='password'
             )
+            user.set_password('password')  # Use the set_password method
             users.append(user)
             db.session.add(user)
         db.session.commit()
@@ -49,8 +48,10 @@ with app.app_context():
 
     def seed_parcels(users, num_parcels=20):
         parcels = []
+        categories = ['Small Electronic', 'Envelope', 'Big electronic', 'Food']
+        statuses = ['Picked Up', 'Out for Delivery', 'In Transit', 'Delivered']
         for _ in range(num_parcels):
-            sender = random.choice([u for u in users if u.user_role in [ 'Business']])
+            sender = random.choice([u for u in users if u.user_role == 'Business'])
             recipient = random.choice(users)
             parcel = Parcel(
                 sender_id=sender.user_id,
@@ -59,11 +60,16 @@ with app.app_context():
                 recipient_address=faker.address(),
                 recipient_phone=recipient.phone_number,
                 description=faker.text(),
-                weight=round(random.uniform(1.0, 10.0), 2),
-                status='Scheduled',
+                weight=Decimal(str(round(random.uniform(1.0, 10.0), 2))),
                 created_at=datetime.now(timezone.utc),
                 updated_at=datetime.now(timezone.utc),
-                current_location=faker.address()
+                current_location=faker.city(),
+                status=random.choice(statuses),
+                sender_email=sender.email,
+                recipient_email=recipient.email,
+                category=random.choice(categories),
+                latitude=float(faker.latitude()),
+                longitude=float(faker.longitude())
             )
             parcels.append(parcel)
             db.session.add(parcel)
@@ -74,13 +80,14 @@ with app.app_context():
     def seed_deliveries(parcels, users, num_deliveries=15):
         deliveries = []
         agents = [user for user in users if user.user_role == 'Agent']
+        statuses = ['Scheduled', 'In Transit', 'Delivered']
         for parcel in random.sample(parcels, num_deliveries):
             delivery = Delivery(
                 parcel_id=parcel.parcel_id,
                 agent_id=random.choice(agents).user_id,
                 pickup_time=datetime.now(timezone.utc),
                 delivery_time=datetime.now(timezone.utc) + timedelta(days=random.randint(1, 5)),
-                status='Scheduled',
+                status=random.choice(statuses),
                 created_at=datetime.now(timezone.utc),
                 updated_at=datetime.now(timezone.utc)
             )
@@ -93,7 +100,7 @@ with app.app_context():
     def seed_orders(users, parcels, num_orders=10):
         orders = []
         for _ in range(num_orders):
-            user = random.choice([u for u in users if u.user_role in [ 'Business']])
+            user = random.choice([u for u in users if u.user_role == 'Business'])
             parcel = random.choice(parcels)
             order = Order(
                 user_id=user.user_id,
@@ -106,7 +113,6 @@ with app.app_context():
         db.session.commit()
         print(f"Seeded {num_orders} orders.")
         return orders
-
 
     def seed_notifications(users, num_notifications=10):
         notifications = []
@@ -133,34 +139,29 @@ with app.app_context():
         statuses = ['Picked Up', 'In Transit', 'Out for Delivery', 'Delivered']
         
         for parcel in parcels:
-            # Generate 1 to 4 tracking entries for each parcel
             num_entries = random.randint(1, 4)
             current_status_index = 0
             
             for i in range(num_entries):
-                # Ensure status progresses logically
                 status = statuses[current_status_index]
                 
                 tracking = Tracking(
                     parcel_id=parcel.parcel_id,
                     location=faker.city(),
                     status=status,
-                    timestamp=datetime.now(timezone.utc) + timedelta(hours=i*6)  # Space out timestamps
+                    timestamp=datetime.now(timezone.utc) + timedelta(hours=i*6)
                 )
                 trackings.append(tracking)
                 db.session.add(tracking)
                 
-                # Move to next status for next entry, if any
                 if current_status_index < len(statuses) - 1:
                     current_status_index += 1
             
-            # Update parcel status to match its last tracking status
             parcel.status = trackings[-1].status
             
         db.session.commit()
         print(f"Seeded {len(trackings)} trackings for {len(parcels)} parcels.")
         return trackings
-
 
     users = seed_users()
     parcels = seed_parcels(users)
@@ -168,4 +169,3 @@ with app.app_context():
     orders = seed_orders(users, parcels)
     notifications = seed_notifications(users)
     trackings = seed_tracking(parcels)
-

@@ -9,6 +9,14 @@ psycopg2-binary = "*"
 flask-cors = "*"
 flask-apscheduler = "*"
 sendgrid = "*"
+flask-mail = "*"
+geopy = "*"
+honcho = "*"
+gunicorn = "*"
+flask = "*"
+flask-sqlalchemy = "*"
+flask-oauthlib = "*"
+requests = "*"
 
 [dev-packages]
 

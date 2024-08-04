@@ -1,26 +1,34 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCartIcon, UserIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faReceipt, faUser, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 export default function Header() {
   return (
-    <header className="bg-blue-600 text-white shadow-lg">
+    <header className="bg-gray-600 text-white shadow-lg rounded-lg mt-0.5 ml-1 mr-1">
       <div className="container mx-auto px-4 flex items-center justify-between">
         <Link to="/" className="flex items-center">
           <img src="/src/assets/Logo.png" alt="Logo" className="logo" />
         </Link>
         <div className="flex space-x-4 items-center">
+          {/* Orders */}
+          <Link to="/order-list" className="text-white hover:text-blue-700 transition-colors">
+            <FontAwesomeIcon icon={faReceipt} className="h-8 w-8" />
+          </Link>
+
+          {/* General Information */}
+          <Link to="dashboard-part" className="text-white hover:text-blue-700 transition-colors">
+            <FontAwesomeIcon icon={faInfoCircle} className="h-8 w-8" />
+          </Link>
+
           {/* Login Button */}
-          <Link to="/login" className="text-white hover:text-gray-300 transition-colors">
-            <UserIcon className="h-6 w-6" />
+          <Link to="/login" className="text-white hover:text-blue-700 transition-colors">
+            <FontAwesomeIcon icon={faUser} className="h-8 w-8" />
           </Link>
-          {/* Messages */}
-          <Link to="/messages-list" className="text-white hover:text-gray-300 transition-colors">
-            <QuestionMarkCircleIcon className="h-6 w-6" />
-          </Link>
-          {/* Cart */}
-          <Link to="/order-list" className="text-white hover:text-gray-300 transition-colors">
-            <ShoppingCartIcon className="h-6 w-6" />
+
+          {/* Login Button */}
+          <Link to="/seller-profile" className="text-white hover:text-blue-700 transition-colors">
+            <FontAwesomeIcon icon={faUser} className="h-8 w-8" />
           </Link>
         </div>
       </div>

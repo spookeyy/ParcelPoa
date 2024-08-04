@@ -1,4 +1,6 @@
+import os
 import random
+from geopy.geocoders import Nominatim
 import smtplib
 from flask import Flask, request, jsonify,url_for
 from flask_migrate import Migrate
@@ -7,10 +9,10 @@ from flask_cors import CORS
 from datetime import datetime, timezone
 from flask_apscheduler import APScheduler
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+from requests_oauthlib import OAuth1
 from werkzeug.security import generate_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, get_jwt
 from models import db, User, Parcel, Delivery, Notification, Tracking, Order
-import os
 from flask_cors import CORS
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -37,9 +39,8 @@ s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 #     scheduler.init_app(app)
 #     scheduler.start()
 
-blacklist = set()
-
 # JWT Configurations
+blacklist = set()
 @jwt.token_in_blocklist_loader
 def check_if_token_in_blacklist(jwt_header, jwt_payload):
     return jwt_payload['jti'] in blacklist
@@ -50,19 +51,30 @@ def register():
     data = request.get_json()
     if User.query.filter_by(email=data['email']).first():
         return jsonify({'message': 'Email already exists'}), 400
+
+    phone_number = data.get("phone_number")
+    phone_number_exists = User.query.filter_by(phone_number=phone_number).first()
+    if phone_number_exists:
+        return jsonify({"error": "Phone number already exists"}), 400
+
     
     required_fields = ['name', 'email', 'phone_number', 'user_role', 'password']
     
     for field in required_fields:
         if field not in data:
             return jsonify({"error": f"'{field}' is required"}), 400
-    
-    hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+    password = data.get("password")
+    if not password:
+        return jsonify({"error": "Password is required and must not be empty"}), 400
+
+    # if len(password) < 8:
+    #     return jsonify({"error": "Password must be at least 8 characters long"}), 400
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
     new_user = User(
-        name=data['name'],
-        email=data['email'],
-        phone_number=data['phone_number'],
-        user_role=data['user_role'],
+        name=data.get('name'),
+        email=data.get('email'),
+        phone_number=data.get('phone_number'),
+        user_role=data.get('user_role'),
         created_at=datetime.now(),
         updated_at=datetime.now(),
         password_hash=hashed_password
@@ -82,14 +94,27 @@ def login():
     user = User.query.filter_by(email=data['email']).first()
     if user and bcrypt.check_password_hash(user.password_hash, data['password']):
         access_token = create_access_token(identity=user.user_id)
-        return jsonify({"access_token": access_token}), 200
+        return jsonify({
+            "access_token": access_token,
+            "user": {
+                "id": user.user_id,
+                "email": user.email,
+                "role": user.user_role
+            }
+        }), 200
     else:
         return jsonify({"message": "Invalid credentials"}), 401
-    
+
+
+@app.route('/current_user', methods=['GET'])
+@jwt_required()
+def get_current_user():
+    current_user = User.query.get(get_jwt_identity())
+    return jsonify(current_user.to_dict())
 
     
 #logout
-@app.route('/logout', methods=['POST'])
+@app.route('/logout', methods=['DELETE'])
 @jwt_required()
 def logout():
     jti = get_jwt()["jti"]
@@ -179,7 +204,7 @@ def create_parcel():
     data = request.get_json()
     user = User.query.get(get_jwt_identity())
     if user.user_role != 'Agent':
-        return jsonify({"message": "Only agentes can create parcels"}), 403
+        return jsonify({"message": "Only agents can create parcels"}), 403
     
     parcel = Parcel(
         sender_id=data['sender_id'],
@@ -191,11 +216,19 @@ def create_parcel():
         weight=data['weight'],
         status=data['status'],
         current_location=data['current_location'],
+        sender_email=data['sender_email'],
+        recipient_email=data['recipient_email'],
+        category=data['category'],
         created_at=datetime.now(),
         updated_at=datetime.now()
     )
     db.session.add(parcel)
     db.session.commit()
+
+    # Send notifications
+    send_notification(parcel.sender_email, 'Parcel Registered', f'Your parcel with tracking number {parcel.tracking_number} has been processed.')
+    send_notification(parcel.recipient_email, 'Parcel Coming Your Way', f'A parcel with tracking number {parcel.tracking_number} is on its way to you.')
+
     return jsonify({"message": "Parcel created successfully"}), 201
 
 @app.route('/parcels', methods=['GET'])
@@ -207,6 +240,7 @@ def get_parcels():
     parcels = Parcel.query.all()
     return jsonify([parcel.to_dict() for parcel in parcels])
 
+# TODO: check on this later
 @app.route('/parcels/<int:parcel_id>', methods=['GET'])
 @jwt_required()
 def get_parcel_status(parcel_id):
@@ -214,12 +248,10 @@ def get_parcel_status(parcel_id):
     user = User.query.get(get_jwt_identity())
     if not user:
         return jsonify({"message": "User not found"}), 404
-    if parcel.status == 'Delivered':
-        return jsonify({"status": "Delivered"})
-    elif parcel.status == "in Transit":
-        return jsonify({"status": "In Transit"})
-    return jsonify({"status": "Scheduled"})
-    # return jsonify(parcel.to_dict())
+    if user.user_role != 'Agent':
+        return jsonify({"message": "Only agents can view parcel status"}), 403
+    return jsonify({"status": parcel.status})
+
 
 # # update parcel location
 # @app.route('/parcels/<int:parcel_id>/location', methods=['PUT'])
@@ -279,20 +311,27 @@ def update_parcel_status(parcel_id):
     parcel = Parcel.query.get_or_404(parcel_id)
     if parcel.status == 'Delivered':
         return jsonify({"message": "Cannot update delivered parcel status"}), 400
-    if data['status'] not in ['Scheduled', 'In Transit', 'Delivered']:
+    if data['status'] not in ['Picked Up', 'Out for Delivery', 'In Transit', 'Delivered']:
         return jsonify({"message": "Invalid status"}), 400
     
+    old_status = parcel.status
     parcel.status = data['status']
     parcel.updated_at = datetime.now()
     
     new_tracking = Tracking(
         parcel_id=parcel.parcel_id,
-        location=parcel.current_location,
+        location=data['location'],
         status=parcel.status,
         timestamp=datetime.now()
     )
     db.session.add(new_tracking)
     db.session.commit()
+
+    # Send notifications
+    if old_status != parcel.status:
+        send_notification(parcel.sender_email, 'Parcel Status Update', f'Your parcel with tracking number {parcel.tracking_number} is now {parcel.status}.')
+        send_notification(parcel.recipient_email, 'Parcel Status Update', f'The parcel with tracking number {parcel.tracking_number} is now {parcel.status}.')
+
     return jsonify({"message": "Parcel status updated successfully"}), 200
 
 
@@ -366,14 +405,36 @@ def mark_as_delivered(parcel_id):
 
 
 #TODO: TRACKING ROUTES
-@app.route('/parcels-tracking/<string:tracking_number>', methods=['GET'])
+@app.route('/track/<string:tracking_number>', methods=['GET'])
 def track_parcel(tracking_number):
     parcel = Parcel.query.filter_by(tracking_number=tracking_number).first()
-    if not parcel:
-        return jsonify({"message": "Parcel not found"}), 404
+    # if not parcel:
+    #     return jsonify({"message": "Parcel not found"}), 404
     
-    status = get_parcel_status(parcel)
-    return jsonify({"status": status})
+    tracking_info = Tracking.query.filter_by(parcel_id=parcel.parcel_id).order_by(Tracking.timestamp.desc()).all()
+    
+    # Simulate GPS location
+    if parcel.latitude is None or parcel.longitude is None:
+        # Generate random coordinates within a reasonable range
+        parcel.latitude = random.uniform(-90, 90)
+        parcel.longitude = random.uniform(-180, 180)
+        db.session.commit()
+
+    # Get address from coordinates
+    geolocator = Nominatim(user_agent="parcel_tracker")
+    location = geolocator.reverse(f"{parcel.latitude}, {parcel.longitude}")
+    address = location.address if location else "Unknown location"
+
+    tracking_data = [track.to_dict() for track in tracking_info]
+    for track in tracking_data:
+        track['gps_location'] = {
+            'latitude': parcel.latitude,
+            'longitude': parcel.longitude,
+            'address': address
+        }
+
+    return jsonify(tracking_data)
+
 
 # current parcel location
 @app.route('/parcels/<int:parcel_id>/location', methods=['GET'])
@@ -399,7 +460,11 @@ def get_orders():
 
 
 
-# TODO: NOTIFICATION ROUTES
+# TODO: NOTIFICATION
+
+def send_notification(email, subject, body):
+    msg = Message(subject, recipients=[email], body=body)
+    mail.send(msg)
 
 
 
@@ -407,36 +472,52 @@ def get_orders():
 
 
 # RESET PASSWORD
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
-from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
-from flask import current_app
-s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+from flask_mail import Mail, Message
+from dotenv import load_dotenv
+import os
 
-# SendGrid settings
-SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
-FROM_EMAIL = os.environ.get('FROM_EMAIL')
+load_dotenv()
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = os.environ.get('GMAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('GMAIL_APP_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = 'parcelpoa@gmail.com'
+
+mail = Mail(app)
+
+with app.app_context():
+    # serializer for generating secure tokens
+    s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+
+
 # reset password
 @app.route('/request-reset-password', methods=['POST'])
 def request_reset_password():
     data = request.get_json()
     email = data.get('email')
-    user = User.query.filter_by(email=email).first()
+    frontend_url = data.get('frontend_url')
     
+    user = User.query.filter_by(email=email).first()
+
     if not user:
         return jsonify({"message": "If a user with this email exists, a password reset link has been sent."}), 200
-    
+
     token = s.dumps(email, salt='password-reset-salt')
-    
-    reset_url = url_for('reset_password', token=token, _external=True)
-    
+
+    # set the reset URL to use frontend URL
+    reset_url = f"{frontend_url}/reset-password/{token}"
+
     try:
         send_email(user.email, reset_url)
         return jsonify({"message": "If a user with this email exists, a password reset link has been sent."}), 200
     except Exception as e:
         print(f"Error sending email: {str(e)}")
         return jsonify({"message": "An error occurred while processing your request."}), 500
-
+    
+    
 @app.route('/reset-password/<token>', methods=['POST'])
 def reset_password(token):
     try:
@@ -463,10 +544,11 @@ def reset_password(token):
     
     return jsonify({"message": "Password has been reset successfully"}), 200
 
+
 def send_email(to_email, reset_url):
     subject = "Password Reset Request"
     content = f"""
-    Hello,
+    Hello from parcelpoa!,
 
     You have requested to reset your password. Please click on the following link to reset your password:
 
@@ -475,24 +557,43 @@ def send_email(to_email, reset_url):
     If you did not request this, please ignore this email and your password will remain unchanged.
 
     Best regards,
-    Your Application Team
+    The parcelpoa Team
     """
     
-    message = Mail(
-        from_email=FROM_EMAIL,
-        to_emails=to_email,
-        subject=subject,
-        plain_text_content=content)
+    msg = Message(subject=subject,
+                  recipients=[to_email],
+                  body=content)
     
     try:
-        sg = SendGridAPIClient(SENDGRID_API_KEY)
-        response = sg.send(message)
-        print(f"Email sent successfully to {to_email}. Status code: {response.status_code}")
+        print(f"Attempting to send email to {to_email}")
+        mail.send(msg)
+        print(f"Email sent successfully to {to_email}.")
     except Exception as e:
         print(f"Failed to send email: {str(e)}")
+        print(f"Error type: {type(e).__name__}")
+        print(f"MAIL_USERNAME: {app.config['MAIL_USERNAME']}")
+        print(f"MAIL_PASSWORD set: {'Yes' if app.config['MAIL_PASSWORD'] else 'No'}")
         raise
 
     return True
+
+
+# FACEBOOK webhook
+# oauth = OAuth1(app)
+
+# facebook = oauth.remote_app(
+#     'facebook',
+#     consumer_key='1407483346114437',
+#     consumer_secret='9a0...b4',
+#     request_token_params={
+#         'scope': 'email,public_profile'
+#     },
+#     base_url='https://graph.facebook.com/',
+#     request_token_url=None,
+#     access_token_method='POST',
+#     access_token_url='/oauth/access_token',
+#     authorize_url='https://www.facebook.com/dialog/oauth'
+# )
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)

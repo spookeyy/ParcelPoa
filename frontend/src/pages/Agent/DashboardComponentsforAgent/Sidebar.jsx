@@ -12,7 +12,11 @@ export default function Sidebar({ isOpen, toggleSidebar, navigateTo }) {
     >
       <div className="bg-blue-600 text-white p-4 flex items-center justify-between">
         <span className="text-xl font-bold sm:text-2xl md:text-3xl">Dashboard</span>
-        <button onClick={toggleSidebar} className="text-3xl font-bold sm:text-4xl">
+        <button 
+          onClick={toggleSidebar} 
+          className="text-3xl font-bold sm:text-4xl"
+          aria-label="Close sidebar"
+        >
           &times;
         </button>
       </div>
@@ -43,7 +47,6 @@ export default function Sidebar({ isOpen, toggleSidebar, navigateTo }) {
               <i className="fas fa-sign-in-alt mr-3 text-lg sm:text-xl"></i> Login
             </Link>
           </li>
-        
           <li>
             <Link
               to="/agent-register"
@@ -84,12 +87,12 @@ export default function Sidebar({ isOpen, toggleSidebar, navigateTo }) {
               <i className="fas fa-check-circle mr-3 text-lg sm:text-xl"></i> Confirm Delivery
             </button>
           </li>
-            <li>
+          <li>
             <Link
               to="/update-status"
               className="flex items-center text-gray-800 hover:text-blue-600 hover:bg-gray-100 p-3 rounded transition duration-200 text-sm sm:text-base"
             >
-              <i className="fas fa-sign-in-alt mr-3 text-lg sm:text-xl"></i>Update Status
+              <i className="fas fa-sign-in-alt mr-3 text-lg sm:text-xl"></i> Update Status
             </Link>
           </li>
           <li>
@@ -107,7 +110,7 @@ export default function Sidebar({ isOpen, toggleSidebar, navigateTo }) {
       </nav>
 
       <button
-        onClick={() => navigate("/dashboard")}
+        onClick={() => navigate("/agent")}
         className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md mb-6 mx-4 absolute bottom-4 left-4 flex items-center justify-center text-sm sm:text-base"
       >
         <i className="fas fa-arrow-left mr-2 text-lg sm:text-xl"></i> Back

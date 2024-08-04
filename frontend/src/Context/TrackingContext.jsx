@@ -1,50 +1,57 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { server } from '../../config.json';
-import { toast } from 'react-toastify';
+/* eslint-disable react-refresh/only-export-components */
+/* eslint-disable react/prop-types */
+import React, { createContext, useState, useContext, useEffect } from "react";
+import { toast } from "react-toastify";
+import { server } from "../../config.json";
 
 const TrackingContext = createContext();
 
 export const useTracking = () => {
-    return useContext(TrackingContext);
-}
+  return useContext(TrackingContext);
+};
 
 export const TrackingProvider = ({ children }) => {
-    const [trackingData, setTrackingData] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+  const [trackingData, setTrackingData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-    const navigate = useNavigate();
+  const fetchTrackingData = (trackingNumber) => {
+    setLoading(true);
+    fetch(`${server}/track/${trackingNumber}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.message) {
+          toast.error(data.message);
+          setError(data.message);
+        } else {
+          setTrackingData(data);
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        toast.error("Failed to fetch tracking data");
+        setError(err.message);
+        setLoading(false);
+      });
+  };
 
-    const fetchTrackingData = (parcelId, authToken) => {
-        setLoading(true);
-        fetch(`${server}/track-parcel/${parcelId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message) {
-                toast.error(data.message);
-                setError(data.message);
-            } else {
-                setTrackingData(data);
-            }
-            setLoading(false);
-        })
-        .catch(err => {
-            toast.error("Failed to fetch tracking data");
-            setError(err.message);
-            setLoading(false);
-        });
-    };
+  useEffect(() => {
+    fetchTrackingData();
+  }, []);
 
-    return (
-        <TrackingContext.Provider value={{ trackingData, loading, error, fetchTrackingData }}>
-            {children}
-        </TrackingContext.Provider>
-    );
-}
+  useEffect(() => {
+    if (trackingData.length > 0) {
+      setError(null);
+    }
+  }, [trackingData]);
+  
+  const contextdata = { trackingData, loading, error, fetchTrackingData };
+
+  return (
+    <TrackingContext.Provider
+      value={contextdata}
+    >
+      {children}
+    </TrackingContext.Provider>
+  );
+};

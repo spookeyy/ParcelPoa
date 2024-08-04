@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ChangePassword from "../../components/Change-Password";
 
-export default function AgentProfile({ onClose }) {
+export default function  SellerPofie({ onClose }) {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -47,7 +47,7 @@ export default function AgentProfile({ onClose }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
       <div className="max-w-lg w-full bg-white p-8 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold mb-6 text-center">Agent Profile</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">Admin Profile</h2>
         <form onSubmit={handleUpdateProfile} className="space-y-6">
           <div className="mb-4">
             <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
@@ -104,12 +104,7 @@ export default function AgentProfile({ onClose }) {
         </div>
         {showChangePassword && <ChangePassword />}
         <div className="mt-6 text-center">
-          <button
-            onClick={onClose}
-            className="w-full bg-gray-500 text-white py-2 rounded-md shadow hover:bg-gray-600"
-          >
-            Back to Dashboard
-          </button>
+
         </div>
       </div>
     </div>

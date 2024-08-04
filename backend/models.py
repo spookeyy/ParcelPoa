@@ -1,9 +1,10 @@
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, Integer, String, Enum, ForeignKey, Text, DECIMAL, TIMESTAMP
+from sqlalchemy import Column, Float, Integer, String, Enum, ForeignKey, Text, DECIMAL, TIMESTAMP
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash,check_password_hash
 from flask_bcrypt import generate_password_hash, check_password_hash
+
 db = SQLAlchemy()
 
 class User(db.Model):
@@ -17,6 +18,7 @@ class User(db.Model):
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     password_hash = Column(String(128), nullable=False)
+    profile_picture = Column(String, default='default.png', nullable=True)
 
     parcels = relationship('Parcel', back_populates='sender', foreign_keys='Parcel.sender_id')
     deliveries = relationship('Delivery', back_populates='agent', foreign_keys='Delivery.agent_id')
@@ -37,7 +39,8 @@ class User(db.Model):
             'phone_number': self.phone_number,
             'user_role': self.user_role,
             'created_at': self.created_at,
-            'updated_at': self.updated_at
+            'updated_at': self.updated_at,
+            'profile_picture': self.profile_picture
         }
 class Parcel(db.Model):
     __tablename__ = 'parcels'
@@ -45,21 +48,24 @@ class Parcel(db.Model):
     parcel_id = Column(Integer, primary_key=True)
     sender_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
     tracking_number = Column(String(20), unique=True, nullable=False)
-    
     recipient_name = Column(String, nullable=False)
     recipient_address = Column(String, nullable=False)
     recipient_phone = Column(String, nullable=False)
     description = Column(Text)
-    weight = Column(DECIMAL, nullable=False)
+    weight = Column(DECIMAL, nullable=True)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     current_location = Column(String(255), nullable=False)
-    status = Column(Enum('Scheduled', 'In Transit', 'Delivered', name='delivery_statuses'), nullable=False)
+    status = Column(Enum('Picked Up', 'Out for Delivery', 'In Transit', 'Delivered', name='delivery_statuses'), nullable=False)
+    sender_email = Column(String, nullable=False)
+    recipient_email = Column(String, nullable=False)
+    category = Column(String(50), nullable=False)
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
 
-    
     sender = relationship('User', back_populates='parcels', foreign_keys=[sender_id])
     delivery = relationship('Delivery', back_populates='parcel', uselist=False)
-    tracking = relationship('Tracking', back_populates='parcel', uselist=False)
+    tracking = relationship('Tracking', back_populates='parcel')
     orders = relationship('Order', back_populates='parcel', foreign_keys='Order.parcel_id')
 
     def to_dict(self):
@@ -71,12 +77,18 @@ class Parcel(db.Model):
             'recipient_address': self.recipient_address,
             'recipient_phone': self.recipient_phone,
             'description': self.description,
-            'weight': float(self.weight),  # Convert Decimal to float for JSON serialization
+            'weight': float(self.weight),
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat(),
             'current_location': self.current_location,
-            'status': self.status
+            'status': self.status,
+            'sender_email': self.sender_email,
+            'recipient_email': self.recipient_email,
+            'category': self.category,
+            'latitude': float(self.latitude) if self.latitude else None,
+            'longitude': float(self.longitude) if self.longitude else None
         }
+
 
 
 from datetime import datetime, timezone
@@ -132,6 +144,15 @@ class Tracking(db.Model):
     timestamp = Column(TIMESTAMP, nullable=False, default=datetime.now)
 
     parcel = relationship('Parcel', back_populates='tracking', foreign_keys=[parcel_id])
+
+    def to_dict(self):
+        return {
+            'tracking_id': self.tracking_id,
+            'parcel_id': self.parcel_id,
+            'location': self.location,
+            'status': self.status,
+            'timestamp': self.timestamp.isoformat()
+        }
 
 
 class Order(db.Model):
