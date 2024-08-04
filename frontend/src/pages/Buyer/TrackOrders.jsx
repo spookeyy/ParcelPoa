@@ -1,11 +1,12 @@
+
 import React, { useState } from 'react';
 
-const TrackOrders = () => {
+const TrackOrder = () => {
   const [orderId, setOrderId] = useState('');
   const [trackingInfo, setTrackingInfo] = useState(null);
   const [error, setError] = useState('');
 
-  
+  // Sample order data (in a real application, this would come from an API)
   const sampleOrderData = {
     '12345': {
       status: 'In Transit',
@@ -29,13 +30,13 @@ const TrackOrders = () => {
     setError('');
     setTrackingInfo(null);
 
-   
+    // Validate order ID
     if (!orderId) {
       setError('Please enter a valid order ID.');
       return;
     }
 
-    
+    // Simulate fetching order data
     const order = sampleOrderData[orderId];
     if (order) {
       setTrackingInfo(order);
@@ -45,27 +46,37 @@ const TrackOrders = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-semibold mb-6 text-center">Track Your Order</h2>
+    <div className="bg-gray-100 min-h-screen">
+      {/* Navbar */}
+      <nav className="bg-indigo-600 p-4">
+        <div className="container mx-auto flex justify-between items-center">
+          <h1 className="text-white text-2xl font-bold">Parcel Tracker</h1>
+          <ul className="flex space-x-4">
+            <li><a href="/" className="text-white hover:underline">Home</a></li>
+            <li><a href="/about" className="text-white hover:underline">About</a></li>
+            <li><a href="/contact" className="text-white hover:underline">Contact</a></li>
+            <li><a href="/track-order" className="text-white hover:underline">Track Order</a></li>
+          </ul>
+        </div>
+      </nav>
 
-        {error && <p className="text-red-500 mb-4">{error}</p>}
+      <div className="container mx-auto p-8">
+        <h2 className="text-3xl font-semibold mb-6 text-center">Track Your Order</h2>
 
-        <form onSubmit={handleTrackOrder} className="space-y-4">
-          <div>
-            <label htmlFor="orderId" className="block text-sm font-medium text-gray-700">Order ID</label>
-            <input
-              type="text"
-              id="orderId"
-              value={orderId}
-              onChange={(e) => setOrderId(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              required
-            />
-          </div>
+        {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
+
+        <form onSubmit={handleTrackOrder} className="flex justify-center mb-8">
+          <input
+            type="text"
+            placeholder="Enter Order ID"
+            value={orderId}
+            onChange={(e) => setOrderId(e.target.value)}
+            className="border border-gray-300 rounded-md px-4 py-2 w-1/3"
+            required
+          />
           <button
             type="submit"
-            className="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="ml-2 bg-indigo-600 text-white rounded-md px-4 py-2 hover:bg-indigo-700"
           >
             Track Order
           </button>
@@ -85,9 +96,29 @@ const TrackOrders = () => {
             </ul>
           </div>
         )}
+
+        {/* Image Containers Section */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+          <div className="bg-white p-4 rounded-lg shadow-md">
+            <img src="https://via.placeholder.com/150" alt="Order Placed" className="w-full h-32 object-cover rounded-md" />
+            <h5 className="text-center mt-2">Order Placed</h5>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-md">
+            <img src="https://via.placeholder.com/150" alt="In Transit" className="w-full h-32 object-cover rounded-md" />
+            <h5 className="text-center mt-2">In Transit</h5>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-md">
+            <img src="https://via.placeholder.com/150" alt="Out for Delivery" className="w-full h-32 object-cover rounded-md" />
+            <h5 className="text-center mt-2">Out for Delivery</h5>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-md">
+            <img src="https://via.placeholder.com/150" alt="Delivered" className="w-full h-32 object-cover rounded-md" />
+            <h5 className="text-center mt-2">Delivered</h5>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
-export default TrackOrders;
+export default TrackOrder;

@@ -3,32 +3,12 @@ import { ToastContainer } from "react-toastify";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
-import RequestResetPassword from "./components/RequestResetPassword";
-import ResetPassword from "./components/ResetPassword";
-import ChangePassword from "./components/Change-Password";
-import Login from "./components/Login";
-import Create_Account from "./components/Create_Account";
-
-// Seller Pages start
-import Home from "./pages/Seller/Home";
-import Agents from "./pages/Seller/Agents";
-import Agent_Requests from "./pages/Seller/Agent_Requests";
-import Agent_Details from "./pages/Seller/Agent_Details";
-import Agent_Trends from "./pages/Seller/Agent_Trends";
-import Invoice from "./pages/Seller/Invoice";
-import Messages_List from "./pages/Seller/Messages_List";
-import Messages_Details from "./pages/Seller/Messages_Details";
-import Order_List from "./pages/Seller/Order_List";
-import Order_Details from "./pages/Seller/Order_Details";
-import Dashboard_Part from "./pages/Seller/Dashboard_Part";
-import Tracking from "./pages/Seller/Tracking";
-import SellerPofie from "./pages/Seller/SellerPofie";
-import SellerLayout from "./components/SellerLayout";
-
+import Order_List from "./pages/Order_List";
+import Reset_Password from "./pages/Reset_Password";
 //Buyer pages
 import Buyer_Home from "./pages/Buyer/Buyer_Home";
 import OrderTracking from "./pages/Buyer/OrderTracking";
-import TrackOrders from "./pages/Buyer/TrackOrders";
+import TrackOrders from "./Pages/Buyer/TrackOrders";
 //End
 
 // the pages for the agent
