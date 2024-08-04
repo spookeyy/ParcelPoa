@@ -13,6 +13,12 @@ LOGIN USER
   "password": "spookie"
 }
 
+
+ python app.py
+ 
+ run both frontend and backend
+ honcho start -f Procfile.dev
+
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
