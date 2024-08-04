@@ -408,14 +408,13 @@ def mark_as_delivered(parcel_id):
 @app.route('/track/<string:tracking_number>', methods=['GET'])
 def track_parcel(tracking_number):
     parcel = Parcel.query.filter_by(tracking_number=tracking_number).first()
-    # if not parcel:
-    #     return jsonify({"message": "Parcel not found"}), 404
+    if not parcel:
+        return jsonify({"message": "Parcel not found"}), 404
     
     tracking_info = Tracking.query.filter_by(parcel_id=parcel.parcel_id).order_by(Tracking.timestamp.desc()).all()
     
-    # Simulate GPS location
-    if parcel.latitude is None or parcel.longitude is None:
-        # Generate random coordinates within a reasonable range
+    # Simulate GPS location if not available
+    if not hasattr(parcel, 'latitude') or not hasattr(parcel, 'longitude') or parcel.latitude is None or parcel.longitude is None:
         parcel.latitude = random.uniform(-90, 90)
         parcel.longitude = random.uniform(-180, 180)
         db.session.commit()
@@ -507,7 +506,7 @@ def request_reset_password():
 
     token = s.dumps(email, salt='password-reset-salt')
 
-    # set the reset URL to use frontend URL
+    # seting reset URL to use frontend URL
     reset_url = f"{frontend_url}/reset-password/{token}"
 
     try:
