@@ -1,5 +1,6 @@
 import random
 import string
+from decimal import Decimal
 from datetime import datetime, timedelta, timezone
 from faker import Faker
 from flask import Flask
@@ -59,14 +60,16 @@ with app.app_context():
                 recipient_address=faker.address(),
                 recipient_phone=recipient.phone_number,
                 description=faker.text(),
-                weight=round(random.uniform(1.0, 10.0), 2),
+                weight=Decimal(str(round(random.uniform(1.0, 10.0), 2))),
                 created_at=datetime.now(timezone.utc),
                 updated_at=datetime.now(timezone.utc),
                 current_location=faker.city(),
                 status=random.choice(statuses),
                 sender_email=sender.email,
                 recipient_email=recipient.email,
-                category=random.choice(categories)
+                category=random.choice(categories),
+                latitude=float(faker.latitude()),
+                longitude=float(faker.longitude())
             )
             parcels.append(parcel)
             db.session.add(parcel)

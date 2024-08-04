@@ -7,11 +7,11 @@ import {
   faExclamationCircle,
   faCheckCircle,
   faBox,
-  faClock,
   faTruck,
   faShippingFast,
 } from "@fortawesome/free-solid-svg-icons";
 import { useTracking } from "../../Context/TrackingContext";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 
 const OrderTracking = () => {
   const { trackingNumber } = useParams();
@@ -105,7 +105,7 @@ const OrderTracking = () => {
           <h3 className="text-2xl font-semibold text-blue-800 mb-4 text-center">
             Tracking History
           </h3>
-          <ul role="list" className="divide-y divide-gray-200">
+          <ul role="list" className="divide-y divide-gray-200 mb-8">
             {trackingData.map((track, index) => (
               <li key={index} className="relative pb-8">
                 {index !== trackingData.length - 1 && (
@@ -142,6 +142,30 @@ const OrderTracking = () => {
               </li>
             ))}
           </ul>
+          {trackingData[0].gps_location && (
+            <div>
+              <h4 className="text-lg font-semibold mb-2">Current Location</h4>
+              <p className="mb-4">{trackingData[0].gps_location.address}</p>
+              <MapContainer
+                center={[
+                  trackingData[0].gps_location.latitude,
+                  trackingData[0].gps_location.longitude,
+                ]}
+                zoom={13}
+                style={{ height: "400px", width: "100%" }}
+              >
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                <Marker
+                  position={[
+                    trackingData[0].gps_location.latitude,
+                    trackingData[0].gps_location.longitude,
+                  ]}
+                >
+                  <Popup>Current parcel location</Popup>
+                </Marker>
+              </MapContainer>
+            </div>
+          )}
         </div>
       )}
     </div>

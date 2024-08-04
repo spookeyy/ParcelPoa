@@ -1,4 +1,6 @@
+import os
 import random
+from geopy.geocoders import Nominatim
 import smtplib
 from flask import Flask, request, jsonify,url_for
 from flask_migrate import Migrate
@@ -7,10 +9,10 @@ from flask_cors import CORS
 from datetime import datetime, timezone
 from flask_apscheduler import APScheduler
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+from requests_oauthlib import OAuth1
 from werkzeug.security import generate_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, get_jwt
 from models import db, User, Parcel, Delivery, Notification, Tracking, Order
-import os
 from flask_cors import CORS
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -406,11 +408,32 @@ def mark_as_delivered(parcel_id):
 @app.route('/track/<string:tracking_number>', methods=['GET'])
 def track_parcel(tracking_number):
     parcel = Parcel.query.filter_by(tracking_number=tracking_number).first()
-    if not parcel:
-        return jsonify({"message": "Parcel not found"}), 404
+    # if not parcel:
+    #     return jsonify({"message": "Parcel not found"}), 404
     
     tracking_info = Tracking.query.filter_by(parcel_id=parcel.parcel_id).order_by(Tracking.timestamp.desc()).all()
-    return jsonify([track.to_dict() for track in tracking_info])
+    
+    # Simulate GPS location
+    if parcel.latitude is None or parcel.longitude is None:
+        # Generate random coordinates within a reasonable range
+        parcel.latitude = random.uniform(-90, 90)
+        parcel.longitude = random.uniform(-180, 180)
+        db.session.commit()
+
+    # Get address from coordinates
+    geolocator = Nominatim(user_agent="parcel_tracker")
+    location = geolocator.reverse(f"{parcel.latitude}, {parcel.longitude}")
+    address = location.address if location else "Unknown location"
+
+    tracking_data = [track.to_dict() for track in tracking_info]
+    for track in tracking_data:
+        track['gps_location'] = {
+            'latitude': parcel.latitude,
+            'longitude': parcel.longitude,
+            'address': address
+        }
+
+    return jsonify(tracking_data)
 
 
 # current parcel location
@@ -553,6 +576,24 @@ def send_email(to_email, reset_url):
         raise
 
     return True
+
+
+# FACEBOOK webhook
+# oauth = OAuth1(app)
+
+# facebook = oauth.remote_app(
+#     'facebook',
+#     consumer_key='1407483346114437',
+#     consumer_secret='9a0...b4',
+#     request_token_params={
+#         'scope': 'email,public_profile'
+#     },
+#     base_url='https://graph.facebook.com/',
+#     request_token_url=None,
+#     access_token_method='POST',
+#     access_token_url='/oauth/access_token',
+#     authorize_url='https://www.facebook.com/dialog/oauth'
+# )
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)

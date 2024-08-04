@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, Integer, String, Enum, ForeignKey, Text, DECIMAL, TIMESTAMP
+from sqlalchemy import Column, Float, Integer, String, Enum, ForeignKey, Text, DECIMAL, TIMESTAMP
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash,check_password_hash
 from flask_bcrypt import generate_password_hash, check_password_hash
@@ -18,6 +18,7 @@ class User(db.Model):
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     password_hash = Column(String(128), nullable=False)
+    profile_picture = Column(String, default='default.png', nullable=True)
 
     parcels = relationship('Parcel', back_populates='sender', foreign_keys='Parcel.sender_id')
     deliveries = relationship('Delivery', back_populates='agent', foreign_keys='Delivery.agent_id')
@@ -38,7 +39,8 @@ class User(db.Model):
             'phone_number': self.phone_number,
             'user_role': self.user_role,
             'created_at': self.created_at,
-            'updated_at': self.updated_at
+            'updated_at': self.updated_at,
+            'profile_picture': self.profile_picture
         }
 class Parcel(db.Model):
     __tablename__ = 'parcels'
@@ -55,10 +57,11 @@ class Parcel(db.Model):
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     current_location = Column(String(255), nullable=False)
     status = Column(Enum('Picked Up', 'Out for Delivery', 'In Transit', 'Delivered', name='delivery_statuses'), nullable=False)
-    
     sender_email = Column(String, nullable=False)
     recipient_email = Column(String, nullable=False)
     category = Column(String(50), nullable=False)
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
 
     sender = relationship('User', back_populates='parcels', foreign_keys=[sender_id])
     delivery = relationship('Delivery', back_populates='parcel', uselist=False)
@@ -81,7 +84,9 @@ class Parcel(db.Model):
             'status': self.status,
             'sender_email': self.sender_email,
             'recipient_email': self.recipient_email,
-            'category': self.category
+            'category': self.category,
+            'latitude': float(self.latitude) if self.latitude else None,
+            'longitude': float(self.longitude) if self.longitude else None
         }
 
 

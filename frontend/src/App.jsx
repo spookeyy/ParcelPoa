@@ -23,6 +23,7 @@ import Order_Details from "./pages/Seller/Order_Details";
 import Dashboard_Part from "./pages/Seller/Dashboard_Part";
 import Tracking from "./pages/Seller/Tracking";
 import SellerPofie from "./pages/Seller/SellerPofie";
+import SellerLayout from "./components/SellerLayout";
 
 //Buyer pages
 import Buyer_Home from "./pages/Buyer/Buyer_Home";
@@ -59,25 +60,38 @@ function App() {
   return (
     <Router>
       <UserProvider>
-        <Header />
         <TrackingProvider>
           <Routes>
-            {/* Seller Routes  Start*/}
-            <Route path="/seller" element={<Home />} />
-            <Route path="/signup" element={<Create_Account />} />
-            <Route path="/agents" element={<Agents />} />
-            <Route path="/agent-requests" element={<Agent_Requests />} />
-            <Route path="/agent/:id" element={<Agent_Details />} />
-            <Route path="/agent-trends/:id" element={<Agent_Trends />} />
-            <Route path="/invoice/:id" element={<Invoice />} />
-            <Route path="/messages-list" element={<Messages_List />} />
-            <Route path="/message/:id" element={<Messages_Details />} />
-            <Route path="/order-list" element={<Order_List />} />
-            <Route path="/order/:id" element={<Order_Details />} />
-            <Route path="/tracking" element={<Tracking />} />
-            <Route path="/dashboard-part" element={<Dashboard_Part />} />
-            <Route path="seller-profile" element={<SellerPofie />} />
-            {/* Seller Routes  */}
+            <Route path="/seller" element={<SellerLayout />}>
+              {/* Seller Routes  Start*/}
+              <Route path="/seller" element={<Home />} />
+              <Route path="/seller/signup" element={<Create_Account />} />
+              <Route path="/seller/agents" element={<Agents />} />
+              <Route
+                path="/seller/agent-requests"
+                element={<Agent_Requests />}
+              />
+              <Route path="/seller/agent/:id" element={<Agent_Details />} />
+              <Route
+                path="/seller/agent-trends/:id"
+                element={<Agent_Trends />}
+              />
+              <Route path="/seller/invoice/:id" element={<Invoice />} />
+              <Route path="/seller/messages-list" element={<Messages_List />} />
+              <Route
+                path="/seller/message/:id"
+                element={<Messages_Details />}
+              />
+              <Route path="/seller/order-list" element={<Order_List />} />
+              <Route path="/seller/order/:id" element={<Order_Details />} />
+              <Route path="/seller/tracking" element={<Tracking />} />
+              <Route
+                path="/seller/dashboard-part"
+                element={<Dashboard_Part />}
+              />
+              <Route path="/seller/seller-profile" element={<SellerPofie />} />
+              {/* Seller Routes  */}
+            </Route>
 
             {/* Buyer Routes start */}
             <Route path="Buyer" element={<Buyer_Home />} />
