@@ -36,43 +36,6 @@ export default function Login() {
     setShowPassword(!showPassword);
   };
 
-  // const handleLoginWithFacebook = () => {
-  //   const provider = new firebase.auth.FacebookAuthProvider();
-  //   firebase
-  //     .auth()
-  //     .signInWithPopup(provider)
-  //     .then((result) => {
-  //       const user = result.user;
-  //       console.log(user);
-  //     })
-  //     .catch((error) => {
-  //       console.error(error);
-  //     });
-  // };
-
-  // import firebase from "firebase/app";
-  // import "firebase/auth";
-
-  // // Initialize Firebase
-  // const firebaseConfig = {
-  //   // Your Firebase configuration
-  // };
-  // firebase.initializeApp(firebaseConfig);
-
-  // // Now you can use firebase
-  // const handleLoginWithFacebook = () => {
-  //   const provider = new firebase.auth.FacebookAuthProvider();
-  //   firebase
-  //     .auth()
-  //     .signInWithPopup(provider)
-  //     .then((result) => {
-  //       const user = result.user;
-  //       console.log(user);
-  //     })
-  //     .catch((error) => {
-  //       console.error(error);
-  //     });
-  // };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-300 to-indigo-700">
@@ -173,10 +136,7 @@ export default function Login() {
                 Forgot Password?
               </Link>
             </button>
-            <button 
-              // onClick={handleLoginWithFacebook}
-              className="text-blue-600 hover:underline font-medium"
-            >Login with facebook</button>
+            
           </p>
         </div>
       </div>
