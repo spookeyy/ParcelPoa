@@ -55,12 +55,13 @@ import Contact from "./pages/Contacts";
 import PrivacyPolicy from "./pages/policy";
 import Terms from "./pages/terms";
 import Returns from "./pages/return";
+import { DeliveryProvider } from "./Context/DeliveryContext";
 function App() {
   return (
     <Router>
       <UserProvider>
         <TrackingProvider>
-        
+        <DeliveryProvider>
           <Routes>
             <Route path="/seller" element={<SellerLayout />}>
               {/* Seller Routes */}
@@ -147,6 +148,7 @@ function App() {
             <Route path="/send-notification" element={<SendNotification />} />
             <Route path="/" element={<Landing />} />
           </Routes>
+          </DeliveryProvider>
         </TrackingProvider>
         <Footer />
         <ToastContainer
