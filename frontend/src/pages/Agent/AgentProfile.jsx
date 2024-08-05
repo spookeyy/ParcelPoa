@@ -45,59 +45,63 @@ export default function AgentProfile({ onClose }) {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
-      <div className="max-w-lg w-full bg-white p-8 rounded-lg shadow-lg">
+    <div className="flex flex-col items-center justify-center bg-gray-100 p-6">
+      <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-xl transition-transform transform hover:scale-105">
         <h2 className="text-2xl font-bold mb-6 text-center">Agent Profile</h2>
         <form onSubmit={handleUpdateProfile} className="space-y-6">
           <div className="mb-4">
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              Name
+            </label>
             <input
               type="text"
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
             <input
               type="email"
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number</label>
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+              Phone Number
+            </label>
             <input
               type="tel"
               id="phone"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               required
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-md shadow hover:bg-blue-600"
+            className="w-full bg-blue-600 text-white py-2 rounded-md shadow-lg hover:bg-blue-700 transition duration-300"
           >
             Update Profile
           </button>
         </form>
-        {message && (
-          <div className="mt-4 text-green-500 text-center">{message}</div>
-        )}
+        {message && <div className="mt-4 text-green-500 text-center">{message}</div>}
 
         <div className="mt-6 text-center">
           <button
             onClick={() => setShowChangePassword(!showChangePassword)}
-            className="w-full bg-yellow-500 text-white py-2 rounded-md shadow hover:bg-yellow-600"
+            className="w-full bg-yellow-500 text-white py-2 rounded-md shadow-lg hover:bg-yellow-600 transition duration-300"
           >
             Change Password
           </button>
@@ -106,7 +110,7 @@ export default function AgentProfile({ onClose }) {
         <div className="mt-6 text-center">
           <button
             onClick={onClose}
-            className="w-full bg-gray-500 text-white py-2 rounded-md shadow hover:bg-gray-600"
+            className="w-full bg-gray-500 text-white py-2 rounded-md shadow-lg hover:bg-gray-600 transition duration-300"
           >
             Back to Dashboard
           </button>

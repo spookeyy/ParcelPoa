@@ -39,22 +39,7 @@ export default function Sidebar({ isOpen, toggleSidebar, navigateTo }) {
               <i className="fas fa-comments mr-3 text-lg sm:text-xl"></i> Communication Tools
             </Link>
           </li>
-          <li>
-            <Link
-              to="/agent-login"
-              className="flex items-center text-gray-800 hover:text-blue-600 hover:bg-gray-100 p-3 rounded transition duration-200 text-sm sm:text-base"
-            >
-              <i className="fas fa-sign-in-alt mr-3 text-lg sm:text-xl"></i> Login
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/agent-register"
-              className="flex items-center text-gray-800 hover:text-blue-600 hover:bg-gray-100 p-3 rounded transition duration-200 text-sm sm:text-base"
-            >
-              <i className="fas fa-user-plus mr-3 text-lg sm:text-xl"></i> Register
-            </Link>
-          </li>
+         
           <li>
             <Link
               to="/agent-profile"
@@ -68,7 +53,7 @@ export default function Sidebar({ isOpen, toggleSidebar, navigateTo }) {
               onClick={() => navigate("/add-delivery")}
               className="flex items-center text-gray-800 hover:text-blue-600 hover:bg-gray-100 p-3 rounded transition duration-200 text-sm sm:text-base"
             >
-              <i className="fas fa-plus mr-3 text-lg sm:text-xl"></i> Create New Delivery
+              <i className="fas fa-plus mr-3 text-lg sm:text-xl"></i> Create Parcel
             </button>
           </li>
           <li>
