@@ -206,8 +206,8 @@ def create_parcel():
     data = request.get_json()
     user = User.query.get(get_jwt_identity())
     
-    if user.user_role != 'Agent':
-        return jsonify({"message": "Only agents can create parcels"}), 403
+    if user.user_role != 'Business':
+        return jsonify({"message": "Only business can create parcels"}), 403
 
     existing_tracking_numbers = {parcel.tracking_number for parcel in Parcel.query.all()}
     tracking_number = generate_unique_tracking_number(existing_tracking_numbers)

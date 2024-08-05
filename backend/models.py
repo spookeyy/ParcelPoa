@@ -19,7 +19,7 @@ class User(db.Model):
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     password_hash = Column(String(128), nullable=False)
     profile_picture = Column(String, default='default.png', nullable=True)
-    status = Column(Enum('Available', 'Unavailable', name='user_statuses'), default='Active', nullable=True)
+    status = Column(Enum('Available', 'Unavailable', name='user_statuses'), default='Available', nullable=True)
 
     parcels = relationship('Parcel', back_populates='sender', foreign_keys='Parcel.sender_id')
     deliveries = relationship('Delivery', back_populates='agent', foreign_keys='Delivery.agent_id')
