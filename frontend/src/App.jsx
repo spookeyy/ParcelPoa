@@ -1,15 +1,34 @@
+// eslint-disable-next-line no-unused-vars
 import React from "react";
 import { ToastContainer } from "react-toastify";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Footer from "./components/Footer";
-import Header from "./components/Header";
-import Order_List from "./pages/Order_List";
-import Reset_Password from "./pages/Reset_Password";
+import RequestResetPassword from "./components/RequestResetPassword";
+import ResetPassword from "./components/ResetPassword";
+import ChangePassword from "./components/Change-Password";
+import Login from "./components/Login";
+import Create_Account from "./components/Create_Account";
+import SendNotification from "./pages/SendNotification";
+
+// Seller Pages
+import Home from "./pages/Seller/Home";
+import Agents from "./pages/Seller/Agents";
+import Agent_Requests from "./pages/Seller/Agent_Requests";
+import Agent_Details from "./pages/Seller/Agent_Details";
+import Agent_Trends from "./pages/Seller/Agent_Trends";
+import Invoice from "./pages/Seller/Invoice";
+import Messages_List from "./pages/Seller/Messages_List";
+import Messages_Details from "./pages/Seller/Messages_Details";
+import Order_List from "./pages/Seller/Order_List";
+import Order_Details from "./pages/Seller/Order_Details";
+import Dashboard_Part from "./pages/Seller/Dashboard_Part";
+import Tracking from "./pages/Seller/Tracking";
+import SellerPofie from "./pages/Seller/SellerPofie";
+import SellerLayout from "./components/SellerLayout";
+
 //Buyer pages
-import Buyer_Home from "./pages/Buyer/Buyer_Home";
 import OrderTracking from "./pages/Buyer/OrderTracking";
-import TrackOrders from "./Pages/Buyer/TrackOrders";
-//End
+import TrackOrders from "./pages/Buyer/TrackOrders";
 
 // the pages for the agent
 import AgentHome from "./pages/Agent/AgentHome";
@@ -30,7 +49,7 @@ import UpdateStatus from "./pages/Agent/UpdateStatus";
 
 import { UserProvider } from "./Context/UserContext";
 import { TrackingProvider } from "./Context/TrackingContext";
-import  Landing from "./components/landing";
+import Landing from "./components/landing";
 import About from "./pages/About";
 import Contact from "./pages/Contacts";
 import PrivacyPolicy from "./pages/policy";
@@ -43,7 +62,7 @@ function App() {
         <TrackingProvider>
           <Routes>
             <Route path="/seller" element={<SellerLayout />}>
-              {/* Seller Routes  Start*/}
+              {/* Seller Routes */}
               <Route path="/seller" element={<Home />} />
               <Route path="/seller/signup" element={<Create_Account />} />
               <Route path="/seller/agents" element={<Agents />} />
@@ -70,13 +89,10 @@ function App() {
                 element={<Dashboard_Part />}
               />
               <Route path="/seller/seller-profile" element={<SellerPofie />} />
-              {/* Seller Routes  */}
             </Route>
 
-            {/* Buyer Routes start */}
-            <Route path="Buyer" element={<Buyer_Home />} />
+            {/* Buyer Routes */}
             <Route path="/tracking" element={<OrderTracking />} />
-            {/* Buyer Routes end*/}
 
             <Route path="/login" element={<Login />} />
             <Route path="/create-account" element={<Create_Account />} />
@@ -127,6 +143,7 @@ function App() {
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/returns" element={<Returns />} />
+            <Route path="/send-notification" element={<SendNotification />} />
             <Route path="/" element={<Landing />} />
           </Routes>
         </TrackingProvider>
