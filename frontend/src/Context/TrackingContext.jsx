@@ -24,7 +24,7 @@ export const TrackingProvider = ({ children }) => {
           toast.error(data.message);
           setError(data.message);
         } else {
-          setTrackingData(data);
+          setTrackingData(data.tracking_history);
         }
         setLoading(false);
       })
@@ -35,9 +35,9 @@ export const TrackingProvider = ({ children }) => {
       });
   };
 
-  useEffect(() => {
-    fetchTrackingData();
-  }, []);
+  // useEffect(() => {
+  //   fetchTrackingData();
+  // }, []);
 
   useEffect(() => {
     if (trackingData.length > 0) {
