@@ -1,0 +1,66 @@
+REGISTER USER
+{
+  "name": "spookie2",
+  "email": "spookie2@gmail.com",
+  "phone_number": "+254792136720",
+  "user_role": "Agent",
+  "password": "spookie"
+}
+
+LOGIN USER
+{
+  "email": "spookie2@gmail.com",
+  "password": "spookie"
+}
+
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import json
+import os
+
+# Load contacts from JSON file
+def load_contacts(file_path):
+    with open(file_path, 'r') as file:
+        contacts = json.load(file)
+    return contacts
+
+# Compose the message
+def compose_message(sender_email, recipient_email, subject, body):
+    message = MIMEMultipart()
+    message['From'] = sender_email
+    message['To'] = recipient_email
+    message['Subject'] = subject
+    message.attach(MIMEText(body, 'plain'))
+    return message
+
+# Send the message
+def send_message(smtp_server, smtp_port, sender_email, sender_password, contacts, subject, body):
+    try:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(sender_email, sender_password)
+        
+        for contact in contacts:
+            recipient_email = contact['email']
+            message = compose_message(sender_email, recipient_email, subject, body)
+            server.send_message(message)
+            print(f"Message sent to {recipient_email}")
+        
+        server.quit()
+    except Exception as e:
+        print(f"Failed to send message: {e}")
+
+if __name__ == "__main__":
+    # Configuration
+    contacts_file = 'contacts.json'
+    smtp_server = 'smtp.gmail.com'  # Replace with your SMTP server
+    smtp_port = 587  # Replace with your SMTP server port
+    sender_email = 'whitshi215@gmail.com'  # Replace with your email
+    sender_password = 'tvrp yvrq mjee qfju'  # Replace with your email password
+    subject = 'TEST ONE'
+    body = 'This is the first test.'
+
+    # Load contacts and send messages
+    contacts = load_contacts(contacts_file)
+    send_message(smtp_server, smtp_port, sender_email, sender_password, contacts, subject, body)
