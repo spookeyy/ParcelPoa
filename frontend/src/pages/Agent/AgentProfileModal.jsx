@@ -9,10 +9,10 @@ export default function AgentProfileModal() {
   const closeModal = () => setIsModalOpen(false);
 
   return (
-    <div>
+    <div className="flex justify-center items-center h-screen bg-gray-200">
       <button
         onClick={openModal}
-        className="bg-blue-500 text-white py-4 px-4 rounded"
+        className="bg-blue-600 text-white py-3 px-6 rounded shadow-lg hover:bg-blue-700 transition duration-300"
       >
         Open Profile Modal
       </button>
