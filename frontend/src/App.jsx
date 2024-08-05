@@ -41,8 +41,8 @@ import ManageDeliveries from "./pages/Agent/ManageDeliveries";
 import AddDelivery from "./pages/Agent/AddDelivery";
 import CommunicationTools from "./pages/Agent/CommunicationTools";
 import UpdateParcelStatusPage from "./pages/Agent/UpdateParcelStatusPage";
-import AgentLogin from "./pages/Agent/AgentLogin";
-import AgentRegister from "./pages/Agent/AgentRegister";
+// import AgentLogin from "./pages/Agent/AgentLogin";
+// import AgentRegister from "./pages/Agent/AgentRegister";
 import AgentProfile from "./pages/Agent/AgentProfile";
 import UpdateStatus from "./pages/Agent/UpdateStatus";
 // end of the pages for the agent
@@ -127,8 +127,8 @@ function App() {
               path="/update-parcel-status"
               element={<UpdateParcelStatusPage />}
             />
-            <Route path="/agent-login" element={<AgentLogin />} />
-            <Route path="/agent-register" element={<AgentRegister />} />
+            {/* <Route path="/agent-login" element={<AgentLogin />} /> */}
+            {/* <Route path="/agent-register" element={<AgentRegister />} /> */}
             <Route path="/agent-profile" element={<AgentProfile />} />
             <Route path="/update-status" element={<UpdateStatus />} />
             {/* end of the pages for the agent */}
