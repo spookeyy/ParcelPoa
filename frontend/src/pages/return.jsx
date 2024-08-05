@@ -2,9 +2,9 @@ import React from 'react';
 
 export default function Returns() {
   return (
-    <div className="bg-gray-100 min-h-screen p-8">
+    <div className="bg-gradient-to-br from-blue-300 to-indigo-700 min-h-screen p-8">
       <div className="container mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
-        <div className="bg-yellow-500 p-8">
+        <div className="bg-indigo-500 p-8">
           <h1 className="text-3xl font-bold text-white">Returns Policy</h1>
         </div>
         <div className="p-8">
