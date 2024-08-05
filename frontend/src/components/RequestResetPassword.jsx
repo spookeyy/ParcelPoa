@@ -21,8 +21,8 @@ export default function RequestResetPassword() {
   };
 
   return (
-    <div className="flex items-center justify-center bg-gray-100 p-6 dark:bg-gray-900 dark:text-gray-100">
-      <form onSubmit={handleSubmit} className="max-w-sm mx-auto">
+    <div className="flex items-center justify-center bg-gray-100 p-6 dark:bg-gray-900 dark:text-gray-100 min-h-screen">
+      <form onSubmit={handleSubmit} className="max-w-sm mx-auto p-4">
         <div className="mb-5">
           <label
             htmlFor="email"

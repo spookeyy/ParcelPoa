@@ -17,8 +17,8 @@ export default function DeliveryCard({
     }[status] || "bg-gray-500";
 
   return (
-    <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 flex flex-col space-y-4">
-      <div className="text-lg font-semibold text-gray-800">
+    <div className="bg-gradient-to-bl from-blue-200 to-indigo-400  p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 flex flex-col space-y-4">
+      <div className="text-lg font-semibold text-">
         <span className="font-bold">ORDER ID:</span> {orderID}
       </div>
 
@@ -29,7 +29,7 @@ export default function DeliveryCard({
           className="w-full sm:w-20 h-auto sm:h-20 object-cover rounded-lg"
         />
         <div className="flex-1">
-          <p className="text-sm font-medium text-gray-800">{product}</p>
+          <p className="text-sm font-medium text-">{product}</p>
           <p className="text-sm text-gray-600">
             <span className="font-bold">Quantity:</span> {quantity}
           </p>

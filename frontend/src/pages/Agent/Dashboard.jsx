@@ -32,7 +32,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex h-full overflow-hidden bg-gray-100">
+    <div className="flex h-full overflow-hidden  bg-gradient-to-br from-blue-300 to-indigo-700">
       {/* Sidebar component */}
       <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
 
@@ -64,13 +64,13 @@ export default function Dashboard() {
           <Route
             path="/"
             element={
-              <div className="flex flex-col flex-1 overflow-y-auto">
+              <div className="flex flex-col flex-1 overflow-y-auto ">
                 <div className="flex flex-wrap justify-center gap-6 px-6 mb-8">
                   <StatsCard
                     icon="fa-chart-line"
                     title="Total Deliveries"
                     count={120}
-                    color="text-green-500"
+                    color="text-green-500 "
                   />
                   <StatsCard
                     icon="fa-truck"
@@ -93,7 +93,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Chart component */}
-                <DeliveriesChart data={deliveriesData} />
+                {/* <DeliveriesChart data={deliveriesData} /> */}
 
                 <div className="px-6 mb-8">
                   {/* Deliveries component */}

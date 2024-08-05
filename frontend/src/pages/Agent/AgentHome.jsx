@@ -3,15 +3,15 @@ import { Link } from 'react-router-dom';
 
 export default function AgentHome() {
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gray-100 py-6 px-4 sm:px-6 lg:px-8 pt-36 pb-36">
+    <div className="min-h-screen flex flex-col items-center bg-gradient-to-br from-blue-300 to-indigo-700 py-6 px-4 sm:px-6 lg:px-8 pt-36 pb-36">
       {/* Container for the gradient and content */}
-      <div className="w-full max-w-4xl bg-gradient-to-r from-blue-100 to-purple-200 rounded-lg shadow-lg p-6 sm:p-8 lg:p-12">
+      <div className="w-full max-w-4xl bg-gradient-to-bl from-blue-200 to-indigo-400  rounded-lg shadow-lg p-6 sm:p-8 lg:p-12">
         {/* Hero Section */}
         <div className="text-center">
-          <h1 className="text-4xl font-extrabold text-gray-800 mb-4 sm:text-5xl md:text-6xl">
+          <h1 className="text-4xl font-extrabold text-blue-500 mb-4 sm:text-5xl md:text-6xl">
             Welcome to ParcelPoa
           </h1>
-          <p className="text-lg text-gray-700 mb-6 sm:text-xl md:text-2xl">
+          <p className="text-lg text-white mb-6 sm:text-xl md:text-2xl">
             Empowering agents to manage deliveries efficiently and effectively. Join us and explore all the features designed just for you!
           </p>
           
@@ -29,8 +29,8 @@ export default function AgentHome() {
             <div className="bg-white p-4 rounded-full shadow-md mb-4">
               <i className="fas fa-truck text-blue-500 text-3xl"></i>
             </div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">Manage Deliveries</h3>
-            <p className="text-gray-600 max-w-xs">
+            <h3 className="text-xl font-semibold text-white mb-2">Manage Deliveries</h3>
+            <p className="text-white max-w-xs">
               Seamlessly manage and track your deliveries with our easy-to-use dashboard.
             </p>
           </div>
@@ -39,8 +39,8 @@ export default function AgentHome() {
             <div className="bg-white p-4 rounded-full shadow-md mb-4">
               <i className="fas fa-chart-line text-blue-500 text-3xl"></i>
             </div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">Analytics</h3>
-            <p className="text-gray-600 max-w-xs">
+            <h3 className="text-xl font-semibold text-white mb-2">Analytics</h3>
+            <p className="text-white max-w-xs">
               Get insights into your performance with detailed analytics and reports.
             </p>
           </div>
@@ -49,8 +49,8 @@ export default function AgentHome() {
             <div className="bg-white p-4 rounded-full shadow-md mb-4">
               <i className="fas fa-user-friends text-blue-500 text-3xl"></i>
             </div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">Team Collaboration</h3>
-            <p className="text-gray-600 max-w-xs">
+            <h3 className="text-xl font-semibold text-white mb-2">Team Collaboration</h3>
+            <p className="text-white max-w-xs">
               Collaborate with your team and improve communication and efficiency.
             </p>
           </div>
@@ -59,8 +59,8 @@ export default function AgentHome() {
             <div className="bg-white p-4 rounded-full shadow-md mb-4">
               <i className="fas fa-user text-blue-500 text-3xl"></i>
             </div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">Profile Management</h3>
-            <p className="text-gray-600 max-w-xs">
+            <h3 className="text-xl font-semibold text-white mb-2">Profile Management</h3>
+            <p className="text-white max-w-xs">
               Easily manage and update your profile information to stay current and secure.
             </p>
           </div>
