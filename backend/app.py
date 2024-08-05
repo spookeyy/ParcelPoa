@@ -1,4 +1,7 @@
+import os
 import random
+import string
+from geopy.geocoders import Nominatim
 import smtplib
 from flask import Flask, request, jsonify,url_for
 from flask_migrate import Migrate
@@ -7,10 +10,10 @@ from flask_cors import CORS
 from datetime import datetime, timezone
 from flask_apscheduler import APScheduler
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+from requests_oauthlib import OAuth1
 from werkzeug.security import generate_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, get_jwt
 from models import db, User, Parcel, Delivery, Notification, Tracking, Order
-import os
 from flask_cors import CORS
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -65,8 +68,8 @@ def register():
     if not password:
         return jsonify({"error": "Password is required and must not be empty"}), 400
 
-    # if len(password) < 8:
-    #     return jsonify({"error": "Password must be at least 8 characters long"}), 400
+    if len(password) < 8:
+        return jsonify({"error": "Password must be at least 8 characters long"}), 400
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
     new_user = User(
         name=data.get('name'),
@@ -75,7 +78,7 @@ def register():
         user_role=data.get('user_role'),
         created_at=datetime.now(),
         updated_at=datetime.now(),
-        password_hash=hashed_password
+        password_hash=hashed_password,
     )
     db.session.add(new_user)
     db.session.commit()
@@ -175,6 +178,7 @@ def update_profile():
     user.name = data.get('name', user.name)
     user.email = data.get('email', user.email)
     user.phone_number = data.get('phone_number', user.phone_number)
+    user.profile_picture = data.get('profile_picture', user.profile_picture)
     user.updated_at = datetime.now()
     db.session.commit()
     return jsonify({"message": "Profile updated successfully"})
@@ -201,12 +205,16 @@ def change_password():
 def create_parcel():
     data = request.get_json()
     user = User.query.get(get_jwt_identity())
+    
     if user.user_role != 'Agent':
         return jsonify({"message": "Only agents can create parcels"}), 403
-    
+
+    existing_tracking_numbers = {parcel.tracking_number for parcel in Parcel.query.all()}
+    tracking_number = generate_unique_tracking_number(existing_tracking_numbers)
+
     parcel = Parcel(
         sender_id=data['sender_id'],
-        tracking_number=data['tracking_number'],
+        tracking_number=tracking_number,
         recipient_name=data['recipient_name'],
         recipient_address=data['recipient_address'],
         recipient_phone=data['recipient_phone'],
@@ -221,13 +229,23 @@ def create_parcel():
         updated_at=datetime.now()
     )
     db.session.add(parcel)
+
+    db.session.flush()  # assigns an id to the parcel without committing it to the database
+
+    new_tracking = Tracking(
+        parcel_id=parcel.parcel_id,
+        location=parcel.current_location,
+        status=parcel.status
+    )
+    db.session.add(new_tracking)
     db.session.commit()
 
-    # Send notifications
+    # Send notifications to sender(seller) and recipient
     send_notification(parcel.sender_email, 'Parcel Registered', f'Your parcel with tracking number {parcel.tracking_number} has been processed.')
     send_notification(parcel.recipient_email, 'Parcel Coming Your Way', f'A parcel with tracking number {parcel.tracking_number} is on its way to you.')
 
-    return jsonify({"message": "Parcel created successfully"}), 201
+    return jsonify({"message": "Parcel created successfully", "tracking_number": parcel.tracking_number}), 201
+
 
 @app.route('/parcels', methods=['GET'])
 @jwt_required()
@@ -406,11 +424,48 @@ def mark_as_delivered(parcel_id):
 @app.route('/track/<string:tracking_number>', methods=['GET'])
 def track_parcel(tracking_number):
     parcel = Parcel.query.filter_by(tracking_number=tracking_number).first()
-    if not parcel:
+    if parcel is None:
         return jsonify({"message": "Parcel not found"}), 404
     
     tracking_info = Tracking.query.filter_by(parcel_id=parcel.parcel_id).order_by(Tracking.timestamp.desc()).all()
-    return jsonify([track.to_dict() for track in tracking_info])
+    print(f"tracking_info: {tracking_info}")
+
+    # Simulate GPS location if not available
+    if not hasattr(parcel, 'latitude') or not hasattr(parcel, 'longitude') or parcel.latitude is None or parcel.longitude is None:
+        parcel.latitude = random.uniform(-90, 90)
+        parcel.longitude = random.uniform(-180, 180)
+        db.session.commit()
+
+    # Get address from coordinates
+    geolocator = Nominatim(user_agent="parcel_tracker")
+    location = geolocator.reverse(f"{parcel.latitude}, {parcel.longitude}")
+    address = location.address if location else "Unknown location"
+
+    tracking_data = [track.to_dict() for track in tracking_info]
+    for track in tracking_data:
+        track['gps_location'] = {
+            'latitude': parcel.latitude,
+            'longitude': parcel.longitude,
+            'address': address
+        }
+
+    parcel.current_location = address
+
+    response_data = {
+        "parcel": {
+            "tracking_number": parcel.tracking_number,
+            "status": parcel.status,
+            "current_location": parcel.current_location,
+            "sender_name": parcel.sender.name if parcel.sender else "Unknown",
+            "recipient_name": parcel.recipient_name,
+            "description": parcel.description,
+            "category": parcel.category
+        },
+        "tracking_history": tracking_data
+    }
+
+    print(f"response_data: {response_data}")
+    return jsonify(response_data)
 
 
 # current parcel location
@@ -484,7 +539,7 @@ def request_reset_password():
 
     token = s.dumps(email, salt='password-reset-salt')
 
-    # set the reset URL to use frontend URL
+    # seting reset URL to use frontend URL
     reset_url = f"{frontend_url}/reset-password/{token}"
 
     try:
@@ -553,6 +608,31 @@ def send_email(to_email, reset_url):
         raise
 
     return True
+
+# generate tracking numbers
+def generate_unique_tracking_number(existing_numbers):
+    """Generate a unique tracking number not in the existing_numbers set."""
+    while True:
+        tracking_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+        if tracking_number not in existing_numbers:
+            return tracking_number
+
+# FACEBOOK webhook
+# oauth = OAuth1(app)
+
+# facebook = oauth.remote_app(
+#     'facebook',
+#     consumer_key='1407483346114437',
+#     consumer_secret='9a0...b4',
+#     request_token_params={
+#         'scope': 'email,public_profile'
+#     },
+#     base_url='https://graph.facebook.com/',
+#     request_token_url=None,
+#     access_token_method='POST',
+#     access_token_url='/oauth/access_token',
+#     authorize_url='https://www.facebook.com/dialog/oauth'
+# )
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)

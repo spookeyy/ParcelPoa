@@ -1,15 +1,16 @@
+// eslint-disable-next-line no-unused-vars
 import React from "react";
 import { ToastContainer } from "react-toastify";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Footer from "./components/Footer";
-import Header from "./components/Header";
 import RequestResetPassword from "./components/RequestResetPassword";
 import ResetPassword from "./components/ResetPassword";
 import ChangePassword from "./components/Change-Password";
 import Login from "./components/Login";
 import Create_Account from "./components/Create_Account";
+import SendNotification from "./pages/SendNotification";
 
-// Seller Pages start
+// Seller Pages
 import Home from "./pages/Seller/Home";
 import Agents from "./pages/Seller/Agents";
 import Agent_Requests from "./pages/Seller/Agent_Requests";
@@ -23,12 +24,11 @@ import Order_Details from "./pages/Seller/Order_Details";
 import Dashboard_Part from "./pages/Seller/Dashboard_Part";
 import Tracking from "./pages/Seller/Tracking";
 import SellerPofie from "./pages/Seller/SellerPofie";
+import SellerLayout from "./components/SellerLayout";
 
 //Buyer pages
-import Buyer_Home from "./pages/Buyer/Buyer_Home";
 import OrderTracking from "./pages/Buyer/OrderTracking";
 import TrackOrders from "./pages/Buyer/TrackOrders";
-//End
 
 // the pages for the agent
 import AgentHome from "./pages/Agent/AgentHome";
@@ -49,7 +49,7 @@ import UpdateStatus from "./pages/Agent/UpdateStatus";
 
 import { UserProvider } from "./Context/UserContext";
 import { TrackingProvider } from "./Context/TrackingContext";
-import  Landing from "./components/landing";
+import Landing from "./components/landing";
 import About from "./pages/About";
 import Contact from "./pages/Contacts";
 import PrivacyPolicy from "./pages/policy";
@@ -59,30 +59,40 @@ function App() {
   return (
     <Router>
       <UserProvider>
-        <Header />
         <TrackingProvider>
           <Routes>
-            {/* Seller Routes  Start*/}
-            <Route path="/seller" element={<Home />} />
-            <Route path="/signup" element={<Create_Account />} />
-            <Route path="/agents" element={<Agents />} />
-            <Route path="/agent-requests" element={<Agent_Requests />} />
-            <Route path="/agent/:id" element={<Agent_Details />} />
-            <Route path="/agent-trends/:id" element={<Agent_Trends />} />
-            <Route path="/invoice/:id" element={<Invoice />} />
-            <Route path="/messages-list" element={<Messages_List />} />
-            <Route path="/message/:id" element={<Messages_Details />} />
-            <Route path="/order-list" element={<Order_List />} />
-            <Route path="/order/:id" element={<Order_Details />} />
-            <Route path="/tracking" element={<Tracking />} />
-            <Route path="/dashboard-part" element={<Dashboard_Part />} />
-            <Route path="seller-profile" element={<SellerPofie />} />
-            {/* Seller Routes  */}
+            <Route path="/seller" element={<SellerLayout />}>
+              {/* Seller Routes */}
+              <Route path="/seller" element={<Home />} />
+              <Route path="/seller/signup" element={<Create_Account />} />
+              <Route path="/seller/agents" element={<Agents />} />
+              <Route
+                path="/seller/agent-requests"
+                element={<Agent_Requests />}
+              />
+              <Route path="/seller/agent/:id" element={<Agent_Details />} />
+              <Route
+                path="/seller/agent-trends/:id"
+                element={<Agent_Trends />}
+              />
+              <Route path="/seller/invoice/:id" element={<Invoice />} />
+              <Route path="/seller/messages-list" element={<Messages_List />} />
+              <Route
+                path="/seller/message/:id"
+                element={<Messages_Details />}
+              />
+              <Route path="/seller/order-list" element={<Order_List />} />
+              <Route path="/seller/order/:id" element={<Order_Details />} />
+              <Route path="/seller/tracking" element={<Tracking />} />
+              <Route
+                path="/seller/dashboard-part"
+                element={<Dashboard_Part />}
+              />
+              <Route path="/seller/seller-profile" element={<SellerPofie />} />
+            </Route>
 
-            {/* Buyer Routes start */}
-            <Route path="Buyer" element={<Buyer_Home />} />
-            <Route path="/track" element={<OrderTracking />} />
-            {/* Buyer Routes end*/}
+            {/* Buyer Routes */}
+            <Route path="/tracking" element={<OrderTracking />} />
 
             <Route path="/login" element={<Login />} />
             <Route path="/create-account" element={<Create_Account />} />
@@ -133,6 +143,7 @@ function App() {
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/returns" element={<Returns />} />
+            <Route path="/send-notification" element={<SendNotification />} />
             <Route path="/" element={<Landing />} />
           </Routes>
         </TrackingProvider>

@@ -13,6 +13,12 @@ LOGIN USER
   "password": "spookie"
 }
 
+
+ python app.py
+ 
+ run both frontend and backend
+ honcho start -f Procfile.dev
+
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -64,3 +70,42 @@ if __name__ == "__main__":
     # Load contacts and send messages
     contacts = load_contacts(contacts_file)
     send_message(smtp_server, smtp_port, sender_email, sender_password, contacts, subject, body)
+
+
+// const handleLoginWithFacebook = () => {
+  //   const provider = new firebase.auth.FacebookAuthProvider();
+  //   firebase
+  //     .auth()
+  //     .signInWithPopup(provider)
+  //     .then((result) => {
+  //       const user = result.user;
+  //       console.log(user);
+  //     })
+  //     .catch((error) => {
+  //       console.error(error);
+  //     });
+  // };
+
+  // import firebase from "firebase/app";
+  // import "firebase/auth";
+
+  // // Initialize Firebase
+  // const firebaseConfig = {
+  //   // Your Firebase configuration
+  // };
+  // firebase.initializeApp(firebaseConfig);
+
+  // // Now you can use firebase
+  // const handleLoginWithFacebook = () => {
+  //   const provider = new firebase.auth.FacebookAuthProvider();
+  //   firebase
+  //     .auth()
+  //     .signInWithPopup(provider)
+  //     .then((result) => {
+  //       const user = result.user;
+  //       console.log(user);
+  //     })
+  //     .catch((error) => {
+  //       console.error(error);
+  //     });
+  // };

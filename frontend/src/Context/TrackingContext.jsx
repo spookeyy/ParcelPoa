@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react/prop-types */
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 import { toast } from "react-toastify";
 import { server } from "../../config.json";
 
@@ -24,7 +24,7 @@ export const TrackingProvider = ({ children }) => {
           toast.error(data.message);
           setError(data.message);
         } else {
-          setTrackingData(data);
+          setTrackingData(data.tracking_history);
         }
         setLoading(false);
       })
@@ -35,9 +35,21 @@ export const TrackingProvider = ({ children }) => {
       });
   };
 
+  // useEffect(() => {
+  //   fetchTrackingData();
+  // }, []);
+
+  useEffect(() => {
+    if (trackingData.length > 0) {
+      setError(null);
+    }
+  }, [trackingData]);
+  
+  const contextdata = { trackingData, loading, error, fetchTrackingData };
+
   return (
     <TrackingContext.Provider
-      value={{ trackingData, loading, error, fetchTrackingData }}
+      value={contextdata}
     >
       {children}
     </TrackingContext.Provider>

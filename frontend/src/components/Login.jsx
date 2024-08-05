@@ -36,6 +36,7 @@ export default function Login() {
     setShowPassword(!showPassword);
   };
 
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-300 to-indigo-700">
       <div className="login-container flex flex-col p-8 bg-gradient-to-bl from-blue-200 to-indigo-400 bg-opacity-20 backdrop-blur-md shadow-lg rounded-lg max-w-md w-full m-4">
@@ -135,6 +136,7 @@ export default function Login() {
                 Forgot Password?
               </Link>
             </button>
+            
           </p>
         </div>
       </div>
