@@ -1,38 +1,60 @@
 import React, { useState, useEffect } from "react";
-
-// Mock delivery data
-const deliveriesMockData = [
-  { id: 1, parcel: "Parcel A", status: "Scheduled" },
-  { id: 2, parcel: "Parcel B", status: "In Transit" },
-  { id: 3, parcel: "Parcel C", status: "Delivered" },
-];
+import { server } from "../../../config.json";
 
 export default function ManageDeliveries({ openSidebar }) {
-  const [deliveries, setDeliveries] = useState(deliveriesMockData);
+  const [deliveries, setDeliveries] = useState([]);
   const [notification, setNotification] = useState(null);
 
   useEffect(() => {
-    // Fetch real delivery data here if needed
+    const fetchDeliveries = async () => {
+      try {
+        const response = await fetch(`${server}/assigned_deliveries`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch deliveries.");
+        }
+
+        const data = await response.json();
+        setDeliveries(data);
+      } catch (error) {
+        setNotification("Error fetching deliveries.");
+      }
+    };
+
+    fetchDeliveries();
   }, []);
 
-  useEffect(() => {
-    if (notification) {
-      // Simulate notification
-      console.log(notification);
-    }
-  }, [notification]);
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      const response = await fetch(`${server}/update_status/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
 
-  const handleStatusChange = (id, newStatus) => {
-    const updatedDelivery = deliveries.find((delivery) => delivery.id === id);
-    setDeliveries((prevDeliveries) =>
-      prevDeliveries.map((delivery) =>
-        delivery.id === id ? { ...delivery, status: newStatus } : delivery
-      )
-    );
-    setNotification(
-      `Delivery ${updatedDelivery.parcel} status changed to ${newStatus}`
-    );
-    // You can also implement a more sophisticated notification system here
+      if (!response.ok) {
+        throw new Error("Failed to update status.");
+      }
+
+      const updatedDelivery = deliveries.find((delivery) => delivery.id === id);
+      setDeliveries((prevDeliveries) =>
+        prevDeliveries.map((delivery) =>
+          delivery.id === id ? { ...delivery, status: newStatus } : delivery
+        )
+      );
+      setNotification(`Status updated to ${newStatus}`);
+    } catch (error) {
+      setNotification("Error updating status.");
+    }
   };
 
   return (
@@ -68,9 +90,7 @@ export default function ManageDeliveries({ openSidebar }) {
                 <td className="border p-2">
                   <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
                     <button
-                      onClick={() =>
-                        handleStatusChange(delivery.id, "Delivered")
-                      }
+                      onClick={() => handleStatusChange(delivery.id, "Delivered")}
                       className={`w-full sm:w-1/3 px-4 py-2 rounded ${
                         delivery.status === "Delivered"
                           ? "bg-green-600"
@@ -80,9 +100,7 @@ export default function ManageDeliveries({ openSidebar }) {
                       Delivered
                     </button>
                     <button
-                      onClick={() =>
-                        handleStatusChange(delivery.id, "In Transit")
-                      }
+                      onClick={() => handleStatusChange(delivery.id, "In Transit")}
                       className={`w-full sm:w-1/3 px-4 py-2 rounded ${
                         delivery.status === "In Transit"
                           ? "bg-yellow-600"
@@ -92,9 +110,7 @@ export default function ManageDeliveries({ openSidebar }) {
                       In Transit
                     </button>
                     <button
-                      onClick={() =>
-                        handleStatusChange(delivery.id, "Scheduled")
-                      }
+                      onClick={() => handleStatusChange(delivery.id, "Scheduled")}
                       className={`w-full sm:w-1/3 px-4 py-2 rounded ${
                         delivery.status === "Scheduled"
                           ? "bg-red-600"

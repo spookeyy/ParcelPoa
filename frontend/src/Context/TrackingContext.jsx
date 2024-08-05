@@ -1,5 +1,4 @@
-/* eslint-disable react-refresh/only-export-components */
-/* eslint-disable react/prop-types */
+
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { toast } from "react-toastify";
 import { server } from "../../config.json";

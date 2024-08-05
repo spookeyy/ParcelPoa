@@ -60,6 +60,7 @@ function App() {
     <Router>
       <UserProvider>
         <TrackingProvider>
+        
           <Routes>
             <Route path="/seller" element={<SellerLayout />}>
               {/* Seller Routes */}
@@ -106,7 +107,7 @@ function App() {
 
             {/* the pages for the agent */}
             <Route path="/agent" element={<AgentHome />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard/*" element={<Dashboard />} />
             <Route path="/delivery-details/:id" element={<DeliveryDetails />} />
             <Route
               path="/delivery-confirmation"
@@ -168,6 +169,7 @@ function App() {
           progress={undefined}
           theme="dark"
         />
+        
       </UserProvider>
     </Router>
   );
