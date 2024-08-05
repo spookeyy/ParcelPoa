@@ -1,5 +1,7 @@
 import React from 'react';
 import Navbar from './Navbar';
+import { FloatingWhatsApp } from 'react-floating-whatsapp'; 
+
 export default function Landing() {
   return (
     <div className="bg-white min-h-screen flex flex-col">
@@ -23,10 +25,8 @@ export default function Landing() {
               alt="Delivery Person"
               className="h-auto max-w-lg ms-auto "
             />
-          </div>
-        </div>
-        <FloatingWhatsApp
-          phoneNumber="+254715333522"
+             <FloatingWhatsApp
+          phoneNumber="+254705719325"
           accountName="ParcelPoa"
           statusMessage="A Trusted parcel tracking partner"
           avatar="./src/assets/favicon.ico"
@@ -42,7 +42,10 @@ export default function Landing() {
           notificationMessage="Thank you for your message"
           notificationTimestamp="Just now"
           notificationDuration={2000}
-        />
+           
+         />
+          </div>
+        </div>
       </main>
     </div>
   );
