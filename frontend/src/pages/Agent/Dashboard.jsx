@@ -93,7 +93,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Chart component */}
-                <DeliveriesChart data={deliveriesData} />
+                {/* <DeliveriesChart data={deliveriesData} /> */}
 
                 <div className="px-6 mb-8">
                   {/* Deliveries component */}
