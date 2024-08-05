@@ -133,6 +133,16 @@ class Notification(db.Model):
 
     user = relationship('User', back_populates='notifications', foreign_keys=[user_id])
 
+    def to_dict(self):
+        return {
+            'notification_id': self.notification_id,
+            'user_id': self.user_id,
+            'message': self.message,
+            'type': self.type,
+            'status': self.status,
+            'created_at': self.created_at.isoformat()
+        }
+
 
 class Tracking(db.Model):
     __tablename__ = 'tracking'
