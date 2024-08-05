@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function Footer() {
   return (
-    <footer className="bg-purple-900 text-white py-6">
+    <footer className="bg-indigo-700 text-white py-6">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center text-center md:text-left mb-4">
           <nav className="mb-4 md:mb-0">
@@ -10,7 +10,7 @@ export default function Footer() {
               <li><a href="/about" className="hover:text-gray-400 transition duration-300 text-sm">About Us</a></li>
               <li><a href="/contact" className="hover:text-gray-400 transition duration-300 text-sm">Contact Us</a></li>
               <li><a href="/privacy-policy" className="hover:text-gray-400 transition duration-300 text-sm">Privacy Policy</a></li>
-              <li><a href="/terms-of-service" className="hover:text-gray-400 transition duration-300 text-sm">Terms of Service</a></li>
+              <li><a href="/terms" className="hover:text-gray-400 transition duration-300 text-sm">Terms of Service</a></li>
               <li><a href="/returns" className="hover:text-gray-400 transition duration-300 text-sm">Returns</a></li>
             </ul>
           </nav>

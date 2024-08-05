@@ -26,9 +26,9 @@ export default function Contact() {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen p-8">
+    <div className="bg-gradient-to-br from-blue-300 to-indigo-700 min-h-screen p-8">
       <div className="container mx-auto max-w-md bg-white shadow-lg rounded-lg overflow-hidden">
-        <div className="bg-yellow-500 p-4">
+        <div className="bg-indigo-500 p-4">
           <h1 className="text-2xl font-bold text-white">Contact Us</h1>
         </div>
         <div className="p-4">
