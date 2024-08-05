@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function AddDelivery() {
-  const [parcel, setParcel] = useState("");
   const [status, setStatus] = useState("Scheduled");
   const [recipientName, setRecipientName] = useState("");
   const [recipientAddress, setRecipientAddress] = useState("");
@@ -17,27 +16,28 @@ export default function AddDelivery() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Adding delivery:", { parcel, status, recipientName, recipientAddress, recipientPhone, description, weight, currentLocation, senderEmail, recipientEmail, category });
+    console.log("Adding delivery:", { 
+      status, 
+      recipientName, 
+      recipientAddress, 
+      recipientPhone, 
+      description, 
+      weight, 
+      currentLocation, 
+      senderEmail, 
+      recipientEmail, 
+      category 
+    });
 
     // Perform fetch call here
   };
 
   return (
-    <div className="bg-gradient-to-br from-blue-300 to-indigo-700 min-h-screen flex items-center justify-center py-4 px-2 pt-32 pb-32 ">
-      <div className="p-4 sm:p-6 md:p-8 bg-white rounded-lg shadow-lg w-full max-w-md sm:max-w-lg md:max-w-4xl  ">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-center text-gray-800">Add Parcel</h1>
+    <div className="bg-gradient-to-br from-blue-300 to-indigo-700 min-h-screen flex items-center justify-center py-4 px-2 pt-32 pb-32">
+      <div className="p-4 sm:p-6 md:p-8 bg-white rounded-lg shadow-lg w-full max-w-md sm:max-w-lg md:max-w-4xl">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-center text-gray-800">Add Delivery</h1>
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Parcel Name:</label>
-              <input
-                type="text"
-                value={parcel}
-                onChange={(e) => setParcel(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">Status:</label>
               <select
@@ -126,7 +126,7 @@ export default function AddDelivery() {
                 required
               />
             </div>
-            <div className="mb-4 col-span-1 ">
+            <div className="mb-4 col-span-1">
               <label className="block text-gray-700 mb-2">Category:</label>
               <input
                 type="text"
@@ -138,9 +138,9 @@ export default function AddDelivery() {
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition-colors"
+            className="w-full bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition-colors "
           >
-            Add Delivery
+            Add Parcels
           </button>
         </form>
 
@@ -150,7 +150,7 @@ export default function AddDelivery() {
             onClick={() => navigate("/manage-deliveries")}
             className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition-colors w-full"
           >
-            Manage Deliveries
+            Manage Parcels
           </button>
           <button
             onClick={() => navigate("/dashboard")}
