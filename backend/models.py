@@ -19,7 +19,7 @@ class User(db.Model):
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     password_hash = Column(String(128), nullable=False)
     profile_picture = Column(String, default='default.png', nullable=True)
-    status = Column(Enum('Active', 'Inactive', name='user_statuses'), default='Active', nullable=False)
+    status = Column(Enum('Available', 'Unavailable', name='user_statuses'), default='Active', nullable=True)
 
     parcels = relationship('Parcel', back_populates='sender', foreign_keys='Parcel.sender_id')
     deliveries = relationship('Delivery', back_populates='agent', foreign_keys='Delivery.agent_id')
@@ -41,7 +41,8 @@ class User(db.Model):
             'user_role': self.user_role,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
-            'profile_picture': self.profile_picture
+            'profile_picture': self.profile_picture,
+            'status': self.status
         }
 class Parcel(db.Model):
     __tablename__ = 'parcels'

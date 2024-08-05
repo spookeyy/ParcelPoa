@@ -1,5 +1,6 @@
 import React from "react";
 
+// eslint-disable-next-line react/prop-types
 export default function Modal({ isOpen, onClose, children }) {
   if (!isOpen) return null;
 
