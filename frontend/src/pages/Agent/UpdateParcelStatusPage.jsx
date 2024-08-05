@@ -9,7 +9,7 @@ const deliveriesMockData = [
 ];
 
 export default function UpdateParcelStatusPage() {
-  const { parcelId } = useParams(); // Get parcel ID from URL
+  const { parcelId } = useParams();
   const [parcelDetails, setParcelDetails] = useState(null);
   const [status, setStatus] = useState("");
   const [location, setLocation] = useState("");
@@ -17,7 +17,6 @@ export default function UpdateParcelStatusPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Directly set parcelDetails for demonstration
     const fetchedParcelDetails = deliveriesMockData.find(parcel => parcel.id === parseInt(parcelId, 10));
     if (fetchedParcelDetails) {
       setParcelDetails(fetchedParcelDetails);
@@ -25,28 +24,44 @@ export default function UpdateParcelStatusPage() {
     }
   }, [parcelId]);
 
-  // Simulated form submit handlers
-  const handleStatusUpdate = (e) => {
-    e.preventDefault(); // Prevent form submission
+  const handleStatusUpdate = async (e) => {
+    e.preventDefault();
 
     if (!parcelId || !status) {
       setMessage("Please select a status.");
       return;
     }
 
-    const updatedParcel = {
-      parcelId: parseInt(parcelId, 10), // Ensure ID is an integer
-      status,
-    };
+    if (parcelDetails.status === "Delivered") {
+      setMessage("Cannot update status of delivered parcel.");
+      return;
+    }
+
+    const updatedParcel = { status };
 
     // Simulate API call
-    setTimeout(() => {
+    try {
+      const response = await fetch(`/update_status/${parcelId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(updatedParcel)
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update status.");
+      }
+
       setMessage(`Parcel ID ${parcelId} updated to status ${status}`);
       setStatus('');
-    }, 1000);
+    } catch (error) {
+      setMessage("Error updating parcel status.");
+    }
   };
 
-  const handleLocationUpdate = (e) => {
+  const handleLocationUpdate = async (e) => {
     e.preventDefault();
 
     if (!parcelId || !location) {
@@ -54,29 +69,41 @@ export default function UpdateParcelStatusPage() {
       return;
     }
 
-    const updatedLocation = {
-      location,
-    };
+    const updatedLocation = { location };
 
     // Simulate API call
-    setTimeout(() => {
+    try {
+      const response = await fetch(`/update_status/${parcelId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(updatedLocation)
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update location.");
+      }
+
       setMessage(`Parcel ID ${parcelId} location updated to ${location}`);
       setLocation('');
-    }, 1000);
+    } catch (error) {
+      setMessage("Error updating parcel location.");
+    }
   };
 
-  // Default to the first mock data if parcelId does not match
   const displayParcel = parcelDetails || deliveriesMockData[0];
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-6">
-      <div className="max-w-lg w-full bg-white p-8 rounded-lg shadow-lg border border-gray-200">
-        <h1 className="text-3xl font-extrabold mb-8 text-center text-gray-800">Update Parcel</h1>
+      <div className="max-w-3xl w-full bg-white p-8 rounded-lg shadow-lg border border-gray-300">
+        <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">Update Parcel Status</h1>
 
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">Parcel Details</h2>
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-700 mb-4">Parcel Details</h2>
           <p className="text-gray-600">Parcel ID: <span className="font-medium">{displayParcel.id}</span></p>
-          <p className="text-gray-600">Parcel Name: <span className="font-medium">{displayParcel.parcel}</span></p>
+         
           <p className="text-gray-600">Current Status: <span className="font-medium">{displayParcel.status}</span></p>
         </div>
 
@@ -88,10 +115,12 @@ export default function UpdateParcelStatusPage() {
               onChange={(e) => setStatus(e.target.value)}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
               required
+              disabled={displayParcel.status === "Delivered"}
             >
               <option value="">Select Status</option>
               <option value="Scheduled">Scheduled</option>
               <option value="In Transit">In Transit</option>
+              <option value="Out for Delivery">Out for Delivery</option>
               <option value="Delivered">Delivered</option>
             </select>
           </div>
@@ -99,6 +128,7 @@ export default function UpdateParcelStatusPage() {
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded-md shadow hover:bg-blue-700 transition duration-300"
+            disabled={displayParcel.status === "Delivered"}
           >
             Update Status
           </button>
@@ -124,7 +154,7 @@ export default function UpdateParcelStatusPage() {
           </button>
         </form>
 
-        {message && <div className="mt-4 text-green-600 text-center font-medium">{message}</div>}
+        {message && <div className="mt-4 text-red-600 text-center font-medium">{message}</div>}
 
         <div className="mt-6 text-center">
           <button

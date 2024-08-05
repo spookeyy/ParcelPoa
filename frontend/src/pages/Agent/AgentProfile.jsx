@@ -8,6 +8,7 @@ export default function AgentProfile({ onClose }) {
   const [agentOption, setAgentOption] = useState("");
   const [message, setMessage] = useState("");
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const [profilePicture, setProfilePicture] = useState(null);
 
   useEffect(() => {
     fetch("/api/profile")
@@ -17,6 +18,7 @@ export default function AgentProfile({ onClose }) {
         setName(profile.name);
         setPhoneNumber(profile.phoneNumber);
         setAgentOption(profile.agentOption);
+        setProfilePicture(profile.profilePicture); 
       })
       .catch((error) => {
         console.error("Error fetching profile:", error);
@@ -44,10 +46,42 @@ export default function AgentProfile({ onClose }) {
       });
   };
 
+  const handleProfilePictureChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfilePicture(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center bg-gray-100 p-6">
+    <div className="flex flex-col items-center justify-center bg-gray-100 p-6 min-h-screen">
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-xl transition-transform transform hover:scale-105">
         <h2 className="text-2xl font-bold mb-6 text-center">Agent Profile</h2>
+        <div className="flex flex-col items-center mb-6">
+          <div className="relative mb-4">
+            <img
+              src={profilePicture || "/default-profile.png"}
+              alt="Profile"
+              className="w-24 h-24 rounded-full object-cover border-2 border-gray-300"
+            />
+            <label htmlFor="profile-picture-upload" className="absolute bottom-0 right-0 bg-blue-500 text-white p-1 rounded-full cursor-pointer hover:bg-blue-600">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l9 9m0-18L12 14M4 6l-1 1m1 1l-1 1m16 0l1 1m-1-1l1-1M3 13l1 1m1-1l1-1m12 0l1 1m1-1l1 1M6 21h12a1 1 0 001-1v-2H5v2a1 1 0 001 1z" />
+              </svg>
+            </label>
+            <input
+              type="file"
+              id="profile-picture-upload"
+              accept="image/*"
+              onChange={handleProfilePictureChange}
+              className="hidden"
+            />
+          </div>
+        </div>
         <form onSubmit={handleUpdateProfile} className="space-y-6">
           <div className="mb-4">
             <label htmlFor="name" className="block text-sm font-medium text-gray-700">
