@@ -3,6 +3,7 @@ import { UserContext } from '../Context/UserContext';
 import { Link, useNavigate } from 'react-router-dom';
 import {toast} from 'react-toastify';
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import Navbar from './Navbar';
 
 function Create_Account() {
   const nav = useNavigate();
@@ -100,6 +101,8 @@ function Create_Account() {
   };
 
   return (
+    <>
+    <Navbar />    
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-400 to-indigo-600 p-4 sm:p-6">
       <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg overflow-hidden sm:rounded-2xl">
         <div className="md:flex">
@@ -323,6 +326,7 @@ function Create_Account() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
