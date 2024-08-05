@@ -23,7 +23,7 @@ export default function Login() {
         setPassword("");
       })
       .catch((error) => {
-        // Error is already handled in the login function
+        // Error is already handled in the login function in the UserContext
         console.error("Login failed:", error);
       });
   };
