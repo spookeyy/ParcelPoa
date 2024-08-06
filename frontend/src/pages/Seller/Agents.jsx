@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { server } 
+import { server } from "../../../config";
 
 // Sample data for agent requests with dynamic status based on deliveries
 const getStatus = (deliveries) => (deliveries > 5 ? "Online" : "Away");
@@ -104,7 +104,7 @@ export default function Agents() {
   const fetchAgents = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/agents");
+      const response = await fetch(`${server}/agents`);
       const data = await response.json();
       setAgentRequests(data);
       setLoading(false);
@@ -117,7 +117,7 @@ export default function Agents() {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this agent?")) {
       try {
-        const response = await fetch(`/agents/${id}`, {
+        const response = await fetch(`${server}/agents/${id}`, {
           method: "DELETE",
         });
         if (response.ok) {
