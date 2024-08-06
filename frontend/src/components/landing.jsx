@@ -7,7 +7,6 @@ export default function Landing() {
   return (
     <div className="bg-white min-h-screen flex flex-col">
       <Navbar />
-      {/* Well-Designed Container for Track Order Section */}
       <div className="container mx-auto p-8 flex-grow">
         <div
           className="bg-white p-8 rounded-lg shadow-lg"
