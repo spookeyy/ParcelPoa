@@ -9,15 +9,15 @@ export default function Landing() {
 
       {/* Well-Designed Container for Track Order Section */}
       <div className="container mx-auto p-8 flex-grow">
-        <div className="bg-gray-600 p-8 rounded-lg shadow-lg" style={{ height: '120%' }}>
+        <div className="bg-white p-8 rounded-lg shadow-lg" style={{ height: '120%' }}>
           <main className="py-16 px-4 flex items-center">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
               <div className="flex flex-col justify-center items-start">
-                <h8 className="text-6xl font-bold text-white mb-8">
+                <h8 className="text-6xl font-bold  mb-8">
                   <span className="text-indigo-500">ParcelPoa</span>, Deliver your Order
                 </h8>
-                <h10 className="text-4xl font-bold text-white mb-4">Speedy Delivery, Reliable Service</h10>
-                <p className="text-lg text-white mb-8">
+                <h10 className="text-4xl font-bold  mb-4">Speedy Delivery, Reliable Service</h10>
+                <p className="text-lg mb-8">
                   At Parcel Poa, we ensure your packages are delivered swiftly and safely, providing you with peace of mind every time.
                 </p>
                 <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 justify-center md:justify-start">
@@ -36,12 +36,6 @@ export default function Landing() {
           </main>
         </div>
       </div>
-
-      <footer className="bg-gray-800 text-white py-4">
-        <div className="container mx-auto text-center">
-          <p>© 2024 ParcelPoa. All rights reserved.</p>
-        </div>
-      </footer>
 
       <FloatingWhatsApp
         phoneNumber="+254705719325"
