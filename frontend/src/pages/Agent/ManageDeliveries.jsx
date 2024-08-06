@@ -1,6 +1,7 @@
 
 
 import React, { useState, useEffect } from "react";
+import config from "../../config.json"; // Import the server URL
 
 export default function ManageDeliveries({ openSidebar }) {
   const [deliveries, setDeliveries] = useState([]);
@@ -8,7 +9,7 @@ export default function ManageDeliveries({ openSidebar }) {
 
   useEffect(() => {
     // Fetch delivery data from the backend
-    fetch("/api/deliveries")
+    fetch(`${config.server}/api/deliveries`) // Use the server URL from config
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -22,6 +23,13 @@ export default function ManageDeliveries({ openSidebar }) {
         console.error("Error fetching deliveries:", error);
       });
   }, []);
+
+  useEffect(() => {
+    if (notification) {
+      // Simulate notification
+      console.log(notification);
+    }
+  }, [notification]);
 
   const handleStatusChange = (id, newStatus) => {
     const updatedDelivery = deliveries.find((delivery) => delivery.id === id);
