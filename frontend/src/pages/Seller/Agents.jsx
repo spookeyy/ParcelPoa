@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { server } from "../../../config.json";
 
+const getStatus = (status) => (status === "Available" ? "Available" : "Unavailable");
+
 // FilterBar Component
 const FilterBar = ({ filters, onFilterChange, onReset }) => (
   <div className="bg-gray-200 p-4 rounded-lg shadow-md mb-6 flex flex-wrap gap-4 items-center">
@@ -21,8 +23,8 @@ const FilterBar = ({ filters, onFilterChange, onReset }) => (
       aria-label="Filter by status"
     >
       <option value="">Select Status</option>
-      <option value="Online">Online</option>
-      <option value="Away">Away</option>
+      <option value="Available">Available</option>
+      <option value="Unavailable">Unavailable</option>
     </select>
     <button
       onClick={onReset}
@@ -42,18 +44,16 @@ export default function Agents() {
   // Fetch agents data from backend
   const fetchAgents = async () => {
     try {
-      console.log("agents" ,agentRequests);
       const response = await fetch(`${server}/users`);
+
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
       const data = await response.json();
-      // Filter users by role "Agent"
-      const agents = data.filter(user => user.role === "Agent");
-      // Assuming deliveries property exists in the data
+      const agents = data.filter(user => user.user_role === "Agent");
       setAgentRequests(agents.map(agent => ({
         ...agent,
-        status: getStatus(agent.deliveries),
+        status: getStatus(agent.status),
       })));
     } catch (error) {
       console.error("Error fetching agents data:", error);
@@ -122,8 +122,8 @@ export default function Agents() {
               <th className="px-4 py-2 text-left font-medium">Name</th>
               <th className="px-4 py-2 text-left font-medium">Contact</th>
               <th className="px-4 py-2 text-left font-medium">Phone</th>
-              <th className="px-4 py-2 text-left font-medium">Address</th>
-              <th className="px-4 py-2 text-left font-medium">Deliveries</th>
+              {/* <th className="px-4 py-2 text-left font-medium">Address</th>
+              <th className="px-4 py-2 text-left font-medium">Deliveries</th> */}
               <th className="px-4 py-2 text-left font-medium">Status</th>
               <th className="px-4 py-2 text-left font-medium">Actions</th>
             </tr>
@@ -136,21 +136,21 @@ export default function Agents() {
               >
                 <td className="px-4 py-2">
                   <img
-                    src={agent.profileImage}
+                    src={agent.profile_picture}
                     alt={`${agent.name}'s profile`}
                     className="w-12 h-12 rounded-full object-cover"
                   />
                 </td>
-                <td className="px-4 py-2">{agent.id}</td>
+                <td className="px-4 py-2">{agent.user_id}</td>
                 <td className="px-4 py-2">{agent.name}</td>
-                <td className="px-4 py-2">{agent.contact}</td>
-                <td className="px-4 py-2">{agent.phone}</td>
-                <td className="px-4 py-2">{agent.address}</td>
-                <td className="px-4 py-2">{agent.deliveries}</td>
+                <td className="px-4 py-2">{agent.email}</td>
+                <td className="px-4 py-2">{agent.phone_number}</td>
+                {/* <td className="px-4 py-2">{agent.address}</td>
+                <td className="px-4 py-2">{agent.deliveries}</td> */}
                 <td className="px-4 py-2">
                   <span
                     className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${
-                      agent.status === "Online"
+                      agent.status === "Available"
                         ? "bg-green-100 text-green-800"
                         : "bg-yellow-100 text-yellow-800"
                     }`}

@@ -104,7 +104,7 @@ function Home() {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 bg-gray-200">
+    <div className="mt-10 p-4 sm:p-6 lg:p-8 bg-gray-200">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         {/* Sales Trend Card */}
         <div className="bg-white p-4 shadow-lg rounded-lg flex flex-col items-center text-center space-y-4">

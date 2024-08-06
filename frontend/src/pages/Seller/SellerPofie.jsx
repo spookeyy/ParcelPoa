@@ -12,32 +12,36 @@ export default function SellerProfile({ onClose }) {
   const [userRole, setUserRole] = useState("");
   const [message, setMessage] = useState("");
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const [userName, setUserName] = useState("");
 
   const { authToken } = useContext(UserContext);
+  const userInitial = userName.charAt(0).toUpperCase();
 
   useEffect(() => {
     fetchProfile();
   }, []);
 
-  const fetchProfile = () => {
-    fetch(`${server}/profile`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-      },
-    })
-      .then((response) => response.json())
-      .then((profile) => {
-        setName(profile.name);
-        setEmail(profile.email);
-        setPhoneNumber(profile.phone_number);
-        setUserRole(profile.user_role);
-      })
-      .catch((error) => {
-        toast.error("An error occurred while fetching the profile");
-        console.error("Error fetching profile:", error);
-      });
-  };
+  // const fetchProfile = () => {
+  //   fetch(`${server}/profile`, {
+  //     method: "GET",
+  //     headers: {
+  //       Authorization: `Bearer ${authToken}`,
+  //     },
+  //   })
+  //     .then((response) => response.json())
+  //     .then((profile) => {
+  //       setName(profile.name);
+  //       setEmail(profile.email);
+  //       setPhoneNumber(profile.phone_number);
+  //       setUserRole(profile.user_role);
+  //       setUserName(profile.name);
+
+  //     })
+  //     .catch((error) => {
+  //       toast.error("An error occurred while fetching the profile");
+  //       console.error("Error fetching profile:", error);
+  //     });
+  // };
 
   const handleUpdateProfile = (e) => {
     e.preventDefault();
