@@ -15,11 +15,30 @@ function ParcelForm({ onSubmit }) {
 
   const handleChange = (e) => {
     setParcelData({ ...parcelData, [e.target.name]: e.target.value });
-  };
+
+    if (e.target.name === 'pickup_time') {
+    // Convert the datetime-local value to ISO string
+    const date = new Date(e.target.value);
+    setParcelData({ ...parcelData, [e.target.name]: date.toISOString() });
+  } else {
+    setParcelData({ ...parcelData, [e.target.name]: e.target.value });
+  }
+};
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(parcelData);
+    // Basic validation
+    if (Object.values(parcelData).some((value) => value === "")) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    // Convert weight to a number
+    const formattedData = {
+      ...parcelData,
+      weight: parseFloat(parcelData.weight),
+    };
+    onSubmit(formattedData);
   };
 
   return (
