@@ -34,7 +34,7 @@ export default function Header() {
 
           {/* Login Button */}
           <Link
-            to="/login"
+            to="/business/dashboard"
             className="text-white hover:text-blue-700 transition-colors"
           >
             <FontAwesomeIcon icon={faUser} className="h-8 w-8" />

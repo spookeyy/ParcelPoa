@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-
+import {server} from "../../../config.json";
 function PickupScheduling() {
   const [pickupDate, setPickupDate] = useState("");
   const [pickupAddress, setPickupAddress] = useState("");
 
   const schedulePickup = async () => {
     try {
-      const response = await fetch("/schedule_pickup", {
+      const response = await fetch(`${server}/schedule_pickup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

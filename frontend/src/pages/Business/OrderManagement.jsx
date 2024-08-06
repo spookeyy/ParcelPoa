@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ParcelForm from "./ParcelForm";
-import { server } from "../../../config";
-
+import {server} from "../../../config.json";
 function OrderManagement() {
   const [orders, setOrders] = useState([]);
 
@@ -24,7 +23,8 @@ function OrderManagement() {
 
   const createOrder = async (orderData) => {
     try {
-      const response = await fetch(`${server}/business/orders`, {
+      console.log("OrderData", orderData);
+      const response = await fetch(`${server}/schedule_pickup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

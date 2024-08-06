@@ -40,22 +40,22 @@ export default function Sidebar({ isOpen, toggleSidebar, navigateTo }) {
             </Link>
           </li>
          
-          <li>
+          {/* <li>
             <Link
               to="/agent-profile"
               className="flex items-center text-gray-800 hover:text-blue-600 hover:bg-gray-100 p-3 rounded transition duration-200 text-sm sm:text-base"
             >
               <i className="fas fa-user mr-3 text-lg sm:text-xl"></i> Profile
             </Link>
-          </li>
-          <li>
+          </li> */}
+          {/* <li>
             <button
               onClick={() => navigate("/add-delivery")}
               className="flex items-center text-gray-800 hover:text-blue-600 hover:bg-gray-100 p-3 rounded transition duration-200 text-sm sm:text-base"
             >
               <i className="fas fa-plus mr-3 text-lg sm:text-xl"></i> Create Parcel
             </button>
-          </li>
+          </li> */}
           <li>
             <button
               onClick={() => navigate("/update-parcel-status")}
@@ -64,22 +64,22 @@ export default function Sidebar({ isOpen, toggleSidebar, navigateTo }) {
               <i className="fas fa-edit mr-3 text-lg sm:text-xl"></i> Update Parcel Status
             </button>
           </li>
-          <li>
+          {/* <li>
             <button
               onClick={() => navigateTo(true)}
               className="flex items-center text-gray-800 hover:text-blue-600 hover:bg-gray-100 p-3 rounded transition duration-200 text-sm sm:text-base"
             >
               <i className="fas fa-check-circle mr-3 text-lg sm:text-xl"></i> Confirm Delivery
             </button>
-          </li>
-          <li>
+          </li> */}
+          {/* <li>
             <Link
               to="/update-status"
               className="flex items-center text-gray-800 hover:text-blue-600 hover:bg-gray-100 p-3 rounded transition duration-200 text-sm sm:text-base"
             >
               <i className="fas fa-sign-in-alt mr-3 text-lg sm:text-xl"></i> Update Status
             </Link>
-          </li>
+          </li> */}
           <li>
             <button
               onClick={() => {
