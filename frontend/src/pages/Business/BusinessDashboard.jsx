@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 import OrderManagement from "./OrderManagement";
 import ParcelTracking from "./ParcelTracking";
 import PickupScheduling from "./PickupScheduling";
-
+import {server} from "../../../config.json";
 function BusinessDashboard() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch("/current_user", {
+        const response = await fetch(`${server}/current_user`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         if (!response.ok) throw new Error("Failed to fetch user data");

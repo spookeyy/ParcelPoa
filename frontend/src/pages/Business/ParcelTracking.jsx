@@ -1,13 +1,13 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from "react";
-
+import {server} from "../../../config.json";
 function ParcelTracking() {
   const [trackingNumber, setTrackingNumber] = useState("");
   const [trackingInfo, setTrackingInfo] = useState(null);
 
   const trackParcel = async () => {
     try {
-      const response = await fetch(`/track/${trackingNumber}`);
+      const response = await fetch(`${server}/track/${trackingNumber}`);
       if (!response.ok) throw new Error("Failed to track parcel");
       const data = await response.json();
       setTrackingInfo(data);
