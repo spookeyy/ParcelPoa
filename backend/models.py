@@ -58,7 +58,7 @@ class Parcel(db.Model):
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     current_location = Column(String(255), nullable=False)
-    status = Column(Enum('Picked Up', 'Out for Delivery', 'In Transit', 'Delivered', name='delivery_statuses'), nullable=False)
+    status = Column(Enum('Scheduled for Pickup', 'Picked Up', 'Out for Delivery', 'In Transit', 'Delivered', 'Cancelled', name='parcel_statuses'), nullable=False)
     sender_email = Column(String, nullable=False)
     recipient_email = Column(String, nullable=False)
     category = Column(String(50), nullable=False)
@@ -79,7 +79,7 @@ class Parcel(db.Model):
             'recipient_address': self.recipient_address,
             'recipient_phone': self.recipient_phone,
             'description': self.description,
-            'weight': float(self.weight),
+            'weight': float(self.weight) if self.weight else None,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat(),
             'current_location': self.current_location,
@@ -100,7 +100,7 @@ class Delivery(db.Model):
 
     delivery_id = Column(Integer, primary_key=True)
     parcel_id = Column(Integer, ForeignKey('parcels.parcel_id'), nullable=False)
-    agent_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
+    agent_id = Column(Integer, ForeignKey('users.user_id'), nullable=True)  # Changed to nullable
     pickup_time = Column(TIMESTAMP, nullable=False)
     delivery_time = Column(TIMESTAMP)
     status = Column(Enum('Scheduled', 'In Transit', 'Delivered', name='delivery_statuses'), nullable=False)
@@ -109,7 +109,6 @@ class Delivery(db.Model):
 
     parcel = relationship('Parcel', back_populates='delivery', foreign_keys=[parcel_id])
     agent = relationship('User', back_populates='deliveries', foreign_keys=[agent_id])
-
 
     def to_dict(self):
         return {
@@ -175,8 +174,20 @@ class Order(db.Model):
     parcel_id = Column(Integer, ForeignKey('parcels.parcel_id'), nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
+    status = Column(Enum('Active', 'Cancelled', name='order_statuses'), default='Active', nullable=False)  # New field
 
     user = relationship('User', back_populates='orders', foreign_keys=[user_id])
     parcel = relationship('Parcel', back_populates='orders', foreign_keys=[parcel_id])
+
+    def to_dict(self):
+        return {
+            'order_id': self.order_id,
+            'user_id': self.user_id,
+            'parcel_id': self.parcel_id,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat(),
+            'status': self.status,
+            'parcel': self.parcel.to_dict() if self.parcel else None
+        }
 
 

@@ -1,26 +1,37 @@
+/* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
 import ChangePassword from "../../components/Change-Password";
+import { server } from "../../../config";
+import { toast } from "react-toastify";
 
 export default function AgentProfile({ onClose }) {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [agentOption, setAgentOption] = useState("");
+  const [userRole, setUserRole] = useState("");
   const [message, setMessage] = useState("");
   const [showChangePassword, setShowChangePassword] = useState(false);
-  const [profilePicture, setProfilePicture] = useState("https://img.freepik.com/free-photo/young-black-woman-straw-hat-looking-away_23-2148183285.jpg?t=st=1722852363~exp=1722855963~hmac=9bf43b902f33f6a6b76a8d1e0cbb23fca6ff23ed323fcd8b76ae6c5ef8b97eab&w=740");
+  const [profilePicture, setProfilePicture] = useState(
+    "https://img.freepik.com/free-photo/young-black-woman-straw-hat-looking-away_23-2148183285.jpg?t=st=1722852363~exp=1722855963~hmac=9bf43b902f33f6a6b76a8d1e0cbb23fca6ff23ed323fcd8b76ae6c5ef8b97eab&w=740"
+  );
 
   useEffect(() => {
-    fetch("/api/profile")
+    fetch(`${server}/profile`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+    })
       .then((response) => response.json())
       .then((profile) => {
         setEmail(profile.email);
         setName(profile.name);
-        setPhoneNumber(profile.phoneNumber);
-        setAgentOption(profile.agentOption);
-        setProfilePicture(profile.profilePicture || profilePicture);
+        setPhoneNumber(profile.phone_number);
+        setUserRole(profile.user_role);
+        setProfilePicture(profile.profile_picture || profilePicture);
       })
       .catch((error) => {
+        toast.error("An error occurred while fetching the profile");
         console.error("Error fetching profile:", error);
       });
   }, []);
@@ -28,21 +39,34 @@ export default function AgentProfile({ onClose }) {
   const handleUpdateProfile = (e) => {
     e.preventDefault();
 
-    fetch("/api/profile", {
+    fetch(`${server}/profile`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, name, phoneNumber, agentOption }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+      body: JSON.stringify({
+        email,
+        name,
+        phone_number: phoneNumber,
+        profile_picture: profilePicture,
+      }),
     })
       .then((response) => {
         if (response.ok) {
-          setMessage("Profile updated successfully");
-          setTimeout(() => onClose(), 2000); // Close modal after a delay
+          return response.json();
         } else {
-          console.error("Profile update failed");
+          throw new Error("Profile update failed");
         }
       })
+      .then((data) => {
+        setMessage(data.message);
+        setTimeout(() => onClose(), 2000);
+      })
       .catch((error) => {
+        toast.error("An error occurred while updating the profile");
         console.error("Error updating profile:", error);
+        setMessage("Failed to update profile");
       });
   };
 
@@ -74,7 +98,7 @@ export default function AgentProfile({ onClose }) {
     <div className="flex flex-col items-center justify-center bg-gray-100 p-4 min-h-[70vh]">
       <div className="w-full bg-white p-6 rounded-lg shadow-md max-w-sm">
         <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">
-          Agent Profile
+          {userRole} Profile
         </h2>
         <div className="flex flex-col items-center mb-4">
           <div className="relative mb-2">
@@ -160,6 +184,17 @@ export default function AgentProfile({ onClose }) {
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
             />
           </div>
+          <div className="mb-2">
+            <label className="block text-sm font-medium text-gray-700">
+              User Role
+            </label>
+            <input
+              type="text"
+              value={userRole}
+              readOnly
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-100"
+            />
+          </div>
 
           <button
             type="submit"
@@ -183,7 +218,6 @@ export default function AgentProfile({ onClose }) {
           </button>
         </div>
         {showChangePassword && <ChangePassword />}
-        
       </div>
     </div>
   );
