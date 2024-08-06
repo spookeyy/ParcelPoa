@@ -74,15 +74,15 @@ function App() {
               <Route path="/seller" element={<Home />} />
               <Route path="/seller/signup" element={<Create_Account />} />
               <Route path="/seller/agents" element={<Agents />} />
-              <Route
+              {/* <Route
                 path="/seller/agent-requests"
                 element={<Agent_Requests />}
-              />
+              /> */}
               <Route path="/seller/agent/:id" element={<Agent_Details />} />
-              <Route
+              {/* <Route
                 path="/seller/agent-trends/:id"
                 element={<Agent_Trends />}
-              />
+              /> */}
               <Route path="/seller/invoice/:id" element={<Invoice />} />
               <Route path="/seller/messages-list" element={<Messages_List />} />
               <Route

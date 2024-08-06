@@ -620,6 +620,15 @@ def cancel_order(order_id):
     
     return jsonify({"message": "Order cancelled successfully"}), 200
 
+# get agents
+@app.route('/agents', methods=['GET'])
+@jwt_required()
+def get_agents():
+    user = User.query.get(get_jwt_identity())
+    if user.user_role != 'Business':
+        return jsonify({"message": "Only businesses can get agents"}), 403
+    agents = User.query.filter_by(user_role='Agent').all()
+    return jsonify([agent.to_dict() for agent in agents])
 
 
 
