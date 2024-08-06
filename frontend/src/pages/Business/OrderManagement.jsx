@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import ParcelForm from "./ParcelForm";
-
+import {server} from "../../../config.json";
 function OrderManagement() {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch("/business/orders", {
+        const response = await fetch(`${server}/business/orders`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         if (!response.ok) throw new Error("Failed to fetch orders");
@@ -23,7 +23,8 @@ function OrderManagement() {
 
   const createOrder = async (orderData) => {
     try {
-      const response = await fetch("/schedule_pickup", {
+      console.log("OrderData", orderData);
+      const response = await fetch(`${server}/schedule_pickup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -36,7 +37,7 @@ function OrderManagement() {
       console.log("Order created:", result);
 
       // Refresh orders after creating a new one
-      const updatedOrdersResponse = await fetch("/business/orders", {
+      const updatedOrdersResponse = await fetch(`${server}/business/orders`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       if (!updatedOrdersResponse.ok)

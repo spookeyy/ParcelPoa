@@ -519,7 +519,7 @@ def schedule_pickup():
     # Create a new parcel
     new_parcel = Parcel(
         sender_id=current_user_id,
-        tracking_number=generate_unique_tracking_number(),
+        tracking_number=generate_unique_tracking_number(existing_numbers=Parcel.query.with_entities(Parcel.tracking_number).all()),
         recipient_name=data['recipient_name'],
         recipient_address=data['recipient_address'],
         recipient_phone=data['recipient_phone'],
@@ -557,9 +557,10 @@ def schedule_pickup():
 
     recipient_email = data.get('recipient_email')
     if recipient_email:
-        send_notification(recipient_email, f"Your parcel {new_parcel.tracking_number} is scheduled for pickup on {pickup_time.isoformat()}")
-    
-    
+            subject = f"Your parcel {new_parcel.tracking_number} is scheduled for pickup on {pickup_time.isoformat()}"
+            body = f"Dear {data.get('recipient_name')},\n\nYour parcel {new_parcel.tracking_number} is scheduled for pickup on {pickup_time.isoformat()}."
+            send_notification(recipient_email, subject, body)    
+                
     return jsonify({
         "message": "Pickup scheduled successfully",
         "tracking_number": new_parcel.tracking_number,
@@ -651,12 +652,6 @@ def generate_unique_tracking_number(existing_numbers):
         tracking_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
         if tracking_number not in existing_numbers:
             return tracking_number
-
-
-
-
-
-
 
 
 # RESET PASSWORD
