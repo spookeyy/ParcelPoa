@@ -15,7 +15,7 @@ import Home from "./pages/Seller/Home";
 import Agents from "./pages/Seller/Agents";
 import Agent_Requests from "./pages/Seller/Agent_Requests";
 import Agent_Details from "./pages/Seller/Agent_Details";
-import Agent_Trends from "./pages/Seller/Agent_Trends";
+// import Agent_Trends from "./pages/Seller/Agent_Trends";
 import Invoice from "./pages/Seller/Invoice";
 import Messages_List from "./pages/Seller/Messages_List";
 import Messages_Details from "./pages/Seller/Messages_Details";
@@ -74,15 +74,15 @@ function App() {
               <Route path="/seller" element={<Home />} />
               <Route path="/seller/signup" element={<Create_Account />} />
               <Route path="/seller/agents" element={<Agents />} />
-              <Route
+              {/* <Route
                 path="/seller/agent-requests"
                 element={<Agent_Requests />}
-              />
+              /> */}
               <Route path="/seller/agent/:id" element={<Agent_Details />} />
-              <Route
+              {/* <Route
                 path="/seller/agent-trends/:id"
                 element={<Agent_Trends />}
-              />
+              /> */}
               <Route path="/seller/invoice/:id" element={<Invoice />} />
               <Route path="/seller/messages-list" element={<Messages_List />} />
               <Route
