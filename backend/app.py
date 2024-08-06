@@ -158,12 +158,15 @@ def profile():
     user = User.query.get(current_user_id)
     if user is None:
         return jsonify({"message": "User not found"}), 404
+        
     return jsonify({
         'user_id': user.user_id,
         'name': user.name,
         'email': user.email,
         'phone_number': user.phone_number,
-        'user_role': user.user_role
+        'user_role': user.user_role,
+        'profile_picture': user.profile_picture,
+        'status': user.status if user.status else 'Available',
     })
 
 # update profile
@@ -175,13 +178,37 @@ def update_profile():
     user = User.query.get(current_user_id)
     if user is None:
         return jsonify({"message": "User not found"}), 404
+    
     user.name = data.get('name', user.name)
     user.email = data.get('email', user.email)
     user.phone_number = data.get('phone_number', user.phone_number)
     user.profile_picture = data.get('profile_picture', user.profile_picture)
     user.updated_at = datetime.now()
+    
     db.session.commit()
     return jsonify({"message": "Profile updated successfully"})
+
+@app.route('/update-status', methods=['PUT'])
+@jwt_required()
+def update_status():
+    data = request.get_json()
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    if user is None:
+        return jsonify({"message": "User not found"}), 404
+    
+    if user.user_role != 'Agent':
+        return jsonify({"message": "Only agents can update their status"}), 403
+    
+    new_status = data.get('status')
+    if new_status not in ['Available', 'Unavailable']:
+        return jsonify({"message": "Invalid status"}), 400
+    
+    user.status = new_status
+    user.updated_at = datetime.now()
+    
+    db.session.commit()
+    return jsonify({"message": "Status updated successfully", "status": new_status})
 
 # change password
 @app.route('/change_password', methods=['PUT'])
@@ -387,8 +414,8 @@ def get_assigned_deliveries():
     if user.user_role != 'Agent':
         return jsonify({"message": "Only agents can get assigned deliveries"}), 403
     deliveries = Delivery.query.filter_by(agent_id=user.user_id).all()
+    print('assigned deliveries', deliveries)
     return jsonify([delivery.to_dict() for delivery in deliveries])
-
 
 @app.route('/update_delivery_status/<int:delivery_id>', methods=['PUT'])
 @jwt_required()
@@ -476,6 +503,125 @@ def get_current_location(parcel_id):
     return jsonify({"location": parcel.current_location})
 
 
+# BUSINESS ROUTES
+# Route to schedule a pickup
+@app.route('/schedule_pickup', methods=['POST'])
+@jwt_required()
+def schedule_pickup():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    
+    if user.user_role != 'Business':
+        return jsonify({"message": "Only businesses can schedule pickups"}), 403
+    
+    data = request.get_json()
+    
+    # Create a new parcel
+    new_parcel = Parcel(
+        sender_id=current_user_id,
+        tracking_number=generate_unique_tracking_number(),
+        recipient_name=data['recipient_name'],
+        recipient_address=data['recipient_address'],
+        recipient_phone=data['recipient_phone'],
+        description=data['description'],
+        weight=data['weight'],
+        category=data['category'],
+        status='Scheduled for Pickup',
+        current_location='Business Location',
+        sender_email=user.email,
+        recipient_email=data['recipient_email']
+    )
+    db.session.add(new_parcel)
+    db.session.flush()  # This will assign an ID to the new_parcel
+    
+    # Create a new order
+    new_order = Order(
+        user_id=current_user_id,
+        parcel_id=new_parcel.parcel_id,
+        created_at=datetime.now(),
+        updated_at=datetime.now()
+    )
+    db.session.add(new_order)
+    
+
+    pickup_time = datetime.fromisoformat(data['pickup_time'])
+    new_delivery = Delivery(
+        parcel_id=new_parcel.parcel_id,
+        agent_id=None,  # This will be assigned later
+        pickup_time=pickup_time,
+        status='Scheduled'
+    )
+    db.session.add(new_delivery)
+    
+    db.session.commit()
+
+    recipient_email = data.get('recipient_email')
+    if recipient_email:
+        send_notification(recipient_email, f"Your parcel {new_parcel.tracking_number} is scheduled for pickup on {pickup_time.isoformat()}")
+    
+    
+    return jsonify({
+        "message": "Pickup scheduled successfully",
+        "tracking_number": new_parcel.tracking_number,
+        "pickup_time": pickup_time.isoformat()
+    }), 201
+
+# Route to get all orders for a business
+@app.route('/business/orders', methods=['GET'])
+@jwt_required()
+def get_business_orders():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    
+    if user.user_role != 'Business':
+        return jsonify({"message": "Access denied"}), 403
+    
+    orders = Order.query.filter_by(user_id=current_user_id).all()
+    return jsonify([order.to_dict() for order in orders]), 200
+
+# Route to get details of a specific order
+@app.route('/business/orders/<int:order_id>', methods=['GET'])
+@jwt_required()
+def get_order_details(order_id):
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    
+    if user.user_role != 'Business':
+        return jsonify({"message": "Access denied"}), 403
+    
+    order = Order.query.filter_by(id=order_id, user_id=current_user_id).first()
+    if not order:
+        return jsonify({"message": "Order not found"}), 404
+    
+    return jsonify(order.to_dict()), 200
+
+# Route to cancel an order (if it hasn't been picked up yet)
+@app.route('/business/orders/<int:order_id>/cancel', methods=['POST'])
+@jwt_required()
+def cancel_order(order_id):
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    
+    if user.user_role != 'Business':
+        return jsonify({"message": "Access denied"}), 403
+    
+    order = Order.query.filter_by(id=order_id, user_id=current_user_id).first()
+    if not order:
+        return jsonify({"message": "Order not found"}), 404
+    
+    parcel = Parcel.query.get(order.parcel_id)
+    if parcel.status != 'Scheduled for Pickup':
+        return jsonify({"message": "Cannot cancel order, parcel has already been picked up"}), 400
+    
+    # Cancel the order and associated parcel
+    order.status = 'Cancelled'
+    parcel.status = 'Cancelled'
+    db.session.commit()
+    
+    return jsonify({"message": "Order cancelled successfully"}), 200
+
+
+
 
 
 # TODO: ORDER ROUTES
@@ -497,6 +643,16 @@ def get_orders():
 def send_notification(email, subject, body):
     msg = Message(subject, recipients=[email], body=body)
     mail.send(msg)
+
+# generate tracking numbers
+def generate_unique_tracking_number(existing_numbers):
+    """Generate a unique tracking number not in the existing_numbers set."""
+    while True:
+        tracking_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+        if tracking_number not in existing_numbers:
+            return tracking_number
+
+
 
 
 
@@ -537,7 +693,7 @@ def request_reset_password():
     if not user:
         return jsonify({"message": "If a user with this email exists, a password reset link has been sent."}), 200
 
-    token = s.dumps(email, salt='password-reset-salt')
+    token = s.dumps(email, salt='password-reset-salt') 
 
     # seting reset URL to use frontend URL
     reset_url = f"{frontend_url}/reset-password/{token}"
@@ -609,13 +765,6 @@ def send_email(to_email, reset_url):
 
     return True
 
-# generate tracking numbers
-def generate_unique_tracking_number(existing_numbers):
-    """Generate a unique tracking number not in the existing_numbers set."""
-    while True:
-        tracking_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
-        if tracking_number not in existing_numbers:
-            return tracking_number
 
 # FACEBOOK webhook
 # oauth = OAuth1(app)

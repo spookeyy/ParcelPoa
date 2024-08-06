@@ -1,46 +1,69 @@
-import React, { useState, useEffect } from "react";
+/* eslint-disable react/prop-types */
+import React, { useState, useEffect, useContext } from "react";
 import ChangePassword from "../../components/Change-Password";
+import { UserContext } from "../../Context/UserContext";
+import { toast } from "react-toastify";
+import {server} from "../../../config";
 
-export default function  SellerPofie({ onClose }) {
-  const [email, setEmail] = useState("");
+export default function SellerProfile({ onClose }) {
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [agentOption, setAgentOption] = useState("");
+  const [userRole, setUserRole] = useState("");
   const [message, setMessage] = useState("");
   const [showChangePassword, setShowChangePassword] = useState(false);
 
+  const { authToken } = useContext(UserContext);
+
   useEffect(() => {
-    fetch("/api/profile")
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = () => {
+    fetch(`${server}/profile`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
       .then((response) => response.json())
       .then((profile) => {
-        setEmail(profile.email);
         setName(profile.name);
-        setPhoneNumber(profile.phoneNumber);
-        setAgentOption(profile.agentOption);
+        setEmail(profile.email);
+        setPhoneNumber(profile.phone_number);
+        setUserRole(profile.user_role);
       })
       .catch((error) => {
+        toast.error("An error occurred while fetching the profile");
         console.error("Error fetching profile:", error);
       });
-  }, []);
+  };
 
   const handleUpdateProfile = (e) => {
     e.preventDefault();
 
-    fetch("/api/update-profile", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, name, phoneNumber, agentOption }),
+    fetch(`${server}/profile`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+      body: JSON.stringify({ name, email, phone_number: phoneNumber }),
     })
-      .then((response) => {
-        if (response.ok) {
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.message === "Profile updated successfully") {
           setMessage("Profile updated successfully");
+          toast.success(data.message);
           setTimeout(() => onClose(), 2000); // Close modal after a delay
         } else {
-          console.error("Profile update failed");
+          setMessage("Profile update failed");
         }
       })
       .catch((error) => {
+        toast.error("An error occurred while updating the profile");
         console.error("Error updating profile:", error);
+        setMessage("An error occurred while updating the profile");
       });
   };
 
@@ -50,7 +73,12 @@ export default function  SellerPofie({ onClose }) {
         <h2 className="text-2xl font-bold mb-6 text-center">Admin Profile</h2>
         <form onSubmit={handleUpdateProfile} className="space-y-6">
           <div className="mb-4">
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Name
+            </label>
             <input
               type="text"
               id="name"
@@ -61,7 +89,12 @@ export default function  SellerPofie({ onClose }) {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Email
+            </label>
             <input
               type="email"
               id="email"
@@ -72,7 +105,12 @@ export default function  SellerPofie({ onClose }) {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number</label>
+            <label
+              htmlFor="phone"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Phone Number
+            </label>
             <input
               type="tel"
               id="phone"
@@ -80,6 +118,21 @@ export default function  SellerPofie({ onClose }) {
               onChange={(e) => setPhoneNumber(e.target.value)}
               required
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+            />
+          </div>
+          <div className="mb-4">
+            <label
+              htmlFor="userRole"
+              className="block text-sm font-medium text-gray-700"
+            >
+              User Role
+            </label>
+            <input
+              type="text"
+              id="userRole"
+              value={userRole}
+              readOnly
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-100"
             />
           </div>
 
@@ -103,9 +156,6 @@ export default function  SellerPofie({ onClose }) {
           </button>
         </div>
         {showChangePassword && <ChangePassword />}
-        <div className="mt-6 text-center">
-
-        </div>
       </div>
     </div>
   );

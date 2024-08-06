@@ -121,7 +121,7 @@ export default function Login() {
           <p className="text-sm text-center text-gray-800">
             Don't have an account?{" "}
             <Link
-              to="/create-account"
+              to="/signup"
               className="text-blue-600 hover:underline hover:text-blue-800 font-medium transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               Sign up
