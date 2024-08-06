@@ -1,3 +1,4 @@
+
 import React from "react";
 import Navbar from "./Navbar";
 import { Link } from "react-router-dom";
@@ -7,6 +8,7 @@ export default function Landing() {
   return (
     <div className="bg-white min-h-screen flex flex-col">
       <Navbar />
+
       <div className="container mx-auto p-8 flex-grow">
         <div
           className="bg-white p-8 rounded-lg shadow-lg"
@@ -39,6 +41,7 @@ export default function Landing() {
                   >
                     Track Order
                   </Link>
+
                 </div>
               </div>
               <div className="mt-16 md:mt-0 w-full">
@@ -50,6 +53,7 @@ export default function Landing() {
               </div>
             </div>
           </main>
+
           <FloatingWhatsApp
             phoneNumber="+254705719325"
             accountName="ParcelPoa"
