@@ -61,11 +61,13 @@ import Contact from "./pages/Contacts";
 import PrivacyPolicy from "./pages/policy";
 import Terms from "./pages/terms";
 import Returns from "./pages/return";
+import { DeliveryProvider } from "./Context/DeliveryContext";
 function App() {
   return (
     <Router>
       <UserProvider>
         <TrackingProvider>
+        <DeliveryProvider>
           <Routes>
             <Route path="/seller" element={<SellerLayout />}>
               {/* Seller Routes */}
@@ -112,7 +114,7 @@ function App() {
 
             {/* the pages for the agent */}
             <Route path="/agent" element={<AgentHome />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard/*" element={<Dashboard />} />
             <Route path="/delivery-details/:id" element={<DeliveryDetails />} />
             <Route
               path="/delivery-confirmation"
@@ -165,6 +167,7 @@ function App() {
             <Route path="/parcels" element={<ParcelForm />} />
             <Route path="/pickup" element={<PickupScheduling />} />
           </Routes>
+          </DeliveryProvider>
         </TrackingProvider>
         <Footer />
         <ToastContainer
@@ -187,6 +190,7 @@ function App() {
           progress={undefined}
           theme="dark"
         />
+        
       </UserProvider>
     </Router>
   );
