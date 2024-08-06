@@ -1,5 +1,3 @@
-// src/components/AgentProfile.jsx
-
 import React, { useState, useEffect } from "react";
 import ChangePassword from "../../components/Change-Password";
 
@@ -30,8 +28,8 @@ export default function AgentProfile({ onClose }) {
   const handleUpdateProfile = (e) => {
     e.preventDefault();
 
-    fetch("/api/update-profile", {
-      method: "POST",
+    fetch("/api/profile", {
+      method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, name, phoneNumber, agentOption }),
     })
@@ -51,11 +49,24 @@ export default function AgentProfile({ onClose }) {
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfilePicture(reader.result);
-      };
-      reader.readAsDataURL(file);
+      const formData = new FormData();
+      formData.append("profilePicture", file);
+
+      fetch("/api/profile/picture", {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => {
+          if (response.ok) {
+            // Update the profilePicture state with the new URL
+            setProfilePicture(URL.createObjectURL(file));
+          } else {
+            console.error("Profile picture upload failed");
+          }
+        })
+        .catch((error) => {
+          console.error("Error uploading profile picture:", error);
+        });
     }
   };
 
