@@ -73,11 +73,24 @@ export default function AgentProfile({ onClose }) {
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfilePicture(reader.result);
-      };
-      reader.readAsDataURL(file);
+      const formData = new FormData();
+      formData.append("profilePicture", file);
+
+      fetch("/api/profile/picture", {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => {
+          if (response.ok) {
+            // Update the profilePicture state with the new URL
+            setProfilePicture(URL.createObjectURL(file));
+          } else {
+            console.error("Profile picture upload failed");
+          }
+        })
+        .catch((error) => {
+          console.error("Error uploading profile picture:", error);
+        });
     }
   };
 
