@@ -15,7 +15,7 @@ import Home from "./pages/Seller/Home";
 import Agents from "./pages/Seller/Agents";
 import Agent_Requests from "./pages/Seller/Agent_Requests";
 import Agent_Details from "./pages/Seller/Agent_Details";
-import Agent_Trends from "./pages/Seller/Agent_Trends";
+// import Agent_Trends from "./pages/Seller/Agent_Trends";
 import Invoice from "./pages/Seller/Invoice";
 import Messages_List from "./pages/Seller/Messages_List";
 import Messages_Details from "./pages/Seller/Messages_Details";

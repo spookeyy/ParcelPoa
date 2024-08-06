@@ -17,11 +17,11 @@ export default function Landing() {
           <main className="py-16 px-4 flex items-center">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
               <div className="flex flex-col justify-center items-start">
-                <h8 className="text-6xl font-bold  mb-8">
+                <h8 className="text-4xl font-bold  mb-8">
                   <span className="text-indigo-500">ParcelPoa</span>, Deliver
                   your Order
                 </h8>
-                <h10 className="text-4xl font-bold  mb-4">
+                <h10 className="text-2xl font-bold italic mb-4">
                   Speedy Delivery, Reliable Service
                 </h10>
                 <p className="text-lg mb-8">
