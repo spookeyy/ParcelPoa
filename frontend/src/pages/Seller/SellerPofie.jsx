@@ -21,27 +21,27 @@ export default function SellerProfile({ onClose }) {
     fetchProfile();
   }, []);
 
-  // const fetchProfile = () => {
-  //   fetch(`${server}/profile`, {
-  //     method: "GET",
-  //     headers: {
-  //       Authorization: `Bearer ${authToken}`,
-  //     },
-  //   })
-  //     .then((response) => response.json())
-  //     .then((profile) => {
-  //       setName(profile.name);
-  //       setEmail(profile.email);
-  //       setPhoneNumber(profile.phone_number);
-  //       setUserRole(profile.user_role);
-  //       setUserName(profile.name);
+  const fetchProfile = () => {
+    fetch(`${server}/profile`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((profile) => {
+        setName(profile.name);
+        setEmail(profile.email);
+        setPhoneNumber(profile.phone_number);
+        setUserRole(profile.user_role);
+        setUserName(profile.name);
 
-  //     })
-  //     .catch((error) => {
-  //       toast.error("An error occurred while fetching the profile");
-  //       console.error("Error fetching profile:", error);
-  //     });
-  // };
+      })
+      .catch((error) => {
+        toast.error("An error occurred while fetching the profile");
+        console.error("Error fetching profile:", error);
+      });
+  };
 
   const handleUpdateProfile = (e) => {
     e.preventDefault();
