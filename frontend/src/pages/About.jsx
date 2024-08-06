@@ -1,7 +1,11 @@
 import React from 'react';
+import Navbar from '../components/Navbar';
+
 
 export default function About() {
   return (
+    <>
+      <Navbar />
     <div className="bg-gradient-to-br from-blue-300 to-indigo-700 min-h-screen p-8">
       <div className="container mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
         <div className="bg-indigo-500 p-8">
@@ -45,5 +49,6 @@ export default function About() {
         </div>
       </div>
     </div>
+    </>
   );
 }

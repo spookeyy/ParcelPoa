@@ -1,10 +1,22 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
 // Sample data for demonstration; replace with actual data source
 const messages = [
-  { id: '1', date: '2024-07-20', sender: 'John Doe', content: 'Hello, this is a test message.', status: 'Unread' },
-  { id: '2', date: '2024-07-22', sender: 'Jane Smith', content: 'Important update regarding your account.', status: 'Read' },
+  {
+    id: "1",
+    date: "2024-07-20",
+    sender: "John Doe",
+    content: "Hello, this is a test message.",
+    status: "Unread",
+  },
+  {
+    id: "2",
+    date: "2024-07-22",
+    sender: "Jane Smith",
+    content: "Important update regarding your account.",
+    status: "Read",
+  },
   // Add more sample messages as needed
 ];
 
@@ -12,9 +24,9 @@ export default function Messages_Details() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isReplying, setIsReplying] = useState(false);
-  const [replyContent, setReplyContent] = useState('');
+  const [replyContent, setReplyContent] = useState("");
 
-  const message = messages.find(msg => msg.id === id);
+  const message = messages.find((msg) => msg.id === id);
 
   if (!message) return <div className="p-6">Message not found</div>;
 
@@ -26,7 +38,7 @@ export default function Messages_Details() {
     event.preventDefault();
     // Replace with logic to handle reply submission
     alert(`Reply sent: ${replyContent}`);
-    setReplyContent(''); // Clear the reply content
+    setReplyContent(""); // Clear the reply content
     setIsReplying(false); // Close the reply form
   };
 
@@ -35,12 +47,22 @@ export default function Messages_Details() {
       {/* Header with Back Button */}
       <div className="flex items-center mb-6">
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate("/")}
           className="text-blue-500 hover:text-blue-700 flex items-center transition duration-300 ease-in-out"
           aria-label="Back to messages list"
         >
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
+          <svg
+            className="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M15 19l-7-7 7-7"
+            ></path>
           </svg>
           <span>Back to Messages List</span>
         </button>
@@ -48,7 +70,9 @@ export default function Messages_Details() {
 
       {/* Message Details */}
       <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-semibold mb-6 border-b pb-4">Message Details</h1>
+        <h1 className="text-3xl font-semibold mb-6 border-b pb-4">
+          Message Details
+        </h1>
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <p className="font-semibold text-gray-600">Message ID:</p>
@@ -64,11 +88,17 @@ export default function Messages_Details() {
           </div>
           <div className="flex flex-col">
             <p className="font-semibold text-gray-600">Content:</p>
-            <p className="text-gray-800 whitespace-pre-wrap">{message.content}</p>
+            <p className="text-gray-800 whitespace-pre-wrap">
+              {message.content}
+            </p>
           </div>
           <div className="flex justify-between items-center">
             <p className="font-semibold text-gray-600">Status:</p>
-            <p className={`text-gray-800 font-semibold ${message.status === 'Read' ? 'text-green-600' : 'text-red-600'}`}>
+            <p
+              className={`text-gray-800 font-semibold ${
+                message.status === "Read" ? "text-green-600" : "text-red-600"
+              }`}
+            >
               {message.status}
             </p>
           </div>
@@ -87,7 +117,10 @@ export default function Messages_Details() {
 
         {/* Reply Form */}
         {isReplying && (
-          <form onSubmit={handleReplySubmit} className="mt-8 bg-gray-50 border border-gray-200 rounded-lg p-6 shadow-md">
+          <form
+            onSubmit={handleReplySubmit}
+            className="mt-8 bg-gray-50 border border-gray-200 rounded-lg p-6 shadow-md"
+          >
             <h2 className="text-xl font-semibold mb-4">Reply to Message</h2>
             <textarea
               value={replyContent}

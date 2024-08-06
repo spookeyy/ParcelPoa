@@ -18,8 +18,8 @@ def generate_phone_number():
 
 def generate_email(name):
     username = name.lower().replace(' ', '') + str(random.randint(1, 9999))
-    domain = 'gmail.com'
-    return f'{username}@{domain}' 
+    domain = random.choice(['gmail.com', 'yahoo.com', 'outlook.com'])
+    return f'{username}@{domain}'
 
 with app.app_context():
     db.drop_all()
@@ -37,9 +37,10 @@ with app.app_context():
                 user_role=random.choice(user_roles),
                 created_at=datetime.now(timezone.utc),
                 updated_at=datetime.now(timezone.utc),
-                password_hash='password'
+                profile_picture='default.png',
+                status='Available'
             )
-            user.set_password('password')  # Use the set_password method
+            user.set_password('password')
             users.append(user)
             db.session.add(user)
         db.session.commit()
@@ -49,7 +50,7 @@ with app.app_context():
     def seed_parcels(users, num_parcels=20):
         parcels = []
         categories = ['Small Electronic', 'Envelope', 'Big electronic', 'Food']
-        statuses = ['Picked Up', 'Out for Delivery', 'In Transit', 'Delivered']
+        statuses = ['Scheduled for Pickup', 'Picked Up', 'Out for Delivery', 'In Transit', 'Delivered', 'Cancelled']
         for _ in range(num_parcels):
             sender = random.choice([u for u in users if u.user_role == 'Business'])
             recipient = random.choice(users)
@@ -84,7 +85,7 @@ with app.app_context():
         for parcel in random.sample(parcels, num_deliveries):
             delivery = Delivery(
                 parcel_id=parcel.parcel_id,
-                agent_id=random.choice(agents).user_id,
+                agent_id=random.choice(agents).user_id if random.choice([True, False]) else None,
                 pickup_time=datetime.now(timezone.utc),
                 delivery_time=datetime.now(timezone.utc) + timedelta(days=random.randint(1, 5)),
                 status=random.choice(statuses),
@@ -106,7 +107,8 @@ with app.app_context():
                 user_id=user.user_id,
                 parcel_id=parcel.parcel_id,
                 created_at=datetime.now(timezone.utc),
-                updated_at=datetime.now(timezone.utc)
+                updated_at=datetime.now(timezone.utc),
+                status=random.choice(['Active', 'Cancelled'])
             )
             orders.append(order)
             db.session.add(order)
@@ -136,14 +138,13 @@ with app.app_context():
 
     def seed_tracking(parcels):
         trackings = []
-        statuses = ['Picked Up', 'In Transit', 'Out for Delivery', 'Delivered']
+        statuses = ['Scheduled for Pickup', 'Picked Up', 'Out for Delivery', 'In Transit', 'Delivered', 'Cancelled']
         
         for parcel in parcels:
-            num_entries = random.randint(1, 4)
-            current_status_index = 0
+            num_entries = random.randint(1, len(statuses))
             
             for i in range(num_entries):
-                status = statuses[current_status_index]
+                status = statuses[i]
                 
                 tracking = Tracking(
                     parcel_id=parcel.parcel_id,
@@ -153,9 +154,6 @@ with app.app_context():
                 )
                 trackings.append(tracking)
                 db.session.add(tracking)
-                
-                if current_status_index < len(statuses) - 1:
-                    current_status_index += 1
             
             parcel.status = trackings[-1].status
             

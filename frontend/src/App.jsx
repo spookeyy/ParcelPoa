@@ -26,6 +26,12 @@ import Tracking from "./pages/Seller/Tracking";
 import SellerPofie from "./pages/Seller/SellerPofie";
 import SellerLayout from "./components/SellerLayout";
 
+import BusinessDashboard from "./pages/Business/BusinessDashboard";
+import ParcelTracking from "./pages/Business/ParcelTracking";
+import ParcelForm from "./pages/Business/ParcelForm";
+import PickupScheduling from "./pages/Business/PickupScheduling";
+import OrderManagement from "./pages/Business/OrderManagement";
+
 //Buyer pages
 import OrderTracking from "./pages/Buyer/OrderTracking";
 import TrackOrders from "./pages/Buyer/TrackOrders";
@@ -95,7 +101,7 @@ function App() {
             <Route path="/tracking" element={<OrderTracking />} />
 
             <Route path="/login" element={<Login />} />
-            <Route path="/create-account" element={<Create_Account />} />
+            <Route path="/signup" element={<Create_Account />} />
             <Route path="/agent-requests" element={<Agent_Requests />} />
             <Route path="/order-list" element={<Order_List />} />
             <Route path="/order/:id" element={<Order_Details />} />
@@ -138,13 +144,26 @@ function App() {
               element={<RequestResetPassword />}
             />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
+            <Route path="/about-us" element={<About />} />
+            <Route path="/contact-us" element={<Contact />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/returns" element={<Returns />} />
             <Route path="/send-notification" element={<SendNotification />} />
             <Route path="/" element={<Landing />} />
+
+            <Route path="/business/dashboard" element={<BusinessDashboard />} />
+            <Route
+              path="/business/parcel-tracking"
+              element={<ParcelTracking />}
+            />
+            <Route
+              path="/business/parcel-tracking/:trackingid"
+              element={<ParcelTracking />}
+            />
+            <Route path="/business/orders" element={<OrderManagement />} />
+            <Route path="/parcels" element={<ParcelForm />} />
+            <Route path="/pickup" element={<PickupScheduling />} />
           </Routes>
         </TrackingProvider>
         <Footer />

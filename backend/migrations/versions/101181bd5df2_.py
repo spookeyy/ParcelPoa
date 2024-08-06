@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 628b3080bc71
+Revision ID: 101181bd5df2
 Revises: 
-Create Date: 2024-08-04 13:01:05.117688
+Create Date: 2024-08-05 21:57:11.513571
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '628b3080bc71'
+revision = '101181bd5df2'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -27,6 +27,8 @@ def upgrade():
     sa.Column('created_at', sa.TIMESTAMP(), nullable=False),
     sa.Column('updated_at', sa.TIMESTAMP(), nullable=False),
     sa.Column('password_hash', sa.String(length=128), nullable=False),
+    sa.Column('profile_picture', sa.String(), nullable=True),
+    sa.Column('status', sa.Enum('Available', 'Unavailable', name='user_statuses'), nullable=True),
     sa.PrimaryKeyConstraint('user_id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('phone_number')
@@ -53,10 +55,12 @@ def upgrade():
     sa.Column('created_at', sa.TIMESTAMP(), nullable=False),
     sa.Column('updated_at', sa.TIMESTAMP(), nullable=False),
     sa.Column('current_location', sa.String(length=255), nullable=False),
-    sa.Column('status', sa.Enum('Picked Up', 'Out for Delivery', 'In Transit', 'Delivered', name='delivery_statuses'), nullable=False),
+    sa.Column('status', sa.Enum('Scheduled for Pickup', 'Picked Up', 'Out for Delivery', 'In Transit', 'Delivered', 'Cancelled', name='parcel_statuses'), nullable=False),
     sa.Column('sender_email', sa.String(), nullable=False),
     sa.Column('recipient_email', sa.String(), nullable=False),
     sa.Column('category', sa.String(length=50), nullable=False),
+    sa.Column('latitude', sa.Float(), nullable=True),
+    sa.Column('longitude', sa.Float(), nullable=True),
     sa.ForeignKeyConstraint(['sender_id'], ['users.user_id'], ),
     sa.PrimaryKeyConstraint('parcel_id'),
     sa.UniqueConstraint('tracking_number')
@@ -64,7 +68,7 @@ def upgrade():
     op.create_table('deliveries',
     sa.Column('delivery_id', sa.Integer(), nullable=False),
     sa.Column('parcel_id', sa.Integer(), nullable=False),
-    sa.Column('agent_id', sa.Integer(), nullable=False),
+    sa.Column('agent_id', sa.Integer(), nullable=True),
     sa.Column('pickup_time', sa.TIMESTAMP(), nullable=False),
     sa.Column('delivery_time', sa.TIMESTAMP(), nullable=True),
     sa.Column('status', sa.Enum('Scheduled', 'In Transit', 'Delivered', name='delivery_statuses'), nullable=False),
@@ -80,6 +84,7 @@ def upgrade():
     sa.Column('parcel_id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.TIMESTAMP(), nullable=False),
     sa.Column('updated_at', sa.TIMESTAMP(), nullable=False),
+    sa.Column('status', sa.Enum('Active', 'Cancelled', name='order_statuses'), nullable=False),
     sa.ForeignKeyConstraint(['parcel_id'], ['parcels.parcel_id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
     sa.PrimaryKeyConstraint('order_id')

@@ -1,5 +1,6 @@
 import React from 'react';
 import Navbar from './Navbar';
+import { Link } from 'react-router-dom';
 import { FloatingWhatsApp } from 'react-floating-whatsapp'; 
 
 export default function Landing() {
@@ -15,8 +16,8 @@ export default function Landing() {
               At Parcel Poa, we ensure your packages are delivered swiftly and safely, providing you with peace of mind every time.
             </p>
             <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 justify-center md:justify-start">
-              <a href="/create-account" className="bg-transparent hover:bg-indigo-500 text-indigo-700 font-semibold hover:text-white py-2 px-4 rounded-full border border-indigo-500 hover:border-transparent">Get Started</a>
-              <a href="/tracking" className="bg-indigo-500 text-white font-medium py-2 px-4 rounded-full hover:bg-indigo-600">Track Order</a>
+              <Link to="/signup" className="bg-indigo-500 text-white font-medium py-2 px-4 rounded-full hover:bg-indigo-600">Get Started</Link>
+              <Link to="/tracking" className="bg-transparent hover:bg-indigo-500 text-indigo-700 font-semibold hover:text-white py-2 px-4 rounded-full border border-indigo-500 hover:border-transparent">Track Order</Link>
             </div>
           </div>
           <div className=" mt-16 md:mt-0 w-full  ">

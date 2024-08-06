@@ -1,11 +1,23 @@
-import React, { useState } from 'react';
-import { EyeIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { EyeIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { useNavigate } from "react-router-dom";
 
 // Sample data
 const initialMessages = [
-  { id: '1', date: '2024-07-20', sender: 'John Doe', content: 'Hello, this is a test message.', status: 'Unread' },
-  { id: '2', date: '2024-07-22', sender: 'Jane Smith', content: 'Important update regarding your account.', status: 'Read' },
+  {
+    id: "1",
+    date: "2024-07-20",
+    sender: "John Doe",
+    content: "Hello, this is a test message.",
+    status: "Unread",
+  },
+  {
+    id: "2",
+    date: "2024-07-22",
+    sender: "Jane Smith",
+    content: "Important update regarding your account.",
+    status: "Read",
+  },
   // Add more sample messages as needed
 ];
 
@@ -13,16 +25,26 @@ const initialMessages = [
 const FilterBar = ({ onFilterChange, onReset }) => (
   <div className="bg-gray-100 p-4 rounded-lg shadow-md mb-6 flex flex-col sm:flex-row gap-4 sm:gap-6">
     <button
-      onClick={() => alert('Filter Icon Clicked')}
+      onClick={() => alert("Filter Icon Clicked")}
       className="text-gray-700 hover:text-gray-900"
       aria-label="Open filter options"
     >
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 10l5 5 5-5H7z"></path>
+      <svg
+        className="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M7 10l5 5 5-5H7z"
+        ></path>
       </svg>
     </button>
     <select
-      onChange={(e) => onFilterChange('date', e.target.value)}
+      onChange={(e) => onFilterChange("date", e.target.value)}
       className="border rounded p-2 text-sm sm:text-base"
       aria-label="Filter by date"
     >
@@ -32,7 +54,7 @@ const FilterBar = ({ onFilterChange, onReset }) => (
       {/* Add more options */}
     </select>
     <select
-      onChange={(e) => onFilterChange('sender', e.target.value)}
+      onChange={(e) => onFilterChange("sender", e.target.value)}
       className="border rounded p-2 text-sm sm:text-base"
       aria-label="Filter by sender"
     >
@@ -42,7 +64,7 @@ const FilterBar = ({ onFilterChange, onReset }) => (
       {/* Add more options */}
     </select>
     <select
-      onChange={(e) => onFilterChange('status', e.target.value)}
+      onChange={(e) => onFilterChange("status", e.target.value)}
       className="border rounded p-2 text-sm sm:text-base"
       aria-label="Filter by status"
     >
@@ -63,21 +85,21 @@ const FilterBar = ({ onFilterChange, onReset }) => (
 // Main Messages List Component
 export default function Messages_List() {
   const [messages, setMessages] = useState(initialMessages);
-  const [filters, setFilters] = useState({ date: '', sender: '', status: '' });
+  const [filters, setFilters] = useState({ date: "", sender: "", status: "" });
   const navigate = useNavigate();
 
   const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
   const resetFilters = () => {
-    setFilters({ date: '', sender: '', status: '' });
+    setFilters({ date: "", sender: "", status: "" });
   };
 
   const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this message?')) {
-      setMessages(prevMessages => 
-        prevMessages.filter(message => message.id !== id)
+    if (window.confirm("Are you sure you want to delete this message?")) {
+      setMessages((prevMessages) =>
+        prevMessages.filter((message) => message.id !== id)
       );
     }
   };
@@ -87,7 +109,7 @@ export default function Messages_List() {
   };
 
   // Apply filters
-  const filteredMessages = messages.filter(message => {
+  const filteredMessages = messages.filter((message) => {
     return (
       (!filters.date || message.date === filters.date) &&
       (!filters.sender || message.sender === filters.sender) &&
@@ -98,7 +120,9 @@ export default function Messages_List() {
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       {/* Title */}
-      <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-4">Messages List</h1>
+      <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-4">
+        Messages List
+      </h1>
 
       <FilterBar onFilterChange={handleFilterChange} onReset={resetFilters} />
 
@@ -107,23 +131,45 @@ export default function Messages_List() {
         <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
           <thead className="bg-gradient-to-r from-blue-500 to-blue-700 text-white text-xs sm:text-sm lg:text-base">
             <tr>
-              <th className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 text-left font-medium border-b border-gray-300">Message ID</th>
-              <th className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 text-left font-medium border-b border-gray-300">Date</th>
-              <th className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 text-left font-medium border-b border-gray-300">Sender</th>
-              <th className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 text-left font-medium border-b border-gray-300">Content</th>
-              <th className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 text-left font-medium border-b border-gray-300">Status</th>
-              <th className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 text-left font-medium border-b border-gray-300">Actions</th>
+              <th className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 text-left font-medium border-b border-gray-300">
+                Message ID
+              </th>
+              <th className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 text-left font-medium border-b border-gray-300">
+                Date
+              </th>
+              <th className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 text-left font-medium border-b border-gray-300">
+                Sender
+              </th>
+              <th className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 text-left font-medium border-b border-gray-300">
+                Content
+              </th>
+              <th className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 text-left font-medium border-b border-gray-300">
+                Status
+              </th>
+              <th className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 text-left font-medium border-b border-gray-300">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="text-gray-700 text-xs sm:text-sm lg:text-base">
             {filteredMessages.length > 0 ? (
-              filteredMessages.map(message => (
+              filteredMessages.map((message) => (
                 <tr key={message.id} className="hover:bg-gray-50">
-                  <td className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3">{message.id}</td>
-                  <td className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3">{message.date}</td>
-                  <td className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3">{message.sender}</td>
-                  <td className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3">{message.content}</td>
-                  <td className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3">{message.status}</td>
+                  <td className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3">
+                    {message.id}
+                  </td>
+                  <td className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3">
+                    {message.date}
+                  </td>
+                  <td className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3">
+                    {message.sender}
+                  </td>
+                  <td className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3">
+                    {message.content}
+                  </td>
+                  <td className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3">
+                    {message.status}
+                  </td>
                   <td className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 flex items-center gap-2">
                     <button
                       onClick={() => handleViewDetails(message.id)}
@@ -144,7 +190,12 @@ export default function Messages_List() {
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 text-center text-gray-500">No messages found</td>
+                <td
+                  colSpan="6"
+                  className="px-2 py-1 sm:px-3 sm:py-2 lg:px-4 lg:py-3 text-center text-gray-500"
+                >
+                  No messages found
+                </td>
               </tr>
             )}
           </tbody>

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { server } from "../../../../config";
 import {
   FaUser,
   FaSignOutAlt,
@@ -12,14 +13,28 @@ import AgentProfile from "../AgentProfile";
 export default function AgentHeader() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [status, setStatus] = useState("available"); // State for status
+  const [status, setStatus] = useState("Available");
+  const [userName, setUserName] = useState("");
 
   const navigate = useNavigate();
 
-  // Assume you have access to the user's name
-  const userName = "Simon"; // Replace with dynamic data
+  useEffect(() => {
+    fetch(`${server}/profile`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((profile) => {
+        setUserName(profile.name);
+        setStatus(profile.status || "Available");
+      })
+      .catch((error) => {
+        console.error("Error fetching profile:", error);
+      });
+  }, []);
 
-  // Extract the first initial
   const userInitial = userName.charAt(0).toUpperCase();
 
   const toggleDropdown = () => {
@@ -36,10 +51,34 @@ export default function AgentHeader() {
   };
 
   const handleStatusChange = (newStatus) => {
-    setStatus(newStatus);
-    setIsDropdownOpen(false); // Close dropdown after changing status
-    console.log({ status: newStatus }); // Log the new status
+    fetch(`${server}/update-status`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+      body: JSON.stringify({ status: newStatus }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to update status");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setStatus(data.status);
+        setIsDropdownOpen(false);
+        console.log("Status updated:", data.message);
+      })
+      .catch((error) => {
+        console.error("Error updating status:", error);
+      });
   };
+
+  const handleLogout = () => {
+  localStorage.removeItem("access_token");
+  navigate("/login");
+};
 
   return (
     <header className="bg-white p-4 md:p-6 rounded-lg shadow-md mb-4 md:mb-6 border border-gray-200 relative">
@@ -47,47 +86,54 @@ export default function AgentHeader() {
         Agent Dashboard
       </h1>
       <div className="absolute right-4 top-4 md:right-6 md:top-6 flex items-center">
-        {/* Display the user's initial instead of the icon */}
-        <div
-          className="bg-blue-500 text-white w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-lg md:text-xl font-semibold cursor-pointer hover:bg-white hover:text-blue-500 transition-colors duration-300"
-          onClick={toggleDropdown}
-        >
-          {userInitial}
+        <div className="relative">
+          <div
+            className="bg-blue-500 text-white w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-lg md:text-xl font-semibold cursor-pointer hover:bg-white hover:text-blue-500 transition-colors duration-300"
+            onClick={toggleDropdown}
+          >
+            {userInitial}
+          </div>
+          <div
+            className={`absolute bottom-0 right-0 w-3 h-3 md:w-4 md:h-4 rounded-full border-2 border-white ${
+              status === "Available" ? "bg-green-500" : "bg-red-500"
+            }`}
+          ></div>
         </div>
         {isDropdownOpen && (
           <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-md shadow-lg py-2 border border-gray-200 z-10 transition-transform transform duration-300 ease-in-out translate-y-1">
+            <div className="px-4 py-2 text-sm font-semibold text-gray-700 border-b border-gray-200">
+              Status: {status}
+            </div>
             <div className="flex flex-col">
               <div
                 className={`flex items-center px-4 py-2 text-sm cursor-pointer transition-colors duration-300 ${
-                  status === "available"
+                  status === "Available"
                     ? "bg-green-100 text-green-700"
                     : "hover:bg-gray-100 text-gray-700"
                 }`}
-                onClick={() => handleStatusChange("available")}
+                onClick={() => handleStatusChange("Available")}
               >
                 <FaCheckCircle
                   className={`mr-3 ${
-                    status === "available" ? "text-green-500" : "text-gray-500"
+                    status === "Available" ? "text-green-500" : "text-gray-500"
                   }`}
                 />
                 Available
               </div>
               <div
                 className={`flex items-center px-4 py-2 text-sm cursor-pointer transition-colors duration-300 ${
-                  status === "not-available"
+                  status === "Unavailable"
                     ? "bg-red-100 text-red-700"
                     : "hover:bg-gray-100 text-gray-700"
                 }`}
-                onClick={() => handleStatusChange("not-available")}
+                onClick={() => handleStatusChange("Unavailable")}
               >
                 <FaTimesCircle
                   className={`mr-3 ${
-                    status === "not-available"
-                      ? "text-red-500"
-                      : "text-gray-500"
+                    status === "Unavailable" ? "text-red-500" : "text-gray-500"
                   }`}
                 />
-                Not Available
+                Unavailable
               </div>
             </div>
 
@@ -99,14 +145,13 @@ export default function AgentHeader() {
                 <FaUser className="mr-3 text-blue-500" />
                 Profile
               </div>
-              <Link
-                to="/login"
-                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-300"
-                onClick={() => setIsDropdownOpen(false)}
+              <div
+                onClick={handleLogout}
+                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer transition-colors duration-300"
               >
                 <FaSignOutAlt className="mr-3 text-red-500" />
                 Log Out
-              </Link>
+              </div>
             </div>
           </div>
         )}

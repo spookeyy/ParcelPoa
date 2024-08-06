@@ -1,8 +1,22 @@
 import React from "react";
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChartLine, faShoppingCart, faDollarSign, faClock } from '@fortawesome/free-solid-svg-icons';
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faChartLine,
+  faShoppingCart,
+  faDollarSign,
+  faClock,
+} from "@fortawesome/free-solid-svg-icons";
 
 // Register Chart.js components
 ChartJS.register(
@@ -47,13 +61,13 @@ function Home() {
 
   // Sample data for the graph
   const data = {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+    labels: ["January", "February", "March", "April", "May", "June", "July"],
     datasets: [
       {
-        label: 'Sales Over Time',
+        label: "Sales Over Time",
         data: [10, 20, 15, 25, 30, 20, 35],
         fill: false,
-        borderColor: '#3b82f6',
+        borderColor: "#3b82f6",
         tension: 0.1,
       },
     ],
@@ -63,7 +77,7 @@ function Home() {
     responsive: true,
     plugins: {
       legend: {
-        position: 'top',
+        position: "top",
       },
       tooltip: {
         callbacks: {
@@ -77,13 +91,13 @@ function Home() {
       x: {
         title: {
           display: true,
-          text: 'Month',
+          text: "Month",
         },
       },
       y: {
         title: {
           display: true,
-          text: 'Sales ($)',
+          text: "Sales ($)",
         },
       },
     },
@@ -94,44 +108,82 @@ function Home() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         {/* Sales Trend Card */}
         <div className="bg-white p-4 shadow-lg rounded-lg flex flex-col items-center text-center space-y-4">
-          <FontAwesomeIcon icon={salesTrend.icon} className="text-4xl text-blue-500" />
+          <FontAwesomeIcon
+            icon={salesTrend.icon}
+            className="text-4xl text-blue-500"
+          />
           <div>
-            <h2 className="text-lg sm:text-xl font-semibold mb-1">{salesTrend.title}</h2>
-            <p className="text-xl sm:text-2xl font-bold mb-1">{salesTrend.value}</p>
-            <p className="text-gray-600 text-sm sm:text-base">{salesTrend.description}</p>
+            <h2 className="text-lg sm:text-xl font-semibold mb-1">
+              {salesTrend.title}
+            </h2>
+            <p className="text-xl sm:text-2xl font-bold mb-1">
+              {salesTrend.value}
+            </p>
+            <p className="text-gray-600 text-sm sm:text-base">
+              {salesTrend.description}
+            </p>
           </div>
         </div>
         {/* Total Orders Card */}
         <div className="bg-white p-4 shadow-lg rounded-lg flex flex-col items-center text-center space-y-4">
-          <FontAwesomeIcon icon={numberOfOrders.icon} className="text-4xl text-green-500" />
+          <FontAwesomeIcon
+            icon={numberOfOrders.icon}
+            className="text-4xl text-green-500"
+          />
           <div>
-            <h2 className="text-lg sm:text-xl font-semibold mb-1">{numberOfOrders.title}</h2>
-            <p className="text-xl sm:text-2xl font-bold mb-1">{numberOfOrders.value}</p>
-            <p className="text-gray-600 text-sm sm:text-base">{numberOfOrders.description}</p>
+            <h2 className="text-lg sm:text-xl font-semibold mb-1">
+              {numberOfOrders.title}
+            </h2>
+            <p className="text-xl sm:text-2xl font-bold mb-1">
+              {numberOfOrders.value}
+            </p>
+            <p className="text-gray-600 text-sm sm:text-base">
+              {numberOfOrders.description}
+            </p>
           </div>
         </div>
         {/* Total Sales Card */}
         <div className="bg-white p-4 shadow-lg rounded-lg flex flex-col items-center text-center space-y-4">
-          <FontAwesomeIcon icon={totalSales.icon} className="text-4xl text-yellow-500" />
+          <FontAwesomeIcon
+            icon={totalSales.icon}
+            className="text-4xl text-yellow-500"
+          />
           <div>
-            <h2 className="text-lg sm:text-xl font-semibold mb-1">{totalSales.title}</h2>
-            <p className="text-xl sm:text-2xl font-bold mb-1">{totalSales.value}</p>
-            <p className="text-gray-600 text-sm sm:text-base">{totalSales.description}</p>
+            <h2 className="text-lg sm:text-xl font-semibold mb-1">
+              {totalSales.title}
+            </h2>
+            <p className="text-xl sm:text-2xl font-bold mb-1">
+              {totalSales.value}
+            </p>
+            <p className="text-gray-600 text-sm sm:text-base">
+              {totalSales.description}
+            </p>
           </div>
         </div>
         {/* Pending Orders Card */}
         <div className="bg-white p-4 shadow-lg rounded-lg flex flex-col items-center text-center space-y-4">
-          <FontAwesomeIcon icon={totalPending.icon} className="text-4xl text-red-500" />
+          <FontAwesomeIcon
+            icon={totalPending.icon}
+            className="text-4xl text-red-500"
+          />
           <div>
-            <h2 className="text-lg sm:text-xl font-semibold mb-1">{totalPending.title}</h2>
-            <p className="text-xl sm:text-2xl font-bold mb-1">{totalPending.value}</p>
-            <p className="text-gray-600 text-sm sm:text-base">{totalPending.description}</p>
+            <h2 className="text-lg sm:text-xl font-semibold mb-1">
+              {totalPending.title}
+            </h2>
+            <p className="text-xl sm:text-2xl font-bold mb-1">
+              {totalPending.value}
+            </p>
+            <p className="text-gray-600 text-sm sm:text-base">
+              {totalPending.description}
+            </p>
           </div>
         </div>
       </div>
       {/* Graph Section */}
       <div className="mt-8">
-        <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-4">Sales Trends</h2>
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-4">
+          Sales Trends
+        </h2>
         <div className="bg-white p-4 shadow-lg rounded-lg">
           <Line data={data} options={options} />
         </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Navbar from '../components/Navbar';
 
 export default function Contact() {
   const [name, setName] = useState('');
@@ -26,6 +27,8 @@ export default function Contact() {
   };
 
   return (
+    <>
+    <Navbar />
     <div className="bg-gradient-to-br from-blue-300 to-indigo-700 min-h-screen p-8">
       <div className="container mx-auto max-w-md bg-white shadow-lg rounded-lg overflow-hidden">
         <div className="bg-indigo-500 p-4">
@@ -87,5 +90,6 @@ export default function Contact() {
         </div>
       </div>
     </div>
+    </>
   );
 }
