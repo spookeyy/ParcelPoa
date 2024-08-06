@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { server } from "../../../config"
 import {
   faEnvelope,
   faShoppingCart,
@@ -8,14 +9,54 @@ import {
   faUser,
   faQuestionCircle,
 } from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
 
 export default function Dashboard_Part() {
   const navigate = useNavigate();
+  const [dashboardData, setDashboardData] = useState({
+    messages: 0,
+    orders: 0,
+    dispersedOrders: 0,
+    agents: 0,
+    agentRequests: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      const [messages, orders, dispersedOrders, agents, agentRequests] =
+        await Promise.all([
+          axios.get("/messages/unread/count"),
+          axios.get("/orders/count"),
+          axios.get("/orders/dispersed/count"),
+          axios.get("/agents/count"),
+          axios.get("/agents/requests/count"),
+        ]);
+
+      setDashboardData({
+        messages: messages.data.count,
+        orders: orders.data.count,
+        dispersedOrders: dispersedOrders.data.count,
+        agents: agents.data.count,
+        agentRequests: agentRequests.data.count,
+      });
+      setLoading(false);
+    } catch (err) {
+      setError("Failed to fetch dashboard data. Please try again later.");
+      setLoading(false);
+    }
+  };
 
   const cards = [
     {
       title: "Messages",
-      value: "78",
+      value: dashboardData.messages,
       description: "Number of unread messages",
       icon: faEnvelope,
       bgColor: "text-purple-500",
@@ -24,7 +65,7 @@ export default function Dashboard_Part() {
     },
     {
       title: "Orders",
-      value: "890",
+      value: dashboardData.orders,
       description: "Total orders this month",
       icon: faShoppingCart,
       bgColor: "text-teal-500",
@@ -33,7 +74,7 @@ export default function Dashboard_Part() {
     },
     {
       title: "Dispersed Orders",
-      value: "23",
+      value: dashboardData.dispersedOrders,
       description: "Orders in Delivery Process",
       icon: faClipboardList,
       bgColor: "text-blue-500",
@@ -42,7 +83,7 @@ export default function Dashboard_Part() {
     },
     {
       title: "Agents",
-      value: "15",
+      value: dashboardData.agents,
       description: "Active support agents",
       icon: faUser,
       bgColor: "text-orange-500",
@@ -51,7 +92,7 @@ export default function Dashboard_Part() {
     },
     {
       title: "Agent Requests",
-      value: "23",
+      value: dashboardData.agentRequests,
       description: "Pending agent requests",
       icon: faQuestionCircle,
       bgColor: "text-red-500",
@@ -59,6 +100,9 @@ export default function Dashboard_Part() {
       onClick: () => navigate("/agent-requests"),
     },
   ];
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div className="p-4 mt-20 sm:p-6 lg:p-8 bg-gray-100">
