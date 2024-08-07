@@ -52,7 +52,7 @@ function OrderManagement() {
       toast.error(error.message || "Failed to create order");
     }
   };
-  
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Order Management</h1>
@@ -68,9 +68,15 @@ function OrderManagement() {
               {orders.map((order) => (
                 <li key={order.parcel.tracking_number} className="px-6 py-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-900">
-                      {order.parcel.tracking_number}
-                    </span>
+                    <div>
+                      <span className="text-sm font-medium text-gray-900">
+                        Tracking Number: {order.parcel.tracking_number}
+                      </span>
+                      <br />
+                      <span className="text-sm font-medium text-gray-900">
+                        Order Number: {order.order_number}
+                      </span>
+                    </div>
                     <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                       {order.status}
                     </span>

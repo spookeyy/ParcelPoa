@@ -618,6 +618,7 @@ def schedule_pickup():
     # Create a new order
     new_order = Order(
         user_id=current_user_id,
+        order_number=generate_order_number(),
         parcel_id=new_parcel.parcel_id,
         created_at=datetime.now(),
         updated_at=datetime.now()
@@ -795,6 +796,14 @@ def generate_unique_tracking_number(existing_numbers):
         tracking_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
         if tracking_number not in existing_numbers:
             return tracking_number
+
+
+def generate_order_number():
+    while True:
+        order_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+        existing_order = Order.query.filter_by(order_number=order_number).first()
+        if existing_order is None:
+            return order_number
 
 
 # RESET PASSWORD
