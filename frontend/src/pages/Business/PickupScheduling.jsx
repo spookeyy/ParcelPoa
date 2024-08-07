@@ -86,10 +86,8 @@ function PickupScheduling() {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-        Schedule Pickup
-      </h2>
+    <div className="bg-white rounded-lg shadow-md p-6 mb-4 lg:mb-0">
+      <h2 className="text-2xl font-semibold mb-4 text-gray-800">Schedule Pickup</h2>
       <form onSubmit={schedulePickup} className="space-y-4">
         <input
           type="text"
