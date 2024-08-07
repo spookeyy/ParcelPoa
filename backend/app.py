@@ -158,14 +158,16 @@ def profile():
     user = User.query.get(current_user_id)
     if user is None:
         return jsonify({"message": "User not found"}), 404
-        
+    
+    profile_picture_url = url_for('static', filename=f'uploads/{user.profile_picture}', _external=True) if user.profile_picture else None
+    
     return jsonify({
         'user_id': user.user_id,
         'name': user.name,
         'email': user.email,
         'phone_number': user.phone_number,
         'user_role': user.user_role,
-        'profile_picture': user.profile_picture,
+        'profile_picture': profile_picture_url,
         'status': user.status if user.status else 'Available',
     })
 
@@ -182,10 +184,16 @@ def update_profile():
     user.name = data.get('name', user.name)
     user.email = data.get('email', user.email)
     user.phone_number = data.get('phone_number', user.phone_number)
-    user.profile_picture = data.get('profile_picture', user.profile_picture)
-    user.updated_at = datetime.now()
     
+    profile_picture = data.get('profile_picture')
+    if profile_picture and profile_picture.startswith('data:image'):
+        filename = f"profile_picture_{current_user_id}.jpg"
+        file_path = save_base64_image(profile_picture, filename)
+        user.profile_picture = file_path
+    
+    user.updated_at = datetime.now()
     db.session.commit()
+    
     return jsonify({"message": "Profile updated successfully"})
 
 @app.route('/update-status', methods=['PUT'])
@@ -227,51 +235,51 @@ def change_password():
 
 
 # PARCEL ROUTES
-@app.route('/parcels', methods=['POST'])
-@jwt_required()
-def create_parcel():
-    data = request.get_json()
-    user = User.query.get(get_jwt_identity())
+# @app.route('/parcels', methods=['POST'])
+# @jwt_required()
+# def create_parcel():
+#     data = request.get_json()
+#     user = User.query.get(get_jwt_identity())
     
-    if user.user_role != 'Business':
-        return jsonify({"message": "Only business can create parcels"}), 403
+#     if user.user_role != 'Business':
+#         return jsonify({"message": "Only business can create parcels"}), 403
 
-    existing_tracking_numbers = {parcel.tracking_number for parcel in Parcel.query.all()}
-    tracking_number = generate_unique_tracking_number(existing_tracking_numbers)
+#     existing_tracking_numbers = {parcel.tracking_number for parcel in Parcel.query.all()}
+#     tracking_number = generate_unique_tracking_number(existing_tracking_numbers)
 
-    parcel = Parcel(
-        sender_id=data['sender_id'],
-        tracking_number=tracking_number,
-        recipient_name=data['recipient_name'],
-        recipient_address=data['recipient_address'],
-        recipient_phone=data['recipient_phone'],
-        description=data['description'],
-        weight=data['weight'],
-        status=data['status'],
-        current_location=data['current_location'],
-        sender_email=data['sender_email'],
-        recipient_email=data['recipient_email'],
-        category=data['category'],
-        created_at=datetime.now(),
-        updated_at=datetime.now()
-    )
-    db.session.add(parcel)
+#     parcel = Parcel(
+#         sender_id=data['sender_id'],
+#         tracking_number=tracking_number,
+#         recipient_name=data['recipient_name'],
+#         recipient_address=data['recipient_address'],
+#         recipient_phone=data['recipient_phone'],
+#         description=data['description'],
+#         weight=data['weight'],
+#         status=data['status'],
+#         current_location=data['current_location'],
+#         sender_email=data['sender_email'],
+#         recipient_email=data['recipient_email'],
+#         category=data['category'],
+#         created_at=datetime.now(),
+#         updated_at=datetime.now()
+#     )
+#     db.session.add(parcel)
 
-    db.session.flush()  # assigns an id to the parcel without committing it to the database
+#     db.session.flush()  # assigns an id to the parcel without committing it to the database
 
-    new_tracking = Tracking(
-        parcel_id=parcel.parcel_id,
-        location=parcel.current_location,
-        status=parcel.status
-    )
-    db.session.add(new_tracking)
-    db.session.commit()
+#     new_tracking = Tracking(
+#         parcel_id=parcel.parcel_id,
+#         location=parcel.current_location,
+#         status=parcel.status
+#     )
+#     db.session.add(new_tracking)
+#     db.session.commit()
 
-    # Send notifications to sender(seller) and recipient
-    send_notification(parcel.sender_email, 'Parcel Registered', f'Your parcel with tracking number {parcel.tracking_number} has been processed.')
-    send_notification(parcel.recipient_email, 'Parcel Coming Your Way', f'A parcel with tracking number {parcel.tracking_number} is on its way to you.')
+#     # Send notifications to sender(seller) and recipient
+#     send_notification(parcel.sender_email, 'Parcel Registered', f'Your parcel with tracking number {parcel.tracking_number} has been processed.')
+#     send_notification(parcel.recipient_email, 'Parcel Coming Your Way', f'A parcel with tracking number {parcel.tracking_number} is on its way to you.')
 
-    return jsonify({"message": "Parcel created successfully", "tracking_number": parcel.tracking_number}), 201
+#     return jsonify({"message": "Parcel created successfully", "tracking_number": parcel.tracking_number}), 201
 
 
 @app.route('/parcels', methods=['GET'])
@@ -421,8 +429,8 @@ def get_assigned_deliveries():
 @jwt_required()
 def update_delivery_status(delivery_id):
     current_user = User.query.get(get_jwt_identity())
-    if current_user.user_role != 'Business':
-        return jsonify({"message": "Only businesses can update delivery status"}), 403
+    if current_user.user_role != 'Business' or current_user.user_role != 'Agent':
+        return jsonify({"message": "Only agents and businesses can update delivery status"}), 403
     data = request.get_json()
     delivery = Delivery.query.get_or_404(delivery_id)
     delivery.status = data['status']
@@ -529,7 +537,7 @@ def schedule_pickup():
         weight=data['weight'],
         category=data['category'],
         status='Scheduled for Pickup',
-        current_location='Business Location',
+        current_location='Nairobi (Store location)',
         sender_email=user.email,
         recipient_email=data['recipient_email']
     )
@@ -558,6 +566,13 @@ def schedule_pickup():
         status='Scheduled'
     )
     db.session.add(new_delivery)
+
+    new_tracking = Tracking(
+        parcel_id=new_parcel.parcel_id,
+        location=new_parcel.current_location,
+        status=new_parcel.status
+    )
+    db.session.add(new_tracking)
     
     # agent = User.query.get(data['agent_id'])  # TODO: Check on this line
     # agent.status = 'Unavailable'
@@ -568,7 +583,12 @@ def schedule_pickup():
         subject = f"Your parcel {new_parcel.tracking_number} is scheduled for pickup on {pickup_time.isoformat()}"
         body = f"Dear {data.get('recipient_name')},\n\nYour parcel {new_parcel.tracking_number} is scheduled for pickup on {pickup_time.isoformat()}."
         send_notification(recipient_email, subject, body)    
-                
+    selected_agent = data.get('agent_id')
+    if selected_agent:
+        subject = f"New parcel {new_parcel.tracking_number} scheduled for pickup"
+        body = f"A new parcel {new_parcel.tracking_number} is scheduled for you to pickup on {pickup_time.isoformat()}.\n Please log in to your dashboard to accept the pickup.\n Location: {new_parcel.current_location}"
+        send_notification(selected_agent, subject, body)
+
     return jsonify({
         "message": "Pickup scheduled successfully",
         "tracking_number": new_parcel.tracking_number,
@@ -777,6 +797,28 @@ def send_email(to_email, reset_url):
 
     return True
 
+
+# Handle image upload:
+import base64
+import os
+from flask import current_app
+
+def save_base64_image(base64_string, filename):
+    if ',' in base64_string:
+        base64_string = base64_string.split(',', 1)[1]
+    
+    image_data = base64.b64decode(base64_string)
+    
+    upload_dir = os.path.join(current_app.root_path, 'static', 'uploads')
+    if not os.path.exists(upload_dir):
+        os.makedirs(upload_dir)
+    
+    file_path = os.path.join(upload_dir, filename)
+    
+    with open(file_path, 'wb') as f:
+        f.write(image_data)
+    
+    return os.path.join('uploads', filename)
 
 # FACEBOOK webhook
 # oauth = OAuth1(app)

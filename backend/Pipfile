@@ -17,6 +17,7 @@ flask = "*"
 flask-sqlalchemy = "*"
 flask-oauthlib = "*"
 requests = "*"
+pillow = "*"
 
 [dev-packages]
 

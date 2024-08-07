@@ -42,7 +42,7 @@ import Dashboard from "./pages/Agent/Dashboard";
 import DeliveryDetails from "./pages/Agent/DeliveryDetails";
 import DeliveryConfirmation from "./pages/Agent/DeliveryConfirmation";
 import PerformanceMetrics from "./pages/Agent/PerformanceMetrics";
-import IssueReporting from "./pages/Agent/IssueReporting";
+// import IssueReporting from "./pages/Agent/IssueReporting";
 import ManageDeliveries from "./pages/Agent/ManageDeliveries";
 import AddDelivery from "./pages/Agent/AddDelivery";
 import CommunicationTools from "./pages/Agent/CommunicationTools";
@@ -124,7 +124,7 @@ function App() {
               path="/performance-metrics"
               element={<PerformanceMetrics />}
             />
-            <Route path="/issue-reporting" element={<IssueReporting />} />
+            {/* <Route path="/issue-reporting" element={<IssueReporting />} /> */}
             <Route path="/manage-deliveries" element={<ManageDeliveries />} />
             <Route path="/add-delivery" element={<AddDelivery />} />
             <Route
