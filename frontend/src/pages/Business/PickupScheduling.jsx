@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import { UserContext } from "../../Context/UserContext";
 import { server } from "../../../config.json";
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 
 function PickupScheduling() {
+  const { authToken } = useContext(UserContext);
+  const [availableAgents, setAvailableAgents] = useState([]);
   const [formData, setFormData] = useState({
     recipient_name: "",
     recipient_address: "",
@@ -12,7 +15,30 @@ function PickupScheduling() {
     weight: "",
     category: "",
     pickup_time: "",
+    agent_id: "",
   });
+
+  useEffect(() => {
+    const fetchAvailableAgents = async () => {
+      try {
+        const response = await fetch(`${server}/agents`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        if (!response.ok) {
+          throw new Error("Failed to fetch available agents");
+        }
+        const agents = await response.json();
+        setAvailableAgents(agents);
+      } catch (error) {
+        console.error("Error fetching available agents:", error);
+        toast.error("Failed to fetch available agents");
+      }
+    };
+
+    fetchAvailableAgents();
+  }, [authToken]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -29,11 +55,14 @@ function PickupScheduling() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${authToken}`,
         },
         body: JSON.stringify(formData),
       });
-      if (!response.ok) throw new Error("Failed to schedule pickup");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to schedule pickup");
+      }
       const result = await response.json();
       toast.success("Pickup scheduled successfully");
       console.log("Pickup scheduled:", result);
@@ -47,9 +76,10 @@ function PickupScheduling() {
         weight: "",
         category: "",
         pickup_time: "",
+        agent_id: "",
       });
     } catch (error) {
-      toast.error("Failed to schedule pickup");
+      toast.error(error.message || "Failed to schedule pickup");
       console.error("Error scheduling pickup:", error);
     }
   };
@@ -131,6 +161,20 @@ function PickupScheduling() {
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
+        <select
+          name="agent_id"
+          value={formData.agent_id}
+          onChange={handleChange}
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required
+        >
+          <option value="">Select an agent</option>
+          {availableAgents.map((agent) => (
+            <option key={agent.user_id} value={agent.user_id}>
+              {agent.name}
+            </option>
+          ))}
+        </select>
         <button
           type="submit"
           className="w-full px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-md hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"

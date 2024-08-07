@@ -1,7 +1,6 @@
-
-
+/* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
-import config from "../../config.json"; // Import the server URL
+import { server } from "../../../config.json";
 
 export default function ManageDeliveries({ openSidebar }) {
   const [deliveries, setDeliveries] = useState([]);
@@ -9,7 +8,7 @@ export default function ManageDeliveries({ openSidebar }) {
 
   useEffect(() => {
     // Fetch delivery data from the backend
-    fetch(`${config.server}/api/deliveries`) // Use the server URL from config
+    fetch(`${server}/assigned_deliveries`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");

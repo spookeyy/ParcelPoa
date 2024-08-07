@@ -505,6 +505,8 @@ def get_current_location(parcel_id):
 
 # BUSINESS ROUTES
 # Route to schedule a pickup
+from datetime import datetime, timezone
+
 @app.route('/schedule_pickup', methods=['POST'])
 @jwt_required()
 def schedule_pickup():
@@ -543,23 +545,29 @@ def schedule_pickup():
     )
     db.session.add(new_order)
     
+    # Parse the pickup time
+    pickup_time_str = data['pickup_time']
+    if pickup_time_str.endswith('Z'):
+        pickup_time_str = pickup_time_str[:-1]  # Remove the 'Z'
+    pickup_time = datetime.fromisoformat(pickup_time_str).replace(tzinfo=timezone.utc)
 
-    pickup_time = datetime.fromisoformat(data['pickup_time'])
     new_delivery = Delivery(
         parcel_id=new_parcel.parcel_id,
-        agent_id=None,  # This will be assigned later
+        agent_id=user.user_id,
         pickup_time=pickup_time,
         status='Scheduled'
     )
     db.session.add(new_delivery)
     
+    # agent = User.query.get(data['agent_id'])  # TODO: Check on this line
+    # agent.status = 'Unavailable'
     db.session.commit()
 
     recipient_email = data.get('recipient_email')
     if recipient_email:
-            subject = f"Your parcel {new_parcel.tracking_number} is scheduled for pickup on {pickup_time.isoformat()}"
-            body = f"Dear {data.get('recipient_name')},\n\nYour parcel {new_parcel.tracking_number} is scheduled for pickup on {pickup_time.isoformat()}."
-            send_notification(recipient_email, subject, body)    
+        subject = f"Your parcel {new_parcel.tracking_number} is scheduled for pickup on {pickup_time.isoformat()}"
+        body = f"Dear {data.get('recipient_name')},\n\nYour parcel {new_parcel.tracking_number} is scheduled for pickup on {pickup_time.isoformat()}."
+        send_notification(recipient_email, subject, body)    
                 
     return jsonify({
         "message": "Pickup scheduled successfully",

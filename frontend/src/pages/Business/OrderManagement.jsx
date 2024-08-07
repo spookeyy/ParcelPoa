@@ -36,11 +36,14 @@ function OrderManagement() {
         },
         body: JSON.stringify(orderData),
       });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to create order");
-      }
+
       const result = await response.json();
+
+      if (!response.ok) {
+        console.error("Server error response:", result);
+        throw new Error(result.message || "Failed to create order");
+      }
+
       console.log("Order created:", result);
       toast.success("Order created successfully");
       fetchOrders(); // Refresh orders after creating a new one
@@ -49,7 +52,7 @@ function OrderManagement() {
       toast.error(error.message || "Failed to create order");
     }
   };
-
+  
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Order Management</h1>
