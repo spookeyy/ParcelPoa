@@ -1,3 +1,4 @@
+
 import React from "react";
 import Navbar from "./Navbar";
 import { Link } from "react-router-dom";
@@ -7,6 +8,7 @@ export default function Landing() {
   return (
     <div className="bg-white min-h-screen flex flex-col">
       <Navbar />
+
       <div className="container mx-auto p-8 flex-grow">
         <div
           className="bg-white p-8 rounded-lg shadow-lg"
@@ -15,11 +17,11 @@ export default function Landing() {
           <main className="py-16 px-4 flex items-center">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
               <div className="flex flex-col justify-center items-start">
-                <h8 className="text-6xl font-bold  mb-8">
+                <h8 className="text-4xl font-bold  mb-8">
                   <span className="text-indigo-500">ParcelPoa</span>, Deliver
                   your Order
                 </h8>
-                <h10 className="text-4xl font-bold  mb-4">
+                <h10 className="text-2xl font-bold italic mb-4">
                   Speedy Delivery, Reliable Service
                 </h10>
                 <p className="text-lg mb-8">
@@ -39,6 +41,7 @@ export default function Landing() {
                   >
                     Track Order
                   </Link>
+
                 </div>
               </div>
               <div className="mt-16 md:mt-0 w-full">
@@ -50,6 +53,7 @@ export default function Landing() {
               </div>
             </div>
           </main>
+
           <FloatingWhatsApp
             phoneNumber="+254705719325"
             accountName="ParcelPoa"
