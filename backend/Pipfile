@@ -17,6 +17,9 @@ flask = "*"
 flask-sqlalchemy = "*"
 flask-oauthlib = "*"
 requests = "*"
+flask-migrate = "*"
+flask-bcrypt = "*"
+flask-jwt-extended = "*"
 
 [dev-packages]
 
