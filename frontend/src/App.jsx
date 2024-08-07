@@ -10,10 +10,16 @@ import Login from "./components/Login";
 import Create_Account from "./components/Create_Account";
 import SendNotification from "./pages/SendNotification";
 
+//Admin
+import Profile from "./pages/Admin/Profile";
+import AgentRequests from "./pages/Admin/AgentRequest";
+// import AdminLayout from "./components/AdminLayout";
+
+
 // Seller Pages
 import Home from "./pages/Seller/Home";
 import Agents from "./pages/Seller/Agents";
-import Agent_Requests from "./pages/Seller/Agent_Requests";
+// import Agent_Requests from "./pages/Seller/Agent_Requests";
 import Agent_Details from "./pages/Seller/Agent_Details";
 // import Agent_Trends from "./pages/Seller/Agent_Trends";
 import Invoice from "./pages/Seller/Invoice";
@@ -63,113 +69,127 @@ import Terms from "./pages/terms";
 import Returns from "./pages/return";
 import { DeliveryProvider } from "./Context/DeliveryContext";
 
-import AgentRequests from "./pages/Admin/AgentRequest";
+
 function App() {
   return (
     <Router>
       <UserProvider>
         <TrackingProvider>
-        <DeliveryProvider>
-          <Routes>
-            <Route path="/agent-requests" element={<AgentRequests />} />
-            <Route path="/seller" element={<SellerLayout />}>
-              {/* Seller Routes */}
-              <Route path="/seller" element={<Home />} />
-              <Route path="/seller/signup" element={<Create_Account />} />
-              <Route path="/seller/agents" element={<Agents />} />
-              {/* <Route
-                path="/seller/agent-requests"
-                element={<Agent_Requests />}
-              /> */}
-              <Route path="/seller/agent/:id" element={<Agent_Details />} />
-              {/* <Route
+          <DeliveryProvider>
+            <Routes>
+              {/* <Route path="/admin" element={<AdminDashboard />} /> */}
+              <Route path="/admin/requests" element={<AgentRequests />} />
+              <Route path="/admin/profile" element={<Profile />} />
+
+              <Route path="/seller" element={<SellerLayout />}>
+                {/* Seller Routes */}
+                <Route path="/seller" element={<Home />} />
+                <Route path="/seller/signup" element={<Create_Account />} />
+                <Route path="/seller/agents" element={<Agents />} />
+                <Route path="/seller/agent/:id" element={<Agent_Details />} />
+                {/* <Route
                 path="/seller/agent-trends/:id"
                 element={<Agent_Trends />}
               /> */}
-              <Route path="/seller/invoice/:id" element={<Invoice />} />
-              <Route path="/seller/messages-list" element={<Messages_List />} />
+                <Route path="/seller/invoice/:id" element={<Invoice />} />
+                <Route
+                  path="/seller/messages-list"
+                  element={<Messages_List />}
+                />
+                <Route
+                  path="/seller/message/:id"
+                  element={<Messages_Details />}
+                />
+                <Route path="/seller/order-list" element={<Order_List />} />
+                <Route path="/seller/order/:id" element={<Order_Details />} />
+                <Route path="/seller/tracking" element={<Tracking />} />
+                <Route
+                  path="/seller/dashboard-part"
+                  element={<Dashboard_Part />}
+                />
+                <Route
+                  path="/seller/seller-profile"
+                  element={<SellerPofie />}
+                />
+              </Route>
+
+              {/* Buyer Routes */}
+              <Route path="/tracking" element={<OrderTracking />} />
+
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Create_Account />} />
+              {/* <Route path="/agent-requests" element={<Agent_Requests />} /> */}
+              <Route path="/order-list" element={<Order_List />} />
+              <Route path="/order/:id" element={<Order_Details />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/change-password" element={<ChangePassword />} />
+              <Route path="/track/:trackingid" element={<OrderTracking />} />
+              <Route path="/track-orders" element={<TrackOrders />} />
+
+              {/* the pages for the agent */}
+              <Route path="/agent" element={<AgentHome />} />
+              <Route path="/dashboard/*" element={<Dashboard />} />
               <Route
-                path="/seller/message/:id"
-                element={<Messages_Details />}
+                path="/delivery-details/:id"
+                element={<DeliveryDetails />}
               />
-              <Route path="/seller/order-list" element={<Order_List />} />
-              <Route path="/seller/order/:id" element={<Order_Details />} />
-              <Route path="/seller/tracking" element={<Tracking />} />
               <Route
-                path="/seller/dashboard-part"
-                element={<Dashboard_Part />}
+                path="/delivery-confirmation"
+                element={<DeliveryConfirmation />}
               />
-              <Route path="/seller/seller-profile" element={<SellerPofie />} />
-            </Route>
+              <Route
+                path="/performance-metrics"
+                element={<PerformanceMetrics />}
+              />
+              {/* <Route path="/issue-reporting" element={<IssueReporting />} /> */}
+              <Route path="/manage-deliveries" element={<ManageDeliveries />} />
+              <Route path="/add-delivery" element={<AddDelivery />} />
+              <Route
+                path="/communication-tools"
+                element={<CommunicationTools />}
+              />
+              <Route
+                path="/update-parcel-status"
+                element={<UpdateParcelStatusPage />}
+              />
+              {/* <Route path="/agent-login" element={<AgentLogin />} /> */}
+              {/* <Route path="/agent-register" element={<AgentRegister />} /> */}
+              <Route path="/agent-profile" element={<AgentProfile />} />
+              <Route path="/update-status" element={<UpdateStatus />} />
+              {/* end of the pages for the agent */}
 
-            {/* Buyer Routes */}
-            <Route path="/tracking" element={<OrderTracking />} />
+              <Route
+                path="/request-reset-password"
+                element={<RequestResetPassword />}
+              />
+              <Route
+                path="/reset-password/:token"
+                element={<ResetPassword />}
+              />
+              <Route path="/about-us" element={<About />} />
+              <Route path="/contact-us" element={<Contact />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/returns" element={<Returns />} />
+              <Route path="/send-notification" element={<SendNotification />} />
+              <Route path="/" element={<Landing />} />
 
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Create_Account />} />
-            <Route path="/agent-requests" element={<Agent_Requests />} />
-            <Route path="/order-list" element={<Order_List />} />
-            <Route path="/order/:id" element={<Order_Details />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/change-password" element={<ChangePassword />} />
-            <Route path="/track/:trackingid" element={<OrderTracking />} />
-            <Route path="/track-orders" element={<TrackOrders />} />
-
-            {/* the pages for the agent */}
-            <Route path="/agent" element={<AgentHome />} />
-            <Route path="/dashboard/*" element={<Dashboard />} />
-            <Route path="/delivery-details/:id" element={<DeliveryDetails />} />
-            <Route
-              path="/delivery-confirmation"
-              element={<DeliveryConfirmation />}
-            />
-            <Route
-              path="/performance-metrics"
-              element={<PerformanceMetrics />}
-            />
-            {/* <Route path="/issue-reporting" element={<IssueReporting />} /> */}
-            <Route path="/manage-deliveries" element={<ManageDeliveries />} />
-            <Route path="/add-delivery" element={<AddDelivery />} />
-            <Route
-              path="/communication-tools"
-              element={<CommunicationTools />}
-            />
-            <Route
-              path="/update-parcel-status"
-              element={<UpdateParcelStatusPage />}
-            />
-            {/* <Route path="/agent-login" element={<AgentLogin />} /> */}
-            {/* <Route path="/agent-register" element={<AgentRegister />} /> */}
-            <Route path="/agent-profile" element={<AgentProfile />} />
-            <Route path="/update-status" element={<UpdateStatus />} />
-            {/* end of the pages for the agent */}
-
-            <Route
-              path="/request-reset-password"
-              element={<RequestResetPassword />}
-            />
-            <Route path="/reset-password/:token" element={<ResetPassword />} />
-            <Route path="/about-us" element={<About />} />
-            <Route path="/contact-us" element={<Contact />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/returns" element={<Returns />} />
-            <Route path="/send-notification" element={<SendNotification />} />
-            <Route path="/" element={<Landing />} />
-
-            <Route path="/business/dashboard" element={<BusinessDashboard />} />
-            <Route
-              path="/business/parcel-tracking"
-              element={<ParcelTracking />}
-            />
-            <Route
-              path="/business/parcel-tracking/:trackingid"
-              element={<ParcelTracking />}
-            />
-            <Route path="/business/orders" element={<OrderManagement />} />
-            <Route path="/parcels" element={<ParcelForm />} />
-            <Route path="/pickup" element={<PickupScheduling />} />
-          </Routes>
+              <Route
+                path="/business/dashboard"
+                element={<BusinessDashboard />}
+              />
+              <Route
+                path="/business/parcel-tracking"
+                element={<ParcelTracking />}
+              />
+              <Route
+                path="/business/parcel-tracking/:trackingid"
+                element={<ParcelTracking />}
+              />
+              <Route path="/business/orders" element={<OrderManagement />} />
+              <Route path="/parcels" element={<ParcelForm />} />
+              <Route path="/pickup" element={<PickupScheduling />} />
+            </Routes>
           </DeliveryProvider>
         </TrackingProvider>
         <Footer />
@@ -193,7 +213,6 @@ function App() {
           progress={undefined}
           theme="dark"
         />
-        
       </UserProvider>
     </Router>
   );

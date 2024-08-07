@@ -86,7 +86,7 @@ export const UserProvider = ({ children }) => {
           const routes = {
             Agent: "/agent",
             Business: "/seller",
-            Admin: "/agent-requests", //TODO: change this later to "/admin" after peter creates the admin dashboard
+            Admin: "/admin/requests", //TODO: change this later to "/admin" after peter creates the admin dashboard
           };
 
           if (role in routes) {

@@ -233,6 +233,7 @@ def change_password():
     db.session.commit()
     return jsonify({"message": "Password changed successfully"})
 
+#ADMIN
 # approve agent 
 @app.route('/approve-agent/<int:agent_id>', methods=['PUT'])
 @jwt_required()
@@ -302,55 +303,6 @@ def get_businesses():
         return jsonify({"message": "Only admins can get businesses"}), 403
     businesses = User.query.filter_by(user_role='Business').all()
     return jsonify([business.to_dict() for business in businesses])
-
-
-
-# PARCEL ROUTES
-# @app.route('/parcels', methods=['POST'])
-# @jwt_required()
-# def create_parcel():
-#     data = request.get_json()
-#     user = User.query.get(get_jwt_identity())
-    
-#     if user.user_role != 'Business':
-#         return jsonify({"message": "Only business can create parcels"}), 403
-
-#     existing_tracking_numbers = {parcel.tracking_number for parcel in Parcel.query.all()}
-#     tracking_number = generate_unique_tracking_number(existing_tracking_numbers)
-
-#     parcel = Parcel(
-#         sender_id=data['sender_id'],
-#         tracking_number=tracking_number,
-#         recipient_name=data['recipient_name'],
-#         recipient_address=data['recipient_address'],
-#         recipient_phone=data['recipient_phone'],
-#         description=data['description'],
-#         weight=data['weight'],
-#         status=data['status'],
-#         current_location=data['current_location'],
-#         sender_email=data['sender_email'],
-#         recipient_email=data['recipient_email'],
-#         category=data['category'],
-#         created_at=datetime.now(),
-#         updated_at=datetime.now()
-#     )
-#     db.session.add(parcel)
-
-#     db.session.flush()  # assigns an id to the parcel without committing it to the database
-
-#     new_tracking = Tracking(
-#         parcel_id=parcel.parcel_id,
-#         location=parcel.current_location,
-#         status=parcel.status
-#     )
-#     db.session.add(new_tracking)
-#     db.session.commit()
-
-#     # Send notifications to sender(seller) and recipient
-#     send_notification(parcel.sender_email, 'Parcel Registered', f'Your parcel with tracking number {parcel.tracking_number} has been processed.')
-#     send_notification(parcel.recipient_email, 'Parcel Coming Your Way', f'A parcel with tracking number {parcel.tracking_number} is on its way to you.')
-
-#     return jsonify({"message": "Parcel created successfully", "tracking_number": parcel.tracking_number}), 201
 
 
 @app.route('/parcels', methods=['GET'])
@@ -493,7 +445,6 @@ def get_assigned_deliveries():
     if user.user_role != 'Agent':
         return jsonify({"message": "Only agents can get assigned deliveries"}), 403
     deliveries = Delivery.query.filter_by(agent_id=user.user_id).all()
-    print('assigned deliveries', deliveries)
     return jsonify([delivery.to_dict() for delivery in deliveries])
 
 @app.route('/update_delivery_status/<int:delivery_id>', methods=['PUT'])

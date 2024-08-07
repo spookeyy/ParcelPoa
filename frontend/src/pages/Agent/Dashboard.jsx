@@ -13,16 +13,14 @@ export default function Dashboard() {
   const [inTransit, setInTransit] = useState(0);
   const [assignedDeliveries, setAssignedDeliveries] = useState([]);
 
-  // Fetch assigned deliveries
   useEffect(() => {
-    // Assuming you have the JWT stored somewhere
     const jwtToken = localStorage.getItem("jwt");
 
     fetch(`${server}/assigned_deliveries`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${jwtToken}`, // Adding the JWT token
+        Authorization: `Bearer ${jwtToken}`,
       },
     })
       .then((response) => {
@@ -33,16 +31,13 @@ export default function Dashboard() {
       })
       .then((data) => {
         setAssignedDeliveries(data);
-        // Count total deliveries
         setTotalDeliveries(data.length);
 
-        // Count delivered deliveries
         const deliveredCount = data.filter(
           (delivery) => delivery.status === "Delivered"
         ).length;
         setDelivered(deliveredCount);
 
-        // Count in-transit deliveries
         const inTransitCount = data.filter(
           (delivery) => delivery.status === "In Transit"
         ).length;
