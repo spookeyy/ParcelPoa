@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { server } from "../../../config.json";
 
+// Define the getStatus function
 const getStatus = (status) => (status === "Available" ? "Available" : "Unavailable");
 
 // FilterBar Component
@@ -39,16 +40,12 @@ const FilterBar = ({ filters, onFilterChange, onReset }) => (
 export default function Agents() {
   const [agentRequests, setAgentRequests] = useState([]);
   const [filters, setFilters] = useState({ name: "", status: "" });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  
   const navigate = useNavigate();
 
   // Fetch agents data from backend
   const fetchAgents = async () => {
     try {
       const response = await fetch(`${server}/users`);
-
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -56,13 +53,13 @@ export default function Agents() {
       const agents = data.filter(user => user.user_role === "Agent");
       setAgentRequests(agents.map(agent => ({
         ...agent,
-        status: getStatus(agent.status),
+        status: getStatus(agent.deliveries),
       })));
     } catch (error) {
       console.error("Error fetching agents data:", error);
     }
   };
-  
+
   useEffect(() => {
     fetchAgents();
   }, []);
@@ -105,14 +102,9 @@ export default function Agents() {
       (!filters.status || agent.status === filters.status)
   );
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>{error}</div>;
-
-  
-
   return (
-    <>
     <div className="p-6 bg-gray-50 min-h-screen">
+      {/* Title */}
       <h1 className="text-2xl font-bold mb-6 text-gray-800">Agents List</h1>
 
       <FilterBar
@@ -128,7 +120,7 @@ export default function Agents() {
               <th className="px-4 py-2 text-left font-medium">Profile Image</th>
               <th className="px-4 py-2 text-left font-medium">Agent ID</th>
               <th className="px-4 py-2 text-left font-medium">Name</th>
-              <th className="px-4 py-2 text-left font-medium">Contact</th>
+              <th className="px-4 py-2 text-left font-medium">Email</th>
               <th className="px-4 py-2 text-left font-medium">Phone</th>
               {/* <th className="px-4 py-2 text-left font-medium">Address</th>
               <th className="px-4 py-2 text-left font-medium">Deliveries</th> */}
@@ -139,7 +131,7 @@ export default function Agents() {
           <tbody className="text-gray-700 text-sm">
             {filteredAgentRequests.map((agent) => (
               <tr
-                key={agent.user_id}
+                key={agent.id}
                 className="hover:bg-gray-50 transition-colors duration-300"
               >
                 <td className="px-4 py-2">
@@ -149,9 +141,7 @@ export default function Agents() {
                     className="w-12 h-12 rounded-full object-cover"
                   />
                 </td>
-                <td className="px-4 py-2">{agent.user_id}</td>
-                <td className="px-4 py-2">{agent.user_id}</td>
-                <td className="px-4 py-2">{agent.user_id}</td>
+                <td className="px-4 py-2">{agent.id}</td>
                 <td className="px-4 py-2">{agent.name}</td>
                 <td className="px-4 py-2">{agent.email}</td>
                 <td className="px-4 py-2">{agent.phone_number}</td>
@@ -170,16 +160,16 @@ export default function Agents() {
                 </td>
                 <td className="px-4 py-2 flex items-center gap-2">
                   <button
-                    onClick={() => handleView(agent.user_id)}
+                    onClick={() => handleView(agent.id)}
                     className="text-blue-600 hover:text-blue-800 transition-colors duration-300 text-base"
-                    aria-label={`View Agent ID: ${agent.user_id}`}
+                    aria-label={`View Agent ID: ${agent.id}`}
                   >
                     <PencilIcon className="w-5 h-5" />
                   </button>
                   <button
-                    onClick={() => handleDelete(agent.user_id)}
+                    onClick={() => handleDelete(agent.id)}
                     className="text-gray-600 hover:text-gray-800 transition-colors duration-300 text-base"
-                    aria-label={`Delete Agent ID: ${agent.user_id}`}
+                    aria-label={`Delete Agent ID: ${agent.id}`}
                   >
                     <TrashIcon className="w-5 h-5" />
                   </button>
@@ -188,20 +178,7 @@ export default function Agents() {
             ))}
           </tbody>
         </table>
-        </div>
       </div>
-          </>
+    </div>
   );
 }
-
-
-
-
-
-
-        
-
-
-
-
-
