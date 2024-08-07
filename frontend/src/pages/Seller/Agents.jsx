@@ -41,6 +41,7 @@ export default function Agents() {
   const [filters, setFilters] = useState({ name: "", status: "" });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
   const navigate = useNavigate();
 
   // Fetch agents data from backend
@@ -107,6 +108,8 @@ export default function Agents() {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
 
+  
+
   return (
     <>
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -146,6 +149,7 @@ export default function Agents() {
                     className="w-12 h-12 rounded-full object-cover"
                   />
                 </td>
+                <td className="px-4 py-2">{agent.user_id}</td>
                 <td className="px-4 py-2">{agent.user_id}</td>
                 <td className="px-4 py-2">{agent.user_id}</td>
                 <td className="px-4 py-2">{agent.name}</td>
@@ -190,6 +194,12 @@ export default function Agents() {
   );
 }
 
+
+
+
+
+
+        
 
 
 
