@@ -30,7 +30,6 @@ function PickupScheduling() {
           throw new Error("Failed to fetch available agents");
         }
         const agents = await response.json();
-        console.log("Available agents:", agents);
         setAvailableAgents(agents);
       } catch (error) {
         console.error("Error fetching available agents:", error);
@@ -66,8 +65,6 @@ function PickupScheduling() {
       }
       const result = await response.json();
       toast.success("Pickup scheduled successfully");
-      console.log("Pickup scheduled:", result);
-      // Clear form after successful scheduling
       setFormData({
         recipient_name: "",
         recipient_address: "",
@@ -86,101 +83,114 @@ function PickupScheduling() {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 mb-4 lg:mb-0">
-      <h2 className="text-2xl font-semibold mb-4 text-gray-800">Schedule Pickup</h2>
-      <form onSubmit={schedulePickup} className="space-y-4">
-        <input
-          type="text"
-          name="recipient_name"
-          value={formData.recipient_name}
-          onChange={handleChange}
-          placeholder="Recipient Name"
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-        <input
-          type="text"
-          name="recipient_address"
-          value={formData.recipient_address}
-          onChange={handleChange}
-          placeholder="Recipient Address"
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-        <input
-          type="tel"
-          name="recipient_phone"
-          value={formData.recipient_phone}
-          onChange={handleChange}
-          placeholder="Recipient Phone"
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-        <input
-          type="email"
-          name="recipient_email"
-          value={formData.recipient_email}
-          onChange={handleChange}
-          placeholder="Recipient Email"
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-        <input
-          type="text"
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          placeholder="Parcel Description"
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-        <input
-          type="number"
-          name="weight"
-          value={formData.weight}
-          onChange={handleChange}
-          placeholder="Weight (kg)"
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-        <input
-          type="text"
-          name="category"
-          value={formData.category}
-          onChange={handleChange}
-          placeholder="Category"
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-        <input
-          type="datetime-local"
-          name="pickup_time"
-          value={formData.pickup_time}
-          onChange={handleChange}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-        <select
-          name="agent_id"
-          value={formData.agent_id}
-          onChange={handleChange}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        >
-          <option value="">Select an agent</option>
-          {availableAgents.map((agent) => (
-            <option key={agent.user_id} value={agent.user_id}>
-              {agent.name}
-            </option>
-          ))}
-        </select>
-        <button
-          type="submit"
-          className="w-full px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-md hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
-          Schedule Pickup
-        </button>
-      </form>
+    <div className="bg-gradient-to-br from-blue-300 to-indigo-400 rounded-lg shadow-md p-6 mb-4 lg:mb-0 max-w-5xl mx-auto pb-8">
+      <div className="flex flex-col lg:flex-row items-center justify-center space-y-6 lg:space-y-0 lg:space-x-6">
+        {/* Image Section */}
+        <div className="flex-1 mb-6 md:mb-0 lg:mb-0 lg:max-w-md">
+          <img
+            src="https://img.freepik.com/free-photo/close-up-woman-shopping-store_23-2149241401.jpg?t=st=1723061496~exp=1723065096~hmac=06e9f4b9d2fcc6f95767eb2443eb604810f1826c2b3849a10b9d630b9ff340c8&w=740"
+            alt="Pickup"
+            className="w-full h-auto rounded-lg shadow-md"
+          />
+        </div>
+        {/* Form Section */}
+        <div className="flex-1 max-w-full lg:max-w-md">
+          <h2 className="text-2xl lg:text-3xl text-center font-semibold mb-6 lg:mb-8 text-white">Schedule Pickup</h2>
+          <form onSubmit={schedulePickup} className="space-y-6 lg:space-y-8">
+            <input
+              type="text"
+              name="recipient_name"
+              value={formData.recipient_name}
+              onChange={handleChange}
+              placeholder="Recipient Name"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <input
+              type="text"
+              name="recipient_address"
+              value={formData.recipient_address}
+              onChange={handleChange}
+              placeholder="Recipient Address"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <input
+              type="tel"
+              name="recipient_phone"
+              value={formData.recipient_phone}
+              onChange={handleChange}
+              placeholder="Recipient Phone"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <input
+              type="email"
+              name="recipient_email"
+              value={formData.recipient_email}
+              onChange={handleChange}
+              placeholder="Recipient Email"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <input
+              type="text"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Parcel Description"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <input
+              type="number"
+              name="weight"
+              value={formData.weight}
+              onChange={handleChange}
+              placeholder="Weight (kg)"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <input
+              type="text"
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+              placeholder="Category"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <input
+              type="datetime-local"
+              name="pickup_time"
+              value={formData.pickup_time}
+              onChange={handleChange}
+              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <select
+              name="agent_id"
+              value={formData.agent_id}
+              onChange={handleChange}
+              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            >
+              <option value="">Select an agent</option>
+              {availableAgents.map((agent) => (
+                <option key={agent.user_id} value={agent.user_id}>
+                  {agent.name}
+                </option>
+              ))}
+            </select>
+            <button
+              type="submit"
+              className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-md hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              Schedule Pickup
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }
