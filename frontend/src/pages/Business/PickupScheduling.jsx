@@ -21,7 +21,7 @@ function PickupScheduling() {
   useEffect(() => {
     const fetchAvailableAgents = async () => {
       try {
-        const response = await fetch(`${server}/agents`, {
+        const response = await fetch(`${server}/get-available-agents`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
@@ -30,6 +30,7 @@ function PickupScheduling() {
           throw new Error("Failed to fetch available agents");
         }
         const agents = await response.json();
+        console.log("Available agents:", agents);
         setAvailableAgents(agents);
       } catch (error) {
         console.error("Error fetching available agents:", error);

@@ -239,7 +239,6 @@ def change_password():
 def approve_agent(agent_id):
     current_user = User.query.get(get_jwt_identity())
     
-    # Check if the current user is an admin
     if current_user.user_role != 'Admin':
         return jsonify({"message": "Only admins can approve agent requests"}), 403
     
@@ -251,12 +250,15 @@ def approve_agent(agent_id):
         return jsonify({"message": "Agent is not in pending status"}), 400
     
     agent.Request = 'Approved'
-    agent.status = 'Available'  # Set the status to Available
+    agent.status = 'Available'
     db.session.commit()
     
     # Send notification to the agent
-    send_notification(agent.email, 'Agent Request Approved', 
-                      f'Your agent request has been approved. Welcome to our system!')
+    if is_valid_email(agent.email):
+        send_notification(agent.email, 'Agent Request Approved', 
+                          f'Your agent request has been approved. Welcome to our system!')
+    else:
+        print(f"Invalid email for agent {agent_id}: {agent.email}. Notification not sent.")
     
     return jsonify({"message": "Agent request approved successfully"}), 200
 
@@ -281,10 +283,14 @@ def reject_agent(agent_id):
     db.session.commit()
     
     # Send notification to the agent
-    send_notification(agent.email, 'Agent Request Rejected', 
-                      f'We regret to inform you that your agent request has been rejected.')
+    if is_valid_email(agent.email):
+        send_notification(agent.email, 'Agent Request Rejected', 
+                          f'Your agent request has been rejected. Please try again later.')
+    else:
+        print(f"Invalid email for agent {agent_id}: {agent.email}. Notification not sent.")
     
     return jsonify({"message": "Agent request rejected successfully"}), 200
+
 
 
 # get all businesses as an admin
@@ -623,10 +629,15 @@ def schedule_pickup():
     if pickup_time_str.endswith('Z'):
         pickup_time_str = pickup_time_str[:-1]  # Remove the 'Z'
     pickup_time = datetime.fromisoformat(pickup_time_str).replace(tzinfo=timezone.utc)
-
+    
+    # Ensure selected_agent is provided
+    selected_agent = data.get('agent_id')
+    if not selected_agent:
+        return jsonify({"message": "Agent ID must be provided"}), 400
+    
     new_delivery = Delivery(
         parcel_id=new_parcel.parcel_id,
-        agent_id=user.user_id,
+        agent_id=selected_agent,
         pickup_time=pickup_time,
         status='Scheduled'
     )
@@ -639,26 +650,35 @@ def schedule_pickup():
     )
     db.session.add(new_tracking)
     
-    # agent = User.query.get(data['agent_id'])  # TODO: Check on this line
-    # agent.status = 'Unavailable'
+    # Update the status of the selected agent to 'Unavailable'
+    agent = User.query.get(selected_agent)
+    if agent:
+        agent.status = 'Unavailable'
+    else:
+        return jsonify({"message": "Invalid agent ID provided"}), 400
+    
     db.session.commit()
 
     recipient_email = data.get('recipient_email')
     if recipient_email:
         subject = f"Your parcel {new_parcel.tracking_number} is scheduled for pickup on {pickup_time.isoformat()}"
         body = f"Dear {data.get('recipient_name')},\n\nYour parcel {new_parcel.tracking_number} is scheduled for pickup on {pickup_time.isoformat()}."
-        send_notification(recipient_email, subject, body)    
-    selected_agent = data.get('agent_id')
+        send_notification(recipient_email, subject, body)
+    
     if selected_agent:
-        subject = f"New parcel {new_parcel.tracking_number} scheduled for pickup"
-        body = f"A new parcel {new_parcel.tracking_number} is scheduled for you to pickup on {pickup_time.isoformat()}.\n Please log in to your dashboard to accept the pickup.\n Location: {new_parcel.current_location}"
-        send_notification(selected_agent, subject, body)
+        agent_user = User.query.get(selected_agent)
+        if agent_user:
+            agent_email = agent_user.email
+            subject = f"New parcel {new_parcel.tracking_number} scheduled for pickup"
+            body = f"A new parcel {new_parcel.tracking_number} is scheduled for you to pickup on {pickup_time.isoformat()}.\nPlease log in to your dashboard to accept the pickup.\nLocation: {new_parcel.current_location}"
+            send_notification(agent_email, subject, body)
 
     return jsonify({
         "message": "Pickup scheduled successfully",
         "tracking_number": new_parcel.tracking_number,
         "pickup_time": pickup_time.isoformat()
     }), 201
+
 
 # Route to get all orders for a business
 @app.route('/business/orders', methods=['GET'])
@@ -726,6 +746,17 @@ def get_agents():
     return jsonify([agent.to_dict() for agent in agents])
 
 
+#available agents
+@app.route('/get-available-agents', methods=['GET'])
+@jwt_required()
+def get_available_agents():
+    user = User.query.get(get_jwt_identity())
+    if user.user_role == 'Agent':
+        return jsonify({"message": "Only admins and Businesses can get available agents"}), 403
+    
+    agents = User.query.filter_by(user_role='Agent', status='Available').all()
+    print('agents', agents)
+    return jsonify([agent.to_dict() for agent in agents])
 
 
 # TODO: ORDER ROUTES
@@ -745,8 +776,17 @@ def get_orders():
 # TODO: NOTIFICATION
 
 def send_notification(email, subject, body):
-    msg = Message(subject, recipients=[email], body=body)
-    mail.send(msg)
+    if not is_valid_email(email):
+        print(f"Invalid email address: {email}. Notification not sent.")
+        return
+
+    with app.app_context():
+        try:
+            msg = Message(subject, recipients=[email], body=body)
+            mail.send(msg)
+            print(f"Notification sent to {email}")
+        except Exception as e:
+            print(f"Failed to send notification to {email}: {str(e)}")
 
 # generate tracking numbers
 def generate_unique_tracking_number(existing_numbers):
@@ -863,6 +903,12 @@ def send_email(to_email, reset_url):
 
     return True
 
+#is valid email
+import re
+
+def is_valid_email(email):
+    pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+    return re.match(pattern, email) is not None
 
 # Handle image upload:
 import base64

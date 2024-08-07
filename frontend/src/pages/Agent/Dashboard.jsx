@@ -1,12 +1,57 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import AgentHeader from "./DashboardComponentsforAgent/AgentHeader";
 import StatsCard from "./DashboardComponentsforAgent/StatsCard";
 import Deliveries from "./DashboardComponentsforAgent/Deliveries";
 import ManageDeliveries from "./ManageDeliveries";
+import { server } from "../../../config.json";
 
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [totalDeliveries, setTotalDeliveries] = useState(0);
+  const [delivered, setDelivered] = useState(0);
+  const [inTransit, setInTransit] = useState(0);
+  const [assignedDeliveries, setAssignedDeliveries] = useState([]);
+
+  // Fetch assigned deliveries
+  useEffect(() => {
+    // Assuming you have the JWT stored somewhere
+    const jwtToken = localStorage.getItem("jwt");
+
+    fetch(`${server}/assigned_deliveries`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${jwtToken}`, // Adding the JWT token
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error("Failed to fetch deliveries");
+      })
+      .then((data) => {
+        setAssignedDeliveries(data);
+        // Count total deliveries
+        setTotalDeliveries(data.length);
+
+        // Count delivered deliveries
+        const deliveredCount = data.filter(
+          (delivery) => delivery.status === "Delivered"
+        ).length;
+        setDelivered(deliveredCount);
+
+        // Count in-transit deliveries
+        const inTransitCount = data.filter(
+          (delivery) => delivery.status === "In Transit"
+        ).length;
+        setInTransit(inTransitCount);
+      })
+      .catch((error) => {
+        console.error("Error fetching deliveries:", error);
+      });
+  }, []);
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -16,11 +61,10 @@ export default function Dashboard() {
     setSidebarOpen(true);
   };
 
-
   return (
     <div className="flex h-full overflow-hidden bg-gradient-to-br from-blue-300 to-indigo-700">
-        <AgentHeader />
-     <div className="mt-24 flex-1 overflow-y-auto px-4 py-2">
+      <AgentHeader />
+      <div className="mt-24 flex-1 overflow-y-auto px-4 py-2">
         <Routes>
           <Route
             path="/manage-deliveries"
@@ -29,45 +73,36 @@ export default function Dashboard() {
           <Route
             path="/"
             element={
-              
-              <div className="flex flex-col flex-1 ">
+              <div className="flex flex-col flex-1">
                 <div className="flex flex-wrap justify-center gap-6 px-6 mb-8">
                   <StatsCard
                     icon="fa-chart-line"
                     title="Total Deliveries"
-                    count={120}
+                    count={totalDeliveries}
                     color="text-green-500"
                   />
                   <StatsCard
                     icon="fa-truck"
                     title="Delivered"
-                    count={45}
+                    count={delivered}
                     color="text-yellow-500"
-                  />
-                  <StatsCard
-                    icon="fa-hourglass-half"
-                    title="Pending Deliveries"
-                    count={75}
-                    color="text-blue-500"
                   />
                   <StatsCard
                     icon="fa-truck-loading"
                     title="In Transit"
-                    count={30}
+                    count={inTransit}
                     color="text-red-500"
                   />
                 </div>
 
                 <div className="px-6 mb-8">
-                  <Deliveries />
+                  <Deliveries deliveries={assignedDeliveries} />
                 </div>
               </div>
             }
-
           />
         </Routes>
-        </div>
       </div>
-    // </div>
+    </div>
   );
 }
