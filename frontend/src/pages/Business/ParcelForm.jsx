@@ -14,14 +14,39 @@ function ParcelForm({ onSubmit }) {
   });
 
   const handleChange = (e) => {
-    setParcelData({ ...parcelData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === "pickup_time") {
+      // Convert the datetime-local value to ISO string
+      const date = new Date(value);
+      setParcelData((prevData) => ({
+        ...prevData,
+        [name]: date.toISOString(),
+      }));
+    } else {
+      setParcelData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(parcelData);
-  };
+    // Basic validation
+    if (Object.values(parcelData).some((value) => value === "")) {
+      alert("Please fill in all fields");
+      return;
+    }
 
+    // Convert weight to a number
+    const formattedData = {
+      ...parcelData,
+      weight: parseFloat(parcelData.weight),
+    };
+    console.log("Submitting order data:", formattedData);
+    onSubmit(formattedData);
+    console.log("Pickup time:", formattedData.pickup_time);
+  };
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <input
@@ -85,7 +110,9 @@ function ParcelForm({ onSubmit }) {
       />
       <input
         name="pickup_time"
-        value={parcelData.pickup_time}
+        value={
+          parcelData.pickup_time ? parcelData.pickup_time.slice(0, 16) : ""
+        }
         onChange={handleChange}
         type="datetime-local"
         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

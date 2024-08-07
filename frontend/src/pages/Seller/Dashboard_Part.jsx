@@ -105,12 +105,13 @@ export default function Dashboard_Part() {
   if (error) return <div>{error}</div>;
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 bg-gray-100">
-      <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 sm:mb-8">
+    <div className="p-4 mt-20 sm:p-6 lg:p-8 bg-gray-100">
+      <h1 className="text-2xl  sm:text-3xl font-bold text-gray-800 mb-6 sm:mb-8">
         Dashboard Overview
       </h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+      {/* Responsive grid layout */}
+      <div className="grid  grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
         {cards.map((card, index) => (
           <div
             key={index}

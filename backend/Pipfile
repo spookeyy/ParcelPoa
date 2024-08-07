@@ -17,9 +17,13 @@ flask = "*"
 flask-sqlalchemy = "*"
 flask-oauthlib = "*"
 requests = "*"
+<<<<<<< HEAD
 flask-migrate = "*"
 flask-bcrypt = "*"
 flask-jwt-extended = "*"
+=======
+pillow = "*"
+>>>>>>> 4d791e8038c4c31038278c959049a1536bc7a587
 
 [dev-packages]
 

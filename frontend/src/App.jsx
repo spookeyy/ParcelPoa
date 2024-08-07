@@ -15,7 +15,7 @@ import Home from "./pages/Seller/Home";
 import Agents from "./pages/Seller/Agents";
 import Agent_Requests from "./pages/Seller/Agent_Requests";
 import Agent_Details from "./pages/Seller/Agent_Details";
-import Agent_Trends from "./pages/Seller/Agent_Trends";
+// import Agent_Trends from "./pages/Seller/Agent_Trends";
 import Invoice from "./pages/Seller/Invoice";
 import Messages_List from "./pages/Seller/Messages_List";
 import Messages_Details from "./pages/Seller/Messages_Details";
@@ -42,7 +42,7 @@ import Dashboard from "./pages/Agent/Dashboard";
 import DeliveryDetails from "./pages/Agent/DeliveryDetails";
 import DeliveryConfirmation from "./pages/Agent/DeliveryConfirmation";
 import PerformanceMetrics from "./pages/Agent/PerformanceMetrics";
-import IssueReporting from "./pages/Agent/IssueReporting";
+// import IssueReporting from "./pages/Agent/IssueReporting";
 import ManageDeliveries from "./pages/Agent/ManageDeliveries";
 import AddDelivery from "./pages/Agent/AddDelivery";
 import CommunicationTools from "./pages/Agent/CommunicationTools";
@@ -124,7 +124,7 @@ function App() {
               path="/performance-metrics"
               element={<PerformanceMetrics />}
             />
-            <Route path="/issue-reporting" element={<IssueReporting />} />
+            {/* <Route path="/issue-reporting" element={<IssueReporting />} /> */}
             <Route path="/manage-deliveries" element={<ManageDeliveries />} />
             <Route path="/add-delivery" element={<AddDelivery />} />
             <Route

@@ -12,8 +12,10 @@ export default function SellerProfile({ onClose }) {
   const [userRole, setUserRole] = useState("");
   const [message, setMessage] = useState("");
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const [userName, setUserName] = useState("");
 
   const { authToken } = useContext(UserContext);
+  const userInitial = userName.charAt(0).toUpperCase();
 
   useEffect(() => {
     fetchProfile();
@@ -32,6 +34,8 @@ export default function SellerProfile({ onClose }) {
         setEmail(profile.email);
         setPhoneNumber(profile.phone_number);
         setUserRole(profile.user_role);
+        setUserName(profile.name);
+
       })
       .catch((error) => {
         toast.error("An error occurred while fetching the profile");

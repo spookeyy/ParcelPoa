@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { UserContext } from "../Context/UserContext";
 import { toast } from "react-toastify";
+import Navbar from "./Navbar";
 
 export default function ResetPassword() {
   const [newPassword, setNewPassword] = useState("");
@@ -27,8 +28,10 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="flex items-center justify-center bg-gray-100 p-6 dark:bg-gray-900 dark:text-gray-100">
-      <form onSubmit={handleSubmit} className="max-w-sm mx-auto">
+    <>
+      <Navbar />
+    <div className="flex items-center justify-center bg-gray-100 p-6  dark:bg-gray-900 dark:text-gray-100">
+      <form onSubmit={handleSubmit} className="max-w-sm mx-auto mb-12">
         <div className="mb-5">
           <label
             htmlFor="newPassword"
@@ -69,5 +72,6 @@ export default function ResetPassword() {
         </button>
       </form>
     </div>
+    </>
   );
 }

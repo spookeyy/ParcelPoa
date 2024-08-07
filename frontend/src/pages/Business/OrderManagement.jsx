@@ -1,74 +1,85 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { UserContext } from "../../Context/UserContext";
 import ParcelForm from "./ParcelForm";
-import {server} from "../../../config.json";
+import { server } from "../../../config.json";
+import { toast } from "react-toastify";
+
 function OrderManagement() {
   const [orders, setOrders] = useState([]);
+  const { authToken } = useContext(UserContext);
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await fetch(`${server}/business/orders`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
-        if (!response.ok) throw new Error("Failed to fetch orders");
-        const ordersData = await response.json();
-        setOrders(ordersData);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      }
-    };
-
     fetchOrders();
   }, []);
 
+  const fetchOrders = async () => {
+    try {
+      const response = await fetch(`${server}/business/orders`, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      if (!response.ok) throw new Error("Failed to fetch orders");
+      const ordersData = await response.json();
+      setOrders(ordersData);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      toast.error("Failed to fetch orders");
+    }
+  };
+
   const createOrder = async (orderData) => {
     try {
-      console.log("OrderData", orderData);
       const response = await fetch(`${server}/schedule_pickup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${authToken}`,
         },
         body: JSON.stringify(orderData),
       });
-      if (!response.ok) throw new Error("Failed to create order");
-      const result = await response.json();
-      console.log("Order created:", result);
 
-      // Refresh orders after creating a new one
-      const updatedOrdersResponse = await fetch(`${server}/business/orders`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-      if (!updatedOrdersResponse.ok)
-        throw new Error("Failed to fetch updated orders");
-      const updatedOrders = await updatedOrdersResponse.json();
-      setOrders(updatedOrders);
+      const result = await response.json();
+
+      if (!response.ok) {
+        console.error("Server error response:", result);
+        throw new Error(result.message || "Failed to create order");
+      }
+
+      console.log("Order created:", result);
+      toast.success("Order created successfully");
+      fetchOrders(); // Refresh orders after creating a new one
     } catch (error) {
       console.error("Error creating order:", error);
+      toast.error(error.message || "Failed to create order");
     }
   };
-
+  
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-        Order Management
-      </h2>
-      <ParcelForm onSubmit={createOrder} />
-      <div className="mt-6">
-        <h3 className="text-lg font-medium mb-2 text-gray-700">
-          Recent Orders
-        </h3>
-        <ul className="space-y-2">
-          {orders.map((order) => (
-            <li
-              key={order.order_id}
-              className="bg-gray-50 p-3 rounded-md text-gray-700"
-            >
-              {order.parcel.tracking_number} - {order.status}
-            </li>
-          ))}
-        </ul>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">Order Management</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+          <h2 className="text-2xl font-semibold mb-4">Create New Order</h2>
+          <ParcelForm onSubmit={createOrder} />
+        </div>
+        <div>
+          <h2 className="text-2xl font-semibold mb-4">Recent Orders</h2>
+          <div className="bg-white shadow overflow-hidden sm:rounded-md">
+            <ul className="divide-y divide-gray-200">
+              {orders.map((order) => (
+                <li key={order.parcel.tracking_number} className="px-6 py-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-900">
+                      {order.parcel.tracking_number}
+                    </span>
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                      {order.status}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   );

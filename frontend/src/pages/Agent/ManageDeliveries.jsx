@@ -1,5 +1,7 @@
+
+
 import React, { useState, useEffect } from "react";
-import {server} from "../../../config.json"; // Import the server URL
+import config from "../../config.json"; // Import the server URL
 
 export default function ManageDeliveries({ openSidebar }) {
   const [deliveries, setDeliveries] = useState([]);
@@ -7,7 +9,7 @@ export default function ManageDeliveries({ openSidebar }) {
 
   useEffect(() => {
     // Fetch delivery data from the backend
-    fetch(`${server}/assigned_deliveries`) // Use the server URL from config
+    fetch(`${config.server}/api/deliveries`) // Use the server URL from config
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");

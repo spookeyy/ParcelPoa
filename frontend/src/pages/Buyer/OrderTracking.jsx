@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   faSearch,
   faSpinner,
@@ -13,6 +14,16 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useTracking } from "../../Context/TrackingContext";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+
+library.add(
+  faSearch,
+  faSpinner,
+  faExclamationCircle,
+  faCheckCircle,
+  faBox,
+  faTruck,
+  faShippingFast
+);
 
 const OrderTracking = () => {
   const { trackingNumber } = useParams();
@@ -38,13 +49,19 @@ const OrderTracking = () => {
   const statusIcon = (status) => {
     switch (status) {
       case "Delivered":
-        return faCheckCircle;
+        return { icon: faCheckCircle, color: "bg-green-500" };
       case "Out for Delivery":
-        return faShippingFast;
+        return { icon: faShippingFast, color: "bg-blue-500" };
       case "In Transit":
-        return faTruck;
+        return { icon: faTruck, color: "bg-yellow-500" };
+      case "Scheduled for Pickup":
+        return { icon: faSpinner, color: "bg-gray-500" };
+      case "Picked Up":
+        return { icon: faCheckCircle, color: "bg-green-800" };
+      case "Cancelled":
+        return { icon: faExclamationCircle, color: "bg-red-500" };
       default:
-        return faBox;
+        return { icon: faBox, color: "bg-gray-500" };
     }
   };
 
@@ -119,9 +136,13 @@ const OrderTracking = () => {
                   )}
                   <div className="relative flex items-start space-x-3">
                     <div className="flex-shrink-0">
-                      <span className="h-8 w-8 rounded-full bg-gray-500 flex items-center justify-center ring-4 ring-white">
+                      <span
+                        className={`h-8 w-8 rounded-full ${
+                          statusIcon(track.status).color
+                        } flex items-center justify-center ring-4 ring-white`}
+                      >
                         <FontAwesomeIcon
-                          icon={statusIcon(track.status)}
+                          icon={statusIcon(track.status).icon}
                           className="text-white text-sm"
                         />
                       </span>
