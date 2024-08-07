@@ -1,8 +1,8 @@
-"""empty message
+"""new migration
 
-Revision ID: 101181bd5df2
+Revision ID: 98a4d728f108
 Revises: 
-Create Date: 2024-08-05 21:57:11.513571
+Create Date: 2024-08-07 18:25:05.007412
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '101181bd5df2'
+revision = '98a4d728f108'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -23,12 +23,13 @@ def upgrade():
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('email', sa.String(), nullable=False),
     sa.Column('phone_number', sa.String(), nullable=False),
-    sa.Column('user_role', sa.Enum('Business', 'Agent', name='user_roles'), nullable=False),
+    sa.Column('user_role', sa.Enum('Business', 'Agent', 'Admin', name='user_roles'), nullable=False),
     sa.Column('created_at', sa.TIMESTAMP(), nullable=False),
     sa.Column('updated_at', sa.TIMESTAMP(), nullable=False),
     sa.Column('password_hash', sa.String(length=128), nullable=False),
     sa.Column('profile_picture', sa.String(), nullable=True),
     sa.Column('status', sa.Enum('Available', 'Unavailable', name='user_statuses'), nullable=True),
+    sa.Column('Request', sa.Enum('Approved', 'Pending', 'Rejected', name='approval_statuses'), nullable=True),
     sa.PrimaryKeyConstraint('user_id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('phone_number')
@@ -80,6 +81,7 @@ def upgrade():
     )
     op.create_table('orders',
     sa.Column('order_id', sa.Integer(), nullable=False),
+    sa.Column('order_number', sa.String(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('parcel_id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.TIMESTAMP(), nullable=False),

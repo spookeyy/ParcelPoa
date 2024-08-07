@@ -61,7 +61,7 @@ function OrderManagement() {
           <h2 className="text-2xl font-semibold mb-4">Create New Order</h2>
           <ParcelForm onSubmit={createOrder} />
         </div>
-        <div>
+        <div className="col-span-1 ">
           <h2 className="text-2xl font-semibold mb-4">Recent Orders</h2>
           <div className="bg-white shadow overflow-hidden sm:rounded-md">
             <ul className="divide-y divide-gray-200">

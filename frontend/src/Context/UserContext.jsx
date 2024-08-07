@@ -82,13 +82,19 @@ export const UserProvider = ({ children }) => {
           localStorage.setItem("access_token", res.access_token);
           setCurrentUser(res.user);
 
-          if (res.user.role === "Agent" || res.user.role === "Business") {
-            toast.success(`Logged in Successfully as ${res.user.role}!`);
-            // TODO: navigate to dashboards check on business from peter
-            nav(res.user.role === "Agent" ? "/agent" : "/seller");
+          const { role } = res.user;
+          const routes = {
+            Agent: "/agent",
+            Business: "/seller",
+            Admin: "/agent-requests", //TODO: change this later to "/admin" after peter creates the admin dashboard
+          };
+
+          if (role in routes) {
+            toast.success(`Logged in Successfully as ${role}!`);
+            nav(routes[role]);
           } else {
-            console.error("Unexpected role:", res.user.role);
-            throw new Error(`Unexpected role: ${res.user.role}`);
+            console.error("Unexpected role:", role);
+            throw new Error(`Unexpected role: ${role}`);
           }
         } else if (res.message) {
           throw new Error(res.message);
@@ -102,6 +108,7 @@ export const UserProvider = ({ children }) => {
         throw error;
       });
   }
+
 
   // UPDATE USER
   const updateUser = (name, email, phone_number) => {
@@ -236,6 +243,54 @@ export const UserProvider = ({ children }) => {
       });
   };
 
+  // APPROVE AGENT REQUEST
+  const approveAgentRequest = (agentId) => {
+    return fetch(`${server}/approve-agent/${agentId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        if (res.message) {
+          toast.success(res.message);
+          return res;
+        } else {
+          throw new Error("An unexpected error occurred");
+        }
+      })
+      .catch((error) => {
+        toast.error("An error occurred");
+        throw error;
+      });
+  };
+
+  // REJECT AGENT REQUEST
+  const rejectAgentRequest = (agentId) => {
+    return fetch(`${server}/reject-agent/${agentId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        if (res.message) {
+          toast.success(res.message);
+          return res;
+        } else {
+          throw new Error("An unexpected error occurred");
+        }
+      })
+      .catch((error) => {
+        toast.error("An error occurred");
+        throw error;
+      });
+  };
+
   const contextData = {
     currentUser,
     setCurrentUser,
@@ -249,7 +304,10 @@ export const UserProvider = ({ children }) => {
     onChange,
     setOnChange,
     resetPassword,
+    approveAgentRequest,
+    rejectAgentRequest,
   };
+
 
   return (
     <UserContext.Provider value={contextData}>{children}</UserContext.Provider>

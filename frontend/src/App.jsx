@@ -62,6 +62,8 @@ import PrivacyPolicy from "./pages/policy";
 import Terms from "./pages/terms";
 import Returns from "./pages/return";
 import { DeliveryProvider } from "./Context/DeliveryContext";
+
+import AgentRequests from "./pages/Admin/AgentRequest";
 function App() {
   return (
     <Router>
@@ -69,6 +71,7 @@ function App() {
         <TrackingProvider>
         <DeliveryProvider>
           <Routes>
+            <Route path="/agent-requests" element={<AgentRequests />} />
             <Route path="/seller" element={<SellerLayout />}>
               {/* Seller Routes */}
               <Route path="/seller" element={<Home />} />

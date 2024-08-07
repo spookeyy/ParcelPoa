@@ -14,12 +14,13 @@ class User(db.Model):
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     phone_number = Column(String, unique=True, nullable=False)
-    user_role = Column(Enum('Business','Agent', name='user_roles'), nullable=False)
+    user_role = Column(Enum('Business','Agent','Admin', name='user_roles'), nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     password_hash = Column(String(128), nullable=False)
     profile_picture = Column(String, default='default.png', nullable=True)
     status = Column(Enum('Available', 'Unavailable', name='user_statuses'), default='Available', nullable=True)
+    Request = Column(Enum('Approved', 'Pending', 'Rejected', name='approval_statuses'), default='Pending', nullable=True)
 
     parcels = relationship('Parcel', back_populates='sender', foreign_keys='Parcel.sender_id')
     deliveries = relationship('Delivery', back_populates='agent', foreign_keys='Delivery.agent_id')
@@ -42,7 +43,8 @@ class User(db.Model):
             'created_at': self.created_at,
             'updated_at': self.updated_at,
             'profile_picture': self.profile_picture,
-            'status': self.status
+            'status': self.status,
+            'Request': self.Request
         }
 class Parcel(db.Model):
     __tablename__ = 'parcels'
@@ -170,6 +172,7 @@ class Order(db.Model):
     __tablename__ = 'orders'
 
     order_id = Column(Integer, primary_key=True)
+    order_number = Column(String, nullable=True)
     user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
     parcel_id = Column(Integer, ForeignKey('parcels.parcel_id'), nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
@@ -182,6 +185,7 @@ class Order(db.Model):
     def to_dict(self):
         return {
             'order_id': self.order_id,
+            'order_number': self.order_number,
             'user_id': self.user_id,
             'parcel_id': self.parcel_id,
             'created_at': self.created_at.isoformat(),

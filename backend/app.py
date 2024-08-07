@@ -233,6 +233,71 @@ def change_password():
     db.session.commit()
     return jsonify({"message": "Password changed successfully"})
 
+# approve agent 
+@app.route('/approve-agent/<int:agent_id>', methods=['PUT'])
+@jwt_required()
+def approve_agent(agent_id):
+    current_user = User.query.get(get_jwt_identity())
+    
+    # Check if the current user is an admin
+    if current_user.user_role != 'Admin':
+        return jsonify({"message": "Only admins can approve agent requests"}), 403
+    
+    agent = User.query.get(agent_id)
+    if not agent:
+        return jsonify({"message": "Agent not found"}), 404
+    
+    if agent.Request != 'Pending':
+        return jsonify({"message": "Agent is not in pending status"}), 400
+    
+    agent.Request = 'Approved'
+    agent.status = 'Available'  # Set the status to Available
+    db.session.commit()
+    
+    # Send notification to the agent
+    send_notification(agent.email, 'Agent Request Approved', 
+                      f'Your agent request has been approved. Welcome to our system!')
+    
+    return jsonify({"message": "Agent request approved successfully"}), 200
+
+@app.route('/reject-agent/<int:agent_id>', methods=['PUT'])
+@jwt_required()
+def reject_agent(agent_id):
+    current_user = User.query.get(get_jwt_identity())
+    
+    # Check if the current user is an admin
+    if current_user.user_role != 'Admin':
+        return jsonify({"message": "Only admins can reject agent requests"}), 403
+    
+    agent = User.query.get(agent_id)
+    if not agent:
+        return jsonify({"message": "Agent not found"}), 404
+    
+    if agent.Request != 'Pending':
+        return jsonify({"message": "Agent is not in pending status"}), 400
+    
+    agent.Request = 'Rejected'
+    agent.status = 'Unavailable'  # Set the status to Unavailable
+    db.session.commit()
+    
+    # Send notification to the agent
+    send_notification(agent.email, 'Agent Request Rejected', 
+                      f'We regret to inform you that your agent request has been rejected.')
+    
+    return jsonify({"message": "Agent request rejected successfully"}), 200
+
+
+# get all businesses as an admin
+@app.route('/get-businesses', methods=['GET'])
+@jwt_required()
+def get_businesses():
+    current_user = User.query.get(get_jwt_identity())
+    if current_user.user_role != 'Admin':
+        return jsonify({"message": "Only admins can get businesses"}), 403
+    businesses = User.query.filter_by(user_role='Business').all()
+    return jsonify([business.to_dict() for business in businesses])
+
+
 
 # PARCEL ROUTES
 # @app.route('/parcels', methods=['POST'])
@@ -650,13 +715,14 @@ def cancel_order(order_id):
     return jsonify({"message": "Order cancelled successfully"}), 200
 
 # get agents
-@app.route('/agents', methods=['GET'])
+@app.route('/get-agents', methods=['GET'])
 @jwt_required()
 def get_agents():
     user = User.query.get(get_jwt_identity())
-    if user.user_role != 'Business':
-        return jsonify({"message": "Only businesses can get agents"}), 403
+    if user.user_role != 'Admin':
+        return jsonify({"message": "Only admins can get agents"}), 403
     agents = User.query.filter_by(user_role='Agent').all()
+    print('agents', agents)
     return jsonify([agent.to_dict() for agent in agents])
 
 
