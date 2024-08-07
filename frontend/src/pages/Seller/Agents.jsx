@@ -53,7 +53,7 @@ export default function Agents() {
       const agents = data.filter(user => user.user_role === "Agent");
       setAgentRequests(agents.map(agent => ({
         ...agent,
-        status: getStatus(agent.deliveries),
+        status: getStatus(agent.status),
       })));
     } catch (error) {
       console.error("Error fetching agents data:", error);
