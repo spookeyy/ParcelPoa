@@ -50,7 +50,7 @@ import DeliveryConfirmation from "./pages/Agent/DeliveryConfirmation";
 import PerformanceMetrics from "./pages/Agent/PerformanceMetrics";
 // import IssueReporting from "./pages/Agent/IssueReporting";
 import ManageDeliveries from "./pages/Agent/ManageDeliveries";
-import AddDelivery from "./pages/Agent/AddDelivery";
+// import AddDelivery from "./pages/Agent/AddDelivery";
 import CommunicationTools from "./pages/Agent/CommunicationTools";
 import UpdateParcelStatusPage from "./pages/Agent/UpdateParcelStatusPage";
 // import AgentLogin from "./pages/Agent/AgentLogin";
@@ -143,7 +143,7 @@ function App() {
               />
               {/* <Route path="/issue-reporting" element={<IssueReporting />} /> */}
               <Route path="/manage-deliveries" element={<ManageDeliveries />} />
-              <Route path="/add-delivery" element={<AddDelivery />} />
+              {/* <Route path="/add-delivery" element={<AddDelivery />} /> */}
               <Route
                 path="/communication-tools"
                 element={<CommunicationTools />}
