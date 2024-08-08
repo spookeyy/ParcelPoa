@@ -85,7 +85,7 @@ export const UserProvider = ({ children }) => {
           const { role } = res.user;
           const routes = {
             Agent: "/agent",
-            Business: "/seller",
+            Business: "/business/dashboard",
             Admin: "/admin/requests", //TODO: change this later to "/admin" after peter creates the admin dashboard
           };
 
@@ -108,7 +108,6 @@ export const UserProvider = ({ children }) => {
         throw error;
       });
   }
-
 
   // UPDATE USER
   const updateUser = (name, email, phone_number) => {
@@ -197,7 +196,6 @@ export const UserProvider = ({ children }) => {
     }
   }, [authToken, onChange, fetchUserProfile]);
 
-
   // current user
   const getCurrentUser = () => {
     return fetch(`${server}/current_user`, {
@@ -221,7 +219,6 @@ export const UserProvider = ({ children }) => {
         localStorage.removeItem("access_token");
       });
   };
-
 
   // Request Password Reset
   const requestPasswordReset = (email, frontendUrl) => {
