@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Routes, Route } from "react-router-dom";
 import AgentHeader from "./DashboardComponentsforAgent/AgentHeader";
 import StatsCard from "./DashboardComponentsforAgent/StatsCard";
 import Deliveries from "./DashboardComponentsforAgent/Deliveries";
 import ManageDeliveries from "./ManageDeliveries";
 import { server } from "../../../config.json";
+import { UserContext } from "../../Context/UserContext";
 
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -13,24 +14,47 @@ export default function Dashboard() {
   const [inTransit, setInTransit] = useState(0);
   const [assignedDeliveries, setAssignedDeliveries] = useState([]);
 
+  const { authToken } = useContext(UserContext);
+
   useEffect(() => {
-    const jwtToken = localStorage.getItem("jwt");
+    if (!authToken) {
+      console.error("No JWT token found");
+      return;
+    }
 
     fetch(`${server}/assigned_deliveries`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${jwtToken}`,
+        Authorization: `Bearer ${authToken}`,
       },
     })
       .then((response) => {
-        if (response.ok) {
-          return response.json();
+        if (response.status === 422) {
+          return response.json().then((errorData) => {
+            throw new Error(
+              `Unprocessable Entity: ${JSON.stringify(errorData)}`
+            );
+          });
         }
-        throw new Error("Failed to fetch deliveries");
+        if (!response.ok) {
+          throw new Error("Failed to fetch deliveries");
+        }
+        return response.json();
       })
       .then((data) => {
-        setAssignedDeliveries(data);
+        console.log("Fetched deliveries data:", data); // Log the entire response
+
+        setAssignedDeliveries(
+          data.map((delivery) => ({
+            orderID: delivery.parcel_id,
+            trackingNumber: delivery.parcel?.tracking_number || "N/A",
+            status: delivery.status,
+            orderDate: delivery.created_at,
+            recipientEmail: delivery.parcel?.recipient_email || "N/A",
+            senderName: delivery.parcel?.sender?.name || "N/A",
+          }))
+        );
         setTotalDeliveries(data.length);
 
         const deliveredCount = data.filter(
@@ -46,11 +70,13 @@ export default function Dashboard() {
       .catch((error) => {
         console.error("Error fetching deliveries:", error);
       });
-  }, []);
+  }, [authToken]);
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
+
+
+  // const toggleSidebar = () => {
+  //   setSidebarOpen(!sidebarOpen);
+  // };
 
   const openSidebar = () => {
     setSidebarOpen(true);

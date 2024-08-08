@@ -17,6 +17,7 @@ from models import db, User, Parcel, Delivery, Notification, Tracking, Order
 from flask_cors import CORS
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from sqlalchemy.orm import joinedload
 
 app = Flask(__name__)
 CORS(app)
@@ -445,9 +446,16 @@ def get_assigned_deliveries():
     print(f"User: {user}")
     if user.user_role != 'Agent':
         return jsonify({"message": "Only agents can get assigned deliveries"}), 403
-    deliveries = Delivery.query.filter_by(agent_id=user.user_id).all()
-    print(f"Deliveries: {deliveries}") 
-    return jsonify([delivery.to_dict() for delivery in deliveries])
+    # Load the parcel relationship
+    deliveries = Delivery.query.options(joinedload(Delivery.parcel)).filter_by(agent_id=user.user_id).all()
+    print(f"Deliveries: {deliveries}")
+    deliveries_data = [
+        {
+            **delivery.to_dict(),
+            'parcel': delivery.parcel.to_dict() if delivery.parcel else None
+        } for delivery in deliveries
+    ]
+    return jsonify(deliveries_data)
 
 @app.route('/update_delivery_status/<int:delivery_id>', methods=['PUT'])
 @jwt_required()
