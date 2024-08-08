@@ -18,27 +18,25 @@ function ParcelTracking() {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-        Parcel Tracking
-      </h2>
-      <div className="flex space-x-2">
-        <input
+    <div className="bg-gradient-to-br from-blue-300 to-indigo-400 rounded-xl shadow-lg p-8 max-w-4xl mx-auto">
+      <h2 className="text-3xl font-bold text-center text-white mb-8">Parcel Tracking</h2>
+      <div className="flex flex-col lg:flex-row items-center justify-between space-y-6 lg:space-y-0 lg:space-x-4">
+         <input
           type="text"
           value={trackingNumber}
           onChange={(e) => setTrackingNumber(e.target.value)}
           placeholder="Enter tracking number"
-          className="flex-grow px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-grow w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
           onClick={trackParcel}
-          className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-md hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-lg hover:bg-white hover:text-blue-500 hover:to-indigo-700 transition duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-blue-500 focus:ring-offset-2 w-full lg:w-auto"
         >
           Track
         </button>
       </div>
       {trackingInfo && (
-        <div className="mt-4 bg-gray-50 p-4 rounded-md">
+        <div className="mt-8 bg-white p-6 rounded-lg shadow-md">
           <p className="text-gray-700">
             <span className="font-medium">Status:</span>{" "}
             {trackingInfo.parcel.status}
