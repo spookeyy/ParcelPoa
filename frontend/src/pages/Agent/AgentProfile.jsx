@@ -28,13 +28,22 @@ export default function AgentProfile({ onClose }) {
       });
       if (!response.ok) throw new Error("Failed to fetch profile");
       const data = await response.json();
-      setProfile({
-        email: data.email,
-        name: data.name,
-        phoneNumber: data.phone_number,
-        userRole: data.user_role,
-        profilePicture: data.profile_picture || profile.profilePicture,
-      });
+
+      // Check user's role and update profile accordingly
+      if (data.user_role === "Agent") {
+        setProfile({
+          email: data.email,
+          name: data.name,
+          phoneNumber: data.phone_number,
+          userRole: data.user_role,
+          profilePicture: data.profile_picture || profile.profilePicture,
+        });
+      } else {
+        // redirect non-agent users them to a home page
+        toast.error("Only agents can access this page");
+        window.location.href = "/";
+        onClose();
+      }
     } catch (error) {
       toast.error("An error occurred while fetching the profile");
       console.error("Error fetching profile:", error);

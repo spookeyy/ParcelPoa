@@ -332,6 +332,7 @@ export const UserProvider = ({ children }) => {
     resetPassword,
     approveAgentRequest,
     rejectAgentRequest,
+    getCurrentUser
   };
 
 
