@@ -32,11 +32,17 @@ import Tracking from "./pages/Seller/Tracking";
 import SellerPofie from "./pages/Seller/SellerPofie";
 import SellerLayout from "./components/SellerLayout";
 
+
+
+// start of business pages
 import BusinessDashboard from "./pages/Business/BusinessDashboard";
-import ParcelTracking from "./pages/Business/ParcelTracking";
+import OrderManagement from "./pages/Business/OrderManagement"
 import ParcelForm from "./pages/Business/ParcelForm";
+import ParcelTracking from "./pages/Business/ParcelTracking";
 import PickupScheduling from "./pages/Business/PickupScheduling";
-import OrderManagement from "./pages/Business/OrderManagement";
+//end of business pages
+
+
 
 //Buyer pages
 import OrderTracking from "./pages/Buyer/OrderTracking";
@@ -174,10 +180,7 @@ function App() {
               <Route path="/send-notification" element={<SendNotification />} />
               <Route path="/" element={<Landing />} />
 
-              <Route
-                path="/business/dashboard"
-                element={<BusinessDashboard />}
-              />
+             
               <Route
                 path="/business/parcel-tracking"
                 element={<ParcelTracking />}
@@ -189,6 +192,15 @@ function App() {
               <Route path="/business/orders" element={<OrderManagement />} />
               <Route path="/parcels" element={<ParcelForm />} />
               <Route path="/pickup" element={<PickupScheduling />} />
+
+
+          {/*business routes  */}
+           <Route path="/business/dashboard" element={<BusinessDashboard />}/>
+           <Route path="/order-management" element={<OrderManagement />}/>
+           <Route path="parcel-form" element ={<ParcelForm />}/>
+           <Route path="parcel-tracking" element ={<ParcelTracking />}/>
+           <Route path="pickup-scheduling" element ={<PickupScheduling />}/>
+          {/* end of business routes */}
             </Routes>
           </DeliveryProvider>
         </TrackingProvider>
