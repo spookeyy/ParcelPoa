@@ -16,9 +16,7 @@ export default function Header() {
           <Link to="/seller" className="text-blue-700 hover:text-indigo-800 text-medium transition-colors">
             Dashboard
           </Link>
-          <Link to="/seller/agents" className="text-blue-700 hover:text-indigo-800 text-medium transition-colors">
-            Agents List
-          </Link>
+         
           <Link to="/business/dashboard" className="text-blue-700 hover:text-indigo-800 text-medium transition-colors">
             Business Dashboard
           </Link>

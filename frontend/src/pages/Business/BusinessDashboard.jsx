@@ -5,6 +5,8 @@ import ParcelTracking from "./ParcelTracking";
 import PickupScheduling from "./PickupScheduling";
 import { UserContext } from "../../Context/UserContext";
 import Logo from "../../assets/Logo.png"; // Updated path
+import { Link } from "react-router-dom";
+import SellerSidebar from "../Seller/SellerSidebar";
 
 function BusinessDashboard() {
   const { currentUser } = useContext(UserContext);
@@ -13,21 +15,32 @@ function BusinessDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-200 to-yellow-600">
 <header className="bg-white p-6 shadow-lg flex items-center rounded-lg border border-gray-300">
-  <img 
-    src={Logo} 
-    alt="Logo" 
-    className="h-12 w-12 lg:h-16 lg:w-16 rounded-full border-2 border-yellow-300 bg-gradient-to-br from-yellow-200 to-yellow-600 cursor-pointer mr-4 lg:mr-6 transition-transform transform hover:scale-105" 
-    onClick={() => navigate('/seller')} 
-  />
-  <div className="flex-1 text-center">
-    <h1 className="text-3xl lg:text-5xl font-extrabold bg-gradient-to-br from-yellow-200 to-yellow-600 text-transparent bg-clip-text py-2 px-4">
-      Business Dashboard
-    </h1>
-    {currentUser && (
-      <p className="bg-gradient-to-br from-yellow-200 to-yellow-600 text-transparent bg-clip-text mt-2 text-xl lg:text-2xl">Welcome, {currentUser.name}</p>
-    )}
-  </div>
-</header>
+      <img
+        src={Logo}
+        alt="Logo"
+        className="h-12 w-12 lg:h-16 lg:w-16 rounded-full border-2 border-yellow-300 bg-gradient-to-br from-yellow-200 to-yellow-600 cursor-pointer mr-4 lg:mr-6 transition-transform transform hover:scale-105"
+        onClick={() => navigate('/seller')}
+      />
+      <div className="flex-1 text-center">
+        <h1 className="text-3xl lg:text-5xl font-extrabold bg-gradient-to-br from-yellow-200 to-yellow-600 text-transparent bg-clip-text py-2 px-4">
+          Business Dashboard
+        </h1>
+        {currentUser && (
+          <p className="bg-gradient-to-br from-yellow-200 to-yellow-600 text-transparent bg-clip-text mt-2 text-xl lg:text-2xl">
+            Welcome, {currentUser.name}
+          </p>
+        )}
+      </div>
+      <div className="flex items-center space-x-4">
+        <Link
+          to="/seller/agents"
+          className="bg-gradient-to-br from-yellow-200 to-yellow-600 text-transparent bg-clip-text hover:bg-yellow-600 text-medium transition-colors"
+        >
+          Agents List
+        </Link>
+        <SellerSidebar />
+      </div>
+    </header>
 {/* 
       <main className="min-h-screen flex flex-col bg-white space-y-8 pb-28">
   <div className="flex-1 pt-12">
