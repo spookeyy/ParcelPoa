@@ -705,10 +705,10 @@ def get_agents():
 @jwt_required()
 def get_available_agents():
     user = User.query.get(get_jwt_identity())
-    if user.user_role == 'Agent':
-        return jsonify({"message": "Only admins and Businesses can get available agents"}), 403
+    # if user.user_role == 'Agent':
+    #     return jsonify({"message": "Only admins and Businesses can get available agents"}), 403
     
-    agents = User.query.filter_by(user_role='Agent', status='Available').all()
+    agents = User.query.filter_by(user_role='Agent', status='Available', Request='Approved').all()
     print('agents', agents)
     return jsonify([agent.to_dict() for agent in agents])
 

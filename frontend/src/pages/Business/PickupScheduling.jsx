@@ -20,6 +20,9 @@ function PickupScheduling() {
 
   useEffect(() => {
     const fetchAvailableAgents = async () => {
+      const authToken = localStorage.getItem("jwt");
+      if (!authToken) return setAvailableAgents([]);
+      console.log("Auth token:", authToken);
       try {
         const response = await fetch(`${server}/get-available-agents`, {
           headers: {
@@ -38,7 +41,7 @@ function PickupScheduling() {
     };
 
     fetchAvailableAgents();
-  }, [authToken]);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -184,12 +187,12 @@ function PickupScheduling() {
                 </option>
               ))}
             </select>
-                          <button
-                type="submit"
-                className="w-full py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              >
-                Schedule Pickup
-              </button>
+            <button
+              type="submit"
+              className="w-full py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              Schedule Pickup
+            </button>
           </form>
         </div>
       </div>
