@@ -17,6 +17,11 @@ flask = "*"
 flask-sqlalchemy = "*"
 flask-oauthlib = "*"
 requests = "*"
+<<<<<<< HEAD
+flask-migrate = "*"
+flask-bcrypt = "*"
+flask-jwt-extended = "*"
+=======
 pillow = "*"
 flask-migrate = "*"
 flask-bcrypt = "*"

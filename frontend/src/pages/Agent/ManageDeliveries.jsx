@@ -1,6 +1,7 @@
-/* eslint-disable react/prop-types */
+
+
 import React, { useState, useEffect } from "react";
-import { server } from "../../../config.json";
+import config from "../../config.json"; // Import the server URL
 
 export default function ManageDeliveries({ openSidebar }) {
   const [deliveries, setDeliveries] = useState([]);
@@ -8,7 +9,7 @@ export default function ManageDeliveries({ openSidebar }) {
 
   useEffect(() => {
     // Fetch delivery data from the backend
-    fetch(`${server}/assigned_deliveries`)
+    fetch(`${config.server}/api/deliveries`) // Use the server URL from config
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -65,9 +66,17 @@ export default function ManageDeliveries({ openSidebar }) {
         </div>
       )}
 
+      {/* In Transit Deliveries */}
       <div className="w-full overflow-x-auto mb-6">
         <h2 className="text-xl font-bold mb-2">In Transit</h2>
         <table className="w-full min-w-full border-collapse text-left">
+          <thead>
+            <tr>
+              <th className="border p-2">Parcel</th>
+              <th className="border p-2">Status</th>
+              <th className="border p-2">Action</th>
+            </tr>
+          </thead>
           <tbody>
             {filteredDeliveries.inTransit.map((delivery) => (
               <tr key={delivery.id}>
@@ -78,9 +87,9 @@ export default function ManageDeliveries({ openSidebar }) {
                     onClick={() =>
                       handleStatusChange(delivery.id, "Delivered")
                     }
-                    className={`w-full px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600`}
+                    className="w-full px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600"
                   >
-                    Delivered
+                    Mark as Delivered
                   </button>
                 </td>
               </tr>
@@ -89,9 +98,17 @@ export default function ManageDeliveries({ openSidebar }) {
         </table>
       </div>
 
+      {/* Scheduled Deliveries */}
       <div className="w-full overflow-x-auto mb-6">
         <h2 className="text-xl font-bold mb-2">Scheduled</h2>
         <table className="w-full min-w-full border-collapse text-left">
+          <thead>
+            <tr>
+              <th className="border p-2">Parcel</th>
+              <th className="border p-2">Status</th>
+              <th className="border p-2">Action</th>
+            </tr>
+          </thead>
           <tbody>
             {filteredDeliveries.scheduled.map((delivery) => (
               <tr key={delivery.id}>
@@ -102,9 +119,9 @@ export default function ManageDeliveries({ openSidebar }) {
                     onClick={() =>
                       handleStatusChange(delivery.id, "In Transit")
                     }
-                    className={`w-full px-4 py-2 rounded bg-yellow-500 text-white hover:bg-yellow-600`}
+                    className="w-full px-4 py-2 rounded bg-yellow-500 text-white hover:bg-yellow-600"
                   >
-                    In Transit
+                    Mark as In Transit
                   </button>
                 </td>
               </tr>
@@ -113,9 +130,17 @@ export default function ManageDeliveries({ openSidebar }) {
         </table>
       </div>
 
+      {/* Delivered Deliveries */}
       <div className="w-full overflow-x-auto mb-6">
         <h2 className="text-xl font-bold mb-2">Delivered</h2>
         <table className="w-full min-w-full border-collapse text-left">
+          <thead>
+            <tr>
+              <th className="border p-2">Parcel</th>
+              <th className="border p-2">Status</th>
+              <th className="border p-2">Action</th>
+            </tr>
+          </thead>
           <tbody>
             {filteredDeliveries.delivered.map((delivery) => (
               <tr key={delivery.id}>
@@ -139,4 +164,3 @@ export default function ManageDeliveries({ openSidebar }) {
     </div>
   );
 }
-

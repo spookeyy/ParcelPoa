@@ -3,35 +3,32 @@ import React, { createContext, useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { server } from "../../config";
+import config from "../../config.json"; // Import the server URL
 
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const nav = useNavigate();
-
-  const [currentUser, setCurrentUser] = useState();
+  const [currentUser, setCurrentUser] = useState(null);
   const [onChange, setOnChange] = useState(false);
   const [authToken, setAuthToken] = useState(() =>
-    localStorage.getItem("access_token")
-      ? localStorage.getItem("access_token")
-      : null
+    localStorage.getItem("access_token") || null
   );
 
   // REGISTER USER
   const addUser = (name, email, phone_number, password, user_role) => {
     return new Promise((resolve, reject) => {
-      fetch(`${server}/register`, {
+      fetch(`${config.server}/register`, {
         method: "POST",
         body: JSON.stringify({
-          name: name,
-          email: email,
-          phone_number: phone_number,
-          password: password,
-          user_role: user_role,
+          name,
+          email,
+          phone_number,
+          password,
+          user_role,
         }),
         headers: {
-          "Content-type": "application/json",
+          "Content-Type": "application/json",
         },
       })
         .then((response) => {
@@ -64,11 +61,11 @@ export const UserProvider = ({ children }) => {
 
   // LOGIN USER
   function login(email, password) {
-    return fetch(`${server}/login`, {
+    return fetch(`${config.server}/login`, {
       method: "POST",
       body: JSON.stringify({
-        email: email,
-        password: password,
+        email,
+        password,
       }),
       headers: {
         "Content-Type": "application/json",
@@ -111,7 +108,7 @@ export const UserProvider = ({ children }) => {
 
   // UPDATE USER
   const updateUser = (name, email, phone_number) => {
-    fetch(`${server}/profile`, {
+    fetch(`${config.server}/profile`, {
       method: "PUT",
       body: JSON.stringify({
         name,
@@ -119,7 +116,7 @@ export const UserProvider = ({ children }) => {
         phone_number,
       }),
       headers: {
-        "Content-type": "application/json",
+        "Content-Type": "application/json",
         Authorization: `Bearer ${authToken}`,
       },
     })
@@ -140,7 +137,7 @@ export const UserProvider = ({ children }) => {
 
   // LOGOUT
   const logout = () => {
-    fetch(`${server}/logout`, {
+    fetch(`${config.server}/logout`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -166,9 +163,9 @@ export const UserProvider = ({ children }) => {
       });
   };
 
-  // fetch user profile
+  // FETCH USER PROFILE
   const fetchUserProfile = useCallback(() => {
-    fetch(`${server}/profile`, {
+    fetch(`${config.server}/profile`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${authToken}`,
@@ -222,7 +219,7 @@ export const UserProvider = ({ children }) => {
 
   // Request Password Reset
   const requestPasswordReset = (email, frontendUrl) => {
-    return fetch(`${server}/request-reset-password`, {
+    return fetch(`${config.server}/request-reset-password`, {
       method: "POST",
       body: JSON.stringify({ email, frontend_url: frontendUrl }),
       headers: {
@@ -243,9 +240,9 @@ export const UserProvider = ({ children }) => {
       });
   };
 
-  // Reset Password
+  // RESET PASSWORD
   const resetPassword = (token, newPassword) => {
-    return fetch(`${server}/reset-password/${token}`, {
+    return fetch(`${config.server}/reset-password/${token}`, {
       method: "POST",
       body: JSON.stringify({ new_password: newPassword }),
       headers: {
