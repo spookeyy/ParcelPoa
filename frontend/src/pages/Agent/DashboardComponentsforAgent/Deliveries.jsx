@@ -10,6 +10,10 @@ export default function Deliveries({ deliveries }) {
       ? deliveries
       : deliveries.filter((delivery) => delivery.status === activeTab);
 
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+  };
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg mb-8 border border-gray-200">
       <h3 className="text-3xl font-semibold text-gray-900 mb-6 text-center sm:text-left">
@@ -19,7 +23,7 @@ export default function Deliveries({ deliveries }) {
         {["all", "In Transit", "Delivered", "Scheduled"].map((tab) => (
           <button
             key={tab}
-            onClick={() => setActiveTab(tab)}
+            onClick={() => handleTabClick(tab)}
             className={`px-5 py-2 rounded-full font-medium text-sm sm:text-base transition duration-300 ease-in-out ${
               activeTab === tab
                 ? "bg-blue-600 text-white shadow-lg"
@@ -32,8 +36,17 @@ export default function Deliveries({ deliveries }) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredDeliveries.map((delivery, index) => (
-          <DeliveryCard key={delivery.delivery_id} {...delivery} />
+        {filteredDeliveries.map((delivery) => (
+          <DeliveryCard
+            key={delivery.delivery_id}
+            delivery_id={delivery.delivery_id}
+            orderID={delivery.orderID}
+            trackingNumber={delivery.trackingNumber}
+            status={delivery.status}
+            orderDate={delivery.orderDate}
+            recipientEmail={delivery.recipientEmail}
+            sender_email={delivery.sender_email}
+          />
         ))}
       </div>
     </div>
