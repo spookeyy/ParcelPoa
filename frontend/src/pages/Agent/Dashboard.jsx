@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import AgentHeader from "./DashboardComponentsforAgent/AgentHeader";
 import StatsCard from "./DashboardComponentsforAgent/StatsCard";
 import Deliveries from "./DashboardComponentsforAgent/Deliveries";
+import Parcels from "./Parcels";
 import ManageDeliveries from "./ManageDeliveries";
 import { server } from "../../../config.json";
 import { UserContext } from "../../Context/UserContext";
@@ -13,6 +14,10 @@ export default function Dashboard() {
   const [delivered, setDelivered] = useState(0);
   const [inTransit, setInTransit] = useState(0);
   const [assignedDeliveries, setAssignedDeliveries] = useState([]);
+  const [totalParcels, setTotalParcels] = useState(0);
+  const [deliveredParcels, setDeliveredParcels] = useState(0);
+  const [inTransitParcels, setInTransitParcels] = useState(0);
+  const [assignedParcels, setAssignedParcels] = useState([]);
 
   const { authToken } = useContext(UserContext);
 
@@ -22,6 +27,7 @@ export default function Dashboard() {
       return;
     }
 
+    // Fetch deliveries
     fetch(`${server}/assigned_deliveries`, {
       method: "GET",
       headers: {
@@ -47,12 +53,13 @@ export default function Dashboard() {
 
         setAssignedDeliveries(
           data.map((delivery) => ({
+            deliveryID: delivery.delivery_id,
             orderID: delivery.parcel_id,
             trackingNumber: delivery.parcel?.tracking_number || "N/A",
             status: delivery.status,
             orderDate: delivery.created_at,
             recipientEmail: delivery.parcel?.recipient_email || "N/A",
-            senderName: delivery.parcel?.sender?.name || "N/A",
+            sender_email: delivery.parcel?.sender?.sender_email || "N/A",
           }))
         );
         setTotalDeliveries(data.length);
@@ -70,13 +77,47 @@ export default function Dashboard() {
       .catch((error) => {
         console.error("Error fetching deliveries:", error);
       });
+
+    // Fetch parcels
+    fetch(`${server}/agent_parcels`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
+      .then((response) => {
+        if (response.status === 422) {
+          return response.json().then((errorData) => {
+            throw new Error(
+              `Unprocessable Entity: ${JSON.stringify(errorData)}`
+            );
+          });
+        }
+        if (!response.ok) {
+          throw new Error("Failed to fetch parcels");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Fetched parcels data:", data); // Log the entire response
+        setAssignedParcels(data);
+        setTotalParcels(data.length);
+
+        const deliveredCount = data.filter(
+          (parcel) => parcel.status === "Delivered"
+        ).length;
+        setDeliveredParcels(deliveredCount);
+
+        const inTransitCount = data.filter(
+          (parcel) => parcel.status === "In Transit"
+        ).length;
+        setInTransitParcels(inTransitCount);
+      })
+      .catch((error) => {
+        console.error("Error fetching parcels:", error);
+      });
   }, [authToken]);
-
-
-
-  // const toggleSidebar = () => {
-  //   setSidebarOpen(!sidebarOpen);
-  // };
 
   const openSidebar = () => {
     setSidebarOpen(true);
@@ -102,7 +143,7 @@ export default function Dashboard() {
                     count={totalDeliveries}
                     color="text-green-500"
                   />
-                  <StatsCard
+                  {/* <StatsCard
                     icon="fa-truck"
                     title="Delivered"
                     count={delivered}
@@ -113,11 +154,33 @@ export default function Dashboard() {
                     title="In Transit"
                     count={inTransit}
                     color="text-red-500"
+                  /> */}
+                  <StatsCard
+                    icon="fa-box"
+                    title="Total Parcels"
+                    count={totalParcels}
+                    color="text-purple-500"
+                  />
+                  <StatsCard
+                    icon="fa-check-square"
+                    title="Delivered Parcels"
+                    count={deliveredParcels}
+                    color="text-green-500"
+                  />
+                  <StatsCard
+                    icon="fa-truck-loading"
+                    title="In Transit Parcels"
+                    count={inTransitParcels}
+                    color="text-red-500"
                   />
                 </div>
 
                 <div className="px-6 mb-8">
                   <Deliveries deliveries={assignedDeliveries} />
+                </div>
+
+                <div className="px-6 mb-8">
+                  <Parcels parcels={assignedParcels} />
                 </div>
               </div>
             }
