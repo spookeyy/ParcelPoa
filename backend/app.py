@@ -18,6 +18,9 @@ from flask_cors import CORS
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from sqlalchemy.orm import joinedload
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 CORS(app)
@@ -378,12 +381,18 @@ def delete_parcel(parcel_id):
 @app.route('/update_status/<int:parcel_id>', methods=['PUT'])
 @jwt_required()
 def update_parcel_status(parcel_id):
+    logging.debug(f"Updating status for parcel ID: {parcel_id}")
+    logging.debug(f"Received data: {request.get_json()}")
     current_user = User.query.get(get_jwt_identity())
     if current_user.user_role != 'Agent':
         return jsonify({"message": "Only agents can update parcel status"}), 403
     
+    # Find the parcel based on the parcel_id
+    parcel = Parcel.query.get(parcel_id)
+    if not parcel:
+        return jsonify({"message": "Parcel not found"}), 404
+    
     data = request.get_json()
-    parcel = Parcel.query.get_or_404(parcel_id)
     if parcel.status == 'Delivered':
         return jsonify({"message": "Cannot update delivered parcel status"}), 400
     if data['status'] not in ['Picked Up', 'Out for Delivery', 'In Transit', 'Delivered']:
@@ -404,11 +413,27 @@ def update_parcel_status(parcel_id):
 
     # Send notifications
     if old_status != parcel.status:
-        send_notification(parcel.sender_email, 'Parcel Status Update', f'Your parcel with tracking number {parcel.tracking_number} is now {parcel.status}.')
+        send_notification(parcel.sender.email, 'Parcel Status Update', f'Your parcel with tracking number {parcel.tracking_number} is now {parcel.status}.')
         send_notification(parcel.recipient_email, 'Parcel Status Update', f'The parcel with tracking number {parcel.tracking_number} is now {parcel.status}.')
 
     return jsonify({"message": "Parcel status updated successfully"}), 200
 
+# agent associated parcels:
+@app.route('/agent_parcels', methods=['GET'])
+@jwt_required()
+def get_agent_parcels():
+    user = User.query.get(get_jwt_identity())
+    
+    if user.user_role != 'Agent':
+        return jsonify({"message": "Only agents can view their assigned parcels"}), 403
+    
+    deliveries = Delivery.query.filter_by(agent_id=user.user_id).all()
+
+    parcels = [delivery.parcel for delivery in deliveries if delivery.parcel]
+    
+    parcels_data = [parcel.to_dict() for parcel in parcels]
+    
+    return jsonify(parcels_data)
 
 
 # DELIVERY ROUTES
@@ -461,14 +486,21 @@ def get_assigned_deliveries():
 @jwt_required()
 def update_delivery_status(delivery_id):
     current_user = User.query.get(get_jwt_identity())
-    if current_user.user_role != 'Business' or current_user.user_role != 'Agent':
+    if current_user.user_role not in ['Business', 'Agent']:
         return jsonify({"message": "Only agents and businesses can update delivery status"}), 403
+
     data = request.get_json()
     delivery = Delivery.query.get_or_404(delivery_id)
+
+    if 'status' not in data:
+        return jsonify({"message": "Status is required"}), 400
+
     delivery.status = data['status']
     delivery.updated_at = datetime.now()
     db.session.commit()
+    
     return jsonify({"message": "Delivery status updated successfully"}), 200
+
 
 # mark parcel as delivered
 @app.route('/mark_as_delivered/<int:parcel_id>', methods=['PUT'])
@@ -761,7 +793,7 @@ def generate_unique_tracking_number(existing_numbers):
 
 def generate_order_number():
     while True:
-        order_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+        order_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
         existing_order = Order.query.filter_by(order_number=order_number).first()
         if existing_order is None:
             return order_number
