@@ -1,95 +1,97 @@
-import React, { useState } from 'react';
-import Navbar from '../components/Navbar';
+import React, { useState } from "react";
+import Navbar from "../components/Navbar";
+function Contact() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [message, setMessage] = useState("");
 
-export default function Contact() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
+  const scriptURL =
+    "https://script.google.com/macros/s/AKfycbwfS4qNLjkTlsV59stdOjcE8png0nwghY1QVOPCFToBlqwqtIzoVOqzyEav8P3A-M3kAg/exec";
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess(false);
 
-    // Validate form inputs
-    if (name === '' || email === '' || message === '') {
-      setError('All fields are required.');
-      return;
-    }
-
-    // Simulate a successful form submission
-    setSuccess(true);
-    setName('');
-    setEmail('');
-    setMessage('');
+    fetch(scriptURL, { method: "POST", body: new FormData(e.target) })
+      .then((response) => {
+        setMessage("Message sent successfully");
+        setFormData({ name: "", email: "", message: "" }); // Reset form
+        setTimeout(() => setMessage(""), 2000); // Clear message after 2 seconds
+      })
+      .catch((error) => {
+        console.error("Error!", error.message);
+        setMessage("An error occurred. Please try again.");
+      });
   };
 
   return (
-    <>
-    <Navbar />
-    <div className="bg-gradient-to-br from-blue-300 to-indigo-700 min-h-screen p-8">
-      <div className="container mx-auto max-w-md bg-white shadow-lg rounded-lg overflow-hidden">
-        <div className="bg-indigo-500 p-4">
-          <h1 className="text-2xl font-bold text-white">Contact Us</h1>
-        </div>
-        <div className="p-4">
-          <h2 className="text-xl font-bold mb-4">Get in Touch</h2>
-          <p className="mb-4 text-gray-700">
-            We'd love to hear from you! Whether you have a question about our services, pricing, or anything else, our team is ready to answer all your questions.
-          </p>
-          
-          {error && <p className="text-red-500 mb-4">{error}</p>}
-          {success && <p className="text-green-500 mb-4">Message sent successfully!</p>}
-
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
-              <input
-                type="text"
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="mt-1 block w-full px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-              <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="message" className="block text-sm font-medium text-gray-700">Message</label>
-              <textarea
-                id="message"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                rows="3"
-                className="mt-1 block w-full px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                required
-              />
-            </div>
-
+    <div className="min-h-screen bg-gray-100">
+      < Navbar />
+      <div className="max-w-md mx-auto p-6 bg-white rounded-md shadow-md mt-10">
+        <h1 className="text-2xl font-bold mb-4">Contact Us</h1>
+        <form
+          className="space-y-4"
+          onSubmit={handleSubmit}
+          name="submit-to-google-sheet"
+        >
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder="Your Email"
+              required
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="message"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Message
+            </label>
+            <textarea
+              id="message"
+              name="message"
+              rows="4"
+              value={formData.message}
+              onChange={handleInputChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder="Your Message"
+              required
+            ></textarea>
+          </div>
+          <div className="flex justify-end">
             <button
               type="submit"
-              className="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               Send Message
             </button>
-          </form>
-        </div>
+          </div>
+        </form>
+        {message && <p className="mt-4 text-green-600">{message}</p>}
       </div>
     </div>
-    </>
   );
 }
+
+export default Contact;

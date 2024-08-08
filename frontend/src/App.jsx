@@ -68,7 +68,8 @@ import PrivacyPolicy from "./pages/policy";
 import Terms from "./pages/terms";
 import Returns from "./pages/return";
 import { DeliveryProvider } from "./Context/DeliveryContext";
-
+import AgentList from "./pages/Admin/AgentList";
+import BusinessList from "./pages/Admin/BusinessList";
 
 function App() {
   return (
@@ -80,6 +81,8 @@ function App() {
               {/* <Route path="/admin" element={<AdminDashboard />} /> */}
               <Route path="/admin/requests" element={<AgentRequests />} />
               <Route path="/admin/profile" element={<Profile />} />
+              <Route path="/admin/agents" element={<AgentList />} />
+              <Route path="/admin/businesses" element={<BusinessList />} />
 
               <Route path="/seller" element={<SellerLayout />}>
                 {/* Seller Routes */}
@@ -166,7 +169,7 @@ function App() {
                 path="/reset-password/:token"
                 element={<ResetPassword />}
               />
-              <Route path="/about-us" element={<About />} />
+              <Route path="/about" element={<About />} />
               <Route path="/contact-us" element={<Contact />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<Terms />} />
