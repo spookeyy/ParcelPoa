@@ -8,7 +8,7 @@ import Logo from "../../assets/Logo.png"; // Updated path
 
 function BusinessDashboard() {
   const { currentUser } = useContext(UserContext);
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate(); 
 
   return (
     <div className="min-h-screen bg-white">
@@ -24,19 +24,19 @@ function BusinessDashboard() {
       Business Dashboard
     </h1>
     {currentUser && (
-      <p className="text-gray-700 mt-2 text-xl lg:text-2xl">Welcome, {currentUser.name}</p>
+      <p className="bg-gradient-to-br from-blue-300 to-indigo-400 text-transparent bg-clip-text mt-2 text-xl lg:text-2xl">Welcome, {currentUser.name}</p>
     )}
   </div>
 </header>
 
-      <main className="min-h-screen flex flex-col bg-gradient-to-br from-blue-300 to-indigo-400 space-y-8 pb-28">
-  <div className="flex-1">
+      <main className="min-h-screen flex flex-col bg-white space-y-8 pb-28">
+  <div className="flex-1 pt-12">
     <OrderManagement />
   </div>
   <div className="flex-1">
     <ParcelTracking />
   </div>
-  <div className="flex-1 pt-28">
+  <div className="flex-1 pt-10">
     <PickupScheduling />
   </div>
 </main>
