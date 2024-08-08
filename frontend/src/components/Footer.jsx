@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function Footer() {
   return (
-    <footer className="bg-indigo-700 text-white py-6">
+    <footer className="bg-yellow-600 text-white py-6">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center text-center md:text-left mb-4">
           <nav className="mb-4 md:mb-0">

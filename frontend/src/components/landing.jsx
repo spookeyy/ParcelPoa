@@ -18,7 +18,7 @@ export default function Landing() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
               <div className="flex flex-col justify-center items-start">
                 <h8 className="text-4xl font-bold  mb-8">
-                  <span className="text-indigo-500">ParcelPoa</span>, Deliver
+                  <span className="text-yellow-500">ParcelPoa</span>, Deliver
                   your Order
                 </h8>
                 <h10 className="text-2xl font-bold italic mb-4">
@@ -31,13 +31,13 @@ export default function Landing() {
                 <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 justify-center md:justify-start">
                   <Link
                     to="/signup"
-                    className="bg-indigo-500 text-white font-medium py-2 px-4 rounded-full hover:bg-indigo-600"
+                    className="bg-yellow-500 text-white font-medium py-2 px-4 rounded-full hover:bg-yellow-600"
                   >
                     Get Started
                   </Link>
                   <Link
                     to="/tracking"
-                    className="bg-transparent hover:bg-indigo-500 text-indigo-700 font-semibold hover:text-white py-2 px-4 rounded-full border border-indigo-500 hover:border-transparent"
+                    className="bg-transparent hover:bg-yellow-500 text-yellow-700 font-semibold hover:text-white py-2 px-4 rounded-full border border-yellow-500 hover:border-transparent"
                   >
                     Track Order
                   </Link>

@@ -32,7 +32,7 @@ const FilterBar = ({ filters, onFilterChange, onReset }) => (
       <option value="Approved">Approved</option>
       <option value="Rejected">Rejected</option>
     </select>
-    <button onClick={onReset} className="bg-blue-500 text-white p-2 rounded-md">
+    <button onClick={onReset} className="bg-yellow-500 p-2 rounded-md">
       Reset
     </button>
   </div>

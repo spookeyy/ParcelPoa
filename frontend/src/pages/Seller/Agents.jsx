@@ -29,7 +29,7 @@ const FilterBar = ({ filters, onFilterChange, onReset }) => (
     </select>
     <button
       onClick={onReset}
-      className="bg-red-600 text-white py-1 px-3 rounded-md text-base hover:bg-red-700"
+      className="bg-yellow-300  py-1 px-3 rounded-md text-base hover:bg-yellow-500"
       aria-label="Reset filters"
     >
       Reset Filter
