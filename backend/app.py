@@ -442,9 +442,11 @@ def create_delivery():
 @jwt_required()
 def get_assigned_deliveries():
     user = User.query.get(get_jwt_identity())
+    print(f"User: {user}")
     if user.user_role != 'Agent':
         return jsonify({"message": "Only agents can get assigned deliveries"}), 403
     deliveries = Delivery.query.filter_by(agent_id=user.user_id).all()
+    print(f"Deliveries: {deliveries}") 
     return jsonify([delivery.to_dict() for delivery in deliveries])
 
 @app.route('/update_delivery_status/<int:delivery_id>', methods=['PUT'])

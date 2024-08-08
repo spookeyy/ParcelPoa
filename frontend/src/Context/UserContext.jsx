@@ -197,6 +197,32 @@ export const UserProvider = ({ children }) => {
     }
   }, [authToken, onChange, fetchUserProfile]);
 
+
+  // current user
+  const getCurrentUser = () => {
+    return fetch(`${server}/current_user`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.user_id) {
+          setCurrentUser(data);
+        } else {
+          setAuthToken(null);
+          localStorage.removeItem("access_token");
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching current user:", error);
+        setAuthToken(null);
+        localStorage.removeItem("access_token");
+      });
+  };
+
+
   // Request Password Reset
   const requestPasswordReset = (email, frontendUrl) => {
     return fetch(`${server}/request-reset-password`, {
