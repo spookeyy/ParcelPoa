@@ -46,7 +46,7 @@ function SellerSidebar() {
     <div className="inline-block">
       <div className="relative">
         <div
-          className="bg-blue-500 text-white w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-lg md:text-xl font-semibold cursor-pointer hover:bg-blue-600 hover:text-blue-500 transition-colors duration-300"
+          className="bg-gradient-to-br from-yellow-200 to-yellow-600 text-white w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-lg md:text-xl font-semibold cursor-pointer hover:bg-blue-600 hover:text-blue-500 transition-colors duration-300"
           onClick={toggleDropdown}
         >
           {userInitial}
