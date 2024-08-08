@@ -9,9 +9,9 @@ function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 py-6 px-4 bg-indigo-200 shadow z-50">
+    <header className="sticky top-0 py-6 px-4 bg-yellow-500 shadow z-50">
       <div className="container mx-auto flex justify-between items-center">
-        <h1 className="font-bold text-3xl text-indigo-500">ParcelPoa</h1>
+        <h1 className="font-bold text-3xl ">ParcelPoa</h1>
         <div className="sm:hidden">
           <button
             onClick={toggleMenu}

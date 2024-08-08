@@ -1,10 +1,13 @@
 import React from 'react';
-
+import Navbar from '../components/Navbar';
 export default function TermsOfService() {
   return (
-    <div className="bg-gradient-to-br from-blue-300 to-indigo-700 min-h-screen p-8">
-      <div className="container mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
-        <div className="bg-indigo-500 p-8">
+    <>
+    <Navbar />
+    <div className="bg-white min-h-screen p-8">
+      
+      <div className=" mt-6 container mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+        <div className="bg-yellow-500 p-8">
           <h1 className="text-3xl font-bold text-white">Terms of Service</h1>
         </div>
         <div className="p-8">
@@ -27,5 +30,6 @@ export default function TermsOfService() {
         </div>
       </div>
     </div>
+    </>
   );
 }

@@ -166,7 +166,7 @@ function App() {
                 path="/reset-password/:token"
                 element={<ResetPassword />}
               />
-              <Route path="/about-us" element={<About />} />
+              <Route path="/about" element={<About />} />
               <Route path="/contact-us" element={<Contact />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<Terms />} />
