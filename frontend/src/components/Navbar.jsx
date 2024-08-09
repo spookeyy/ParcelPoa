@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from "react-router-dom";
+import logo from "../assets/Logo.png";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,13 +10,20 @@ function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 py-6 px-4 bg-yellow-500 shadow z-50">
+    <header className="sticky top-0 py-1 px-2 bg-yellow-500 shadow z-50">
       <div className="container mx-auto flex justify-between items-center">
-        <h1 className="font-bold text-3xl ">ParcelPoa</h1>
+        <div className="flex items-center">
+          <img
+            src={logo}
+            alt="ParcelPoa Logo"
+            className="h-14 w-auto md:h-16 md:w-auto mr-4 sm:mr-0"
+          />
+          <h1 className="font-bold text-3xl ">ParcelPoa</h1>
+        </div>
         <div className="sm:hidden">
           <button
             onClick={toggleMenu}
-            className="text-indigo-500 focus:outline-none"
+            className="text-black-700 focus:outline-none"
           >
             {isOpen ? (
               <svg
@@ -56,43 +64,43 @@ function Navbar() {
           <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-2 sm:mt-0 position sticky">
             <Link
               to="/"
-              className="text-blue-700 font-medium hover:text-indigo-800 hover:underline"
+              className="text-black-700 font-medium hover:text-white hover:underline"
             >
               Home
             </Link>
             {/* <Link
               to="/dashboard"
-              className="text-blue-700 font-medium hover:text-indigo-800 hover:underline"
+              className="text-black-700 font-medium hover:text-white hover:underline"
             >
               Dashboard
             </Link> */}
             <Link
               to="/tracking"
-              className="text-blue-700 hover:text-indigo-800 font-medium hover:underline"
+              className="text-black-700 hover:text-white font-medium hover:underline"
             >
               Track Order
             </Link>
             <Link
               to="/contact-us"
-              className="text-blue-700 font-medium hover:text-indigo-800 hover:underline"
+              className="text-black-700 font-medium hover:text-white hover:underline"
             >
               Contact Us
             </Link>
             <Link
-              to="/about-us"
-              className="text-blue-700 font-medium hover:text-indigo-800 hover:underline "
+              to="/about"
+              className="text-black-700 font-medium hover:text-white hover:underline "
             >
               About Us
             </Link>
             <Link
               to="/signup"
-              className="text-blue-700 font-medium hover:text-indigo-800 hover:underline"
+              className="text-black-700 font-medium hover:text-white hover:underline"
             >
               Sign Up
             </Link>
             <Link
               to="/login"
-              className="text-blue-700 font-medium hover:text-indigo-800 hover:underline"
+              className="text-black-700 font-medium hover:text-white hover:underline"
             >
               Log In
             </Link>
