@@ -66,9 +66,9 @@ export default function AgentRequests() {
     }
   };
 
-  const handleView = (id) => {
-    navigate(`/agent/${id}`);
-  };
+const handleView = (user_id) => {
+  navigate(`/admin/agent/${user_id}`);
+};
 
   const handleApprove = async (id) => {
     try {
