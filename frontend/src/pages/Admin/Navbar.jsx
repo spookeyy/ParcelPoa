@@ -20,31 +20,31 @@ function Navbar() {
                             <div className="ml-10 flex space-x-4 mt-4">
                             <Link
                                     to="/"
-                                    className=" hover:underline  px-3 py-2 rounded-md  font-medium"
+                                    className=" hover:underline hover:text-white  px-3 py-2 rounded-md  font-medium"
                                 >
                                     Home
                                 </Link>
                                 {/* <Link
                                     to="/admin"
-                                    className=" hover:underline  px-3 py-2 rounded-md  font-medium"
+                                    className=" hover:underline hover:text-white  px-3 py-2 rounded-md  font-medium"
                                 >
                                     Dashboard
                                 </Link> */}
                                 <Link
                                     to="/admin/agents"
-                                    className=" hover:underline  px-3 py-2 rounded-md  font-medium"
+                                    className=" hover:underline hover:text-white  px-3 py-2 rounded-md  font-medium"
                                 >
                                     Agents
                                 </Link>
                                 <Link
                                     to="/admin/requests"
-                                    className=" hover:underline  px-3 py-2 rounded-md  font-medium"
+                                    className=" hover:underline hover:text-white  px-3 py-2 rounded-md  font-medium"
                                 >
                                     Requests
                                 </Link>
                                 <Link
                                     to="/admin/businesses"
-                                    className=" hover:underline  px-3 py-2 rounded-md  font-medium"
+                                    className=" hover:underline hover:text-white  px-3 py-2 rounded-md  font-medium"
                                 >
                                     Businesses
                                 </Link>
