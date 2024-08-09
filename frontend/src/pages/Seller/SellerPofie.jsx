@@ -58,7 +58,7 @@ export default function SellerProfile({ onClose }) {
         if (data.message === "Profile updated successfully") {
           setMessage("Profile updated successfully");
           toast.success(data.message);
-          setTimeout(() => onClose(), 2000); // Close modal after a delay
+          setTimeout(onClose, 2000); // Close modal after a delay
         } else {
           setMessage("Profile update failed");
         }
@@ -200,4 +200,5 @@ export default function SellerProfile({ onClose }) {
       )}
     </div>
   );
+
 }
