@@ -10,12 +10,12 @@ export default function Header() {
     <header className="bg-indigo-200 fixed top-0 left-0 right-0 z-10 shadow-lg py-3 ">
       <div className="container mx-auto flex justify-between items-center position sticky">
         <Link to="/" className="flex items-center">
-          <img src="/src/assets/Logo.png" alt="Logo" className="h-10 w-10" />
+          <img src="/src/assets/Logo.png" alt="Logo" className="h-16 w-16" />
         </Link>
         <div className="flex space-x-4 items-center text-sm">
-          <Link to="/seller" className="text-blue-700 hover:text-indigo-800 text-medium transition-colors">
+          {/* <Link to="/seller" className="text-blue-700 hover:text-indigo-800 text-medium transition-colors">
             Dashboard
-          </Link>
+          </Link> */}
          
           <Link to="/business/dashboard" className="text-blue-700 hover:text-indigo-800 text-medium transition-colors">
             Business Dashboard
