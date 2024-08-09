@@ -3,7 +3,6 @@ import { server } from "../../../config.json";
 import { UserContext } from "../../Context/UserContext";
 import ParcelCard from "./ParcelCard";
 
-
 export default function Parcels() {
   const [parcels, setParcels] = useState([]);
   const { authToken } = useContext(UserContext);
@@ -15,12 +14,7 @@ export default function Parcels() {
       return;
     }
 
-    let url = `${server}/agent_parcels`;
-    if (activeFilter !== "all") {
-      url += `?status=${activeFilter}`;
-    }
-
-    fetch(url, {
+    fetch(`${server}/agent_parcels`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -47,7 +41,11 @@ export default function Parcels() {
       .catch((error) => {
         console.error("Error fetching parcels:", error);
       });
-  }, [authToken, activeFilter]);
+  }, [authToken]);
+
+  const filteredParcels = parcels.filter(
+    (parcel) => activeFilter === "all" || parcel.status === activeFilter
+  );
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg mb-8 border border-gray-200">
@@ -79,7 +77,7 @@ export default function Parcels() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {parcels.map((parcel) => (
+        {filteredParcels.map((parcel) => (
           <ParcelCard key={parcel.parcel_id} parcel={parcel} />
         ))}
       </div>
