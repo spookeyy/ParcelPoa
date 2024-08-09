@@ -9,21 +9,21 @@ export default function Landing() {
     <div className="bg-white min-h-screen flex flex-col">
       <Navbar />
 
-      <div className="container mx-auto p-8 flex-grow">
+      <div className="container mx-auto p-8 flex-grow flex justify-center items-center">
         <div
           className="bg-white p-8 rounded-lg shadow-lg"
           style={{ height: "120%" }}
         >
-          <main className="py-16 px-4 flex items-center">
+          <main className="py-16 px-4 flex items-center justify-center">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
               <div className="flex flex-col justify-center items-start">
-                <h8 className="text-4xl font-bold  mb-8">
+                <h3 className="text-4xl font-bold  mb-8">
                   <span className="text-yellow-500">ParcelPoa</span>, Deliver
                   your Order
-                </h8>
-                <h10 className="text-2xl font-bold italic mb-4">
+                </h3>
+                <h5 className="text-2xl font-bold italic mb-4">
                   Speedy Delivery, Reliable Service
-                </h10>
+                </h5>
                 <p className="text-lg mb-8">
                   At Parcel Poa, we ensure your packages are delivered swiftly
                   and safely, providing you with peace of mind every time.
@@ -46,7 +46,7 @@ export default function Landing() {
               </div>
               <div className="mt-16 md:mt-0 w-full">
                 <img
-                  src="https://static.vecteezy.com/system/resources/previews/013/522/695/large_2x/cheerful-delivery-man-happy-young-courier-holding-a-cardboard-box-and-smiling-while-standing-against-white-background-photo.jpg"
+                  src="./src/assets/DeliveryGuy.png"
                   alt="Delivery Person"
                   className="h-auto max-w-lg ms-auto"
                 />
@@ -58,7 +58,7 @@ export default function Landing() {
             phoneNumber="+254705719325"
             accountName="ParcelPoa"
             statusMessage="A Trusted parcel tracking partner"
-            avatar="./src/assets/favicon.ico"
+            avatar="./src/assets/Logo.png"
             banner="./src/assets/favicon.ico"
             chatMessage="Hello, how can we help you?"
             darkMode
