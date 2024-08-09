@@ -337,6 +337,29 @@ export const UserProvider = ({ children }) => {
       });
   };
 
+  // FETCH ALL AGENTS
+  const fetchAllAgents = () => {
+    return fetch(`${server}/agents`, { 
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        if (res.agents) {
+          return res.agents;
+        } else {
+          throw new Error("An unexpected error occurred");
+        }
+      })
+      .catch((error) => {
+        toast.error("An error occurred while fetching agents");
+        throw error;
+      });
+  };
+
   const contextData = {
     currentUser,
     setCurrentUser,
@@ -353,10 +376,12 @@ export const UserProvider = ({ children }) => {
     approveAgentRequest,
     rejectAgentRequest,
     fetchAgentDetails,
-    getCurrentUser,
+    fetchAllAgents,
+    setAuthToken,
   };
 
   return (
     <UserContext.Provider value={contextData}>{children}</UserContext.Provider>
   );
 };
+

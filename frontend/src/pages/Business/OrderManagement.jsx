@@ -3,6 +3,7 @@ import { UserContext } from "../../Context/UserContext";
 import ParcelForm from "./ParcelForm";
 import { server } from "../../../config.json";
 import { toast } from "react-toastify";
+import Header from "./Header";
 
 function OrderManagement() {
   const [orders, setOrders] = useState([]);
@@ -54,8 +55,10 @@ function OrderManagement() {
   };
 
   return (
+    <div>
+      <Header />
+      {/* <OrderList orders={orders} /> */}
     <div className="container mx-auto px-4 py-8">
-      {/* Create New Order Section */}
       <div className="bg-gradient-to-br from-blue-300 to-indigo-400 rounded-xl shadow-lg p-8 max-w-5xl mx-auto mb-12"> {/* Added mb-12 */}
         <h2 className="text-3xl font-bold mb-6 text-center text-white">
           Create New Order
@@ -105,6 +108,7 @@ function OrderManagement() {
           </ul>
         </div>
       </div>
+    </div>
     </div>
   );
 }

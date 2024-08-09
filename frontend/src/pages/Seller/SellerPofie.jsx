@@ -72,13 +72,28 @@ export default function SellerProfile({ onClose }) {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-yellow-900 bg-opacity-50 z-50 p-4">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg mx-auto">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg mx-auto relative z-10">
         {/* Modal header */}
         <div className="flex items-center justify-between p-4 border-b border-yellow-200 rounded-t">
-          <h2 className="text-lg sm:text-xl font-semibold text-yellow-500">Business Profile</h2>
-          <button onClick={onClose} className="text-yellow-500 hover:text-yellow-700">
-            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+          <h2 className="text-lg sm:text-xl font-semibold text-yellow-500">
+            Business Profile
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-yellow-500 hover:text-yellow-700"
+          >
+            <svg
+              className="w-5 h-5 sm:w-6 sm:h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -87,7 +102,12 @@ export default function SellerProfile({ onClose }) {
         <div className="p-4 sm:p-6">
           <form onSubmit={handleUpdateProfile} className="space-y-4">
             <div className="mb-4">
-              <label htmlFor="name" className="block text-sm font-medium text-yellow-700">Name</label>
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-yellow-700"
+              >
+                Name
+              </label>
               <input
                 type="text"
                 id="name"
@@ -98,7 +118,12 @@ export default function SellerProfile({ onClose }) {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="email" className="block text-sm font-medium text-yellow-700">Email</label>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-yellow-700"
+              >
+                Email
+              </label>
               <input
                 type="email"
                 id="email"
@@ -109,7 +134,12 @@ export default function SellerProfile({ onClose }) {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="phone" className="block text-sm font-medium text-yellow-700">Phone Number</label>
+              <label
+                htmlFor="phone"
+                className="block text-sm font-medium text-yellow-700"
+              >
+                Phone Number
+              </label>
               <input
                 type="tel"
                 id="phone"
@@ -120,7 +150,12 @@ export default function SellerProfile({ onClose }) {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="userRole" className="block text-sm font-medium text-yellow-700">User Role</label>
+              <label
+                htmlFor="userRole"
+                className="block text-sm font-medium text-yellow-700"
+              >
+                User Role
+              </label>
               <input
                 type="text"
                 id="userRole"
@@ -135,7 +170,9 @@ export default function SellerProfile({ onClose }) {
             >
               Update Profile
             </button>
-            {message && <div className="mt-4 text-green-500 text-center">{message}</div>}
+            {message && (
+              <div className="mt-4 text-green-500 text-center">{message}</div>
+            )}
           </form>
         </div>
 
@@ -154,9 +191,13 @@ export default function SellerProfile({ onClose }) {
             Change Password
           </button>
         </div>
-
-        {showChangePassword && <ChangePassword />}
       </div>
+
+      {showChangePassword && (
+        <div className="fixed inset-0 flex items-center justify-center bg-yellow-900 bg-opacity-50 z-50">
+          <ChangePassword onClose={() => setShowChangePassword(false)} />
+        </div>
+      )}
     </div>
   );
 }

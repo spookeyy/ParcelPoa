@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
@@ -64,10 +65,9 @@ export default function Agents() {
     fetchAgents();
   }, []);
 
-  const handleView = (id) => {
-    navigate(`/agent-trends/${id}`);
+  const handleView = (user_id) => {
+    navigate(`/admin/agent/${user_id}`);
   };
-
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this client request?")) {
       try {
@@ -103,7 +103,7 @@ export default function Agents() {
   );
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-gray-50 mt-4 min-h-screen">
       {/* Title */}
       <h1 className="text-2xl font-bold mb-6 text-gray-800">Agents List</h1>
 
@@ -131,7 +131,7 @@ export default function Agents() {
           <tbody className="text-gray-700 text-sm">
             {filteredAgentRequests.map((agent) => (
               <tr
-                key={agent.id}
+                key={agent.user_id} // Use user_id as the key
                 className="hover:bg-gray-50 transition-colors duration-300"
               >
                 <td className="px-4 py-2">
@@ -141,12 +141,11 @@ export default function Agents() {
                     className="w-12 h-12 rounded-full object-cover"
                   />
                 </td>
-                <td className="px-4 py-2">{agent.id}</td>
+                <td className="px-4 py-2">{agent.user_id}</td>{" "}
+                {/* Use user_id here */}
                 <td className="px-4 py-2">{agent.name}</td>
                 <td className="px-4 py-2">{agent.email}</td>
                 <td className="px-4 py-2">{agent.phone_number}</td>
-                {/* <td className="px-4 py-2">{agent.address}</td>
-                <td className="px-4 py-2">{agent.deliveries}</td> */}
                 <td className="px-4 py-2">
                   <span
                     className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${
@@ -160,16 +159,16 @@ export default function Agents() {
                 </td>
                 <td className="px-4 py-2 flex items-center gap-2">
                   <button
-                    onClick={() => handleView(agent.id)}
+                    onClick={() => handleView(agent.user_id)}
                     className="text-blue-600 hover:text-blue-800 transition-colors duration-300 text-base"
-                    aria-label={`View Agent ID: ${agent.id}`}
+                    aria-label={`View Agent ID: ${agent.user_id}`}
                   >
                     <PencilIcon className="w-5 h-5" />
                   </button>
                   <button
-                    onClick={() => handleDelete(agent.id)}
+                    onClick={() => handleDelete(agent.user_id)}
                     className="text-gray-600 hover:text-gray-800 transition-colors duration-300 text-base"
-                    aria-label={`Delete Agent ID: ${agent.id}`}
+                    aria-label={`Delete Agent ID: ${agent.user_id}`}
                   >
                     <TrashIcon className="w-5 h-5" />
                   </button>
