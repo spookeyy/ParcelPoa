@@ -1,35 +1,16 @@
-
-
-import React, { useState, useEffect } from "react";
-import config from "../../config.json"; // Import the server URL
+/* eslint-disable react/prop-types */
+import React, { useContext, useEffect, useState } from "react";
+import { DeliveryContext } from "../../Context/DeliveryContext";
 
 export default function ManageDeliveries({ openSidebar }) {
-  const [deliveries, setDeliveries] = useState([]);
-  const [notification, setNotification] = useState(null);
+  const { deliveries, fetchDeliveries } = useContext(DeliveryContext);
+
+  const [notification, setNotification] = useState("");
+  const setDeliveries = useContext(DeliveryContext).setDeliveries;
 
   useEffect(() => {
-    // Fetch delivery data from the backend
-    fetch(`${config.server}/api/deliveries`) // Use the server URL from config
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setDeliveries(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching deliveries:", error);
-      });
-  }, []);
-
-  useEffect(() => {
-    if (notification) {
-      // Simulate notification
-      console.log(notification);
-    }
-  }, [notification]);
+    fetchDeliveries();
+  }, [fetchDeliveries]);
 
   const handleStatusChange = (id, newStatus) => {
     const updatedDelivery = deliveries.find((delivery) => delivery.id === id);
@@ -44,7 +25,9 @@ export default function ManageDeliveries({ openSidebar }) {
   };
 
   const filteredDeliveries = {
-    inTransit: deliveries.filter((delivery) => delivery.status === "In Transit"),
+    inTransit: deliveries.filter(
+      (delivery) => delivery.status === "In Transit"
+    ),
     scheduled: deliveries.filter((delivery) => delivery.status === "Scheduled"),
     delivered: deliveries.filter((delivery) => delivery.status === "Delivered"),
   };
@@ -79,14 +62,12 @@ export default function ManageDeliveries({ openSidebar }) {
           </thead>
           <tbody>
             {filteredDeliveries.inTransit.map((delivery) => (
-              <tr key={delivery.id}>
+              <tr key={delivery.delivery_id}>
                 <td className="border p-2">{delivery.parcel}</td>
                 <td className="border p-2">{delivery.status}</td>
                 <td className="border p-2">
                   <button
-                    onClick={() =>
-                      handleStatusChange(delivery.id, "Delivered")
-                    }
+                    onClick={() => handleStatusChange(delivery.delivery_id, "Delivered")}
                     className="w-full px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600"
                   >
                     Mark as Delivered
