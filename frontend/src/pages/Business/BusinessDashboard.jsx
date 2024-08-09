@@ -1,31 +1,24 @@
 import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../../Context/UserContext";
 // import OrderManagement from "./OrderManagement";
 // import ParcelTracking from "./ParcelTracking";
 // import PickupScheduling from "./PickupScheduling";
 import Header from "./Header";
 
 
-
 function BusinessDashboard() {
+  const { currentUser } = useContext(UserContext);
   const navigate = useNavigate(); 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-200 to-yellow-600">
       <Header />
-      {/* 
-      <main className="min-h-screen flex flex-col bg-white space-y-8 pb-28">
-  <div className="flex-1 pt-12">
-    <OrderManagement />
-  </div>
-  <div className="flex-1">
-    <ParcelTracking />
-  </div>
-  <div className="flex-1 pt-10">
-    <PickupScheduling />
-  </div>
-</main> */}
-
+      {currentUser && (
+        <p className="bg-gradient-to-br from-yellow-200 to-yellow-600 items-center text-center bg-clip-text mt-2 text-xl lg:text-xl">
+          Welcome, <span className="font-bold">{currentUser.name}</span>
+        </p>
+      )}
       <div className="pt-32 flex-grow flex flex-col items-center   py-4 px-2 sm:px-4 lg:px-6 pb-32">
         <div className="w-full mt-0 max-w-2xl bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:p-8">
           <div className="text-center">
