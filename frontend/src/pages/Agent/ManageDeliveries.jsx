@@ -1,13 +1,13 @@
-<<<<<<< HEAD
+
 
 
 import React, { useState, useEffect } from "react";
 import config from "../../../config.json";   // Import the server URL
-=======
+
 /* eslint-disable react/prop-types */
-import React, { useContext, useEffect, useState } from "react";
+import  { useContext } from "react";
 import { DeliveryContext } from "../../Context/DeliveryContext";
->>>>>>> 647593264571be4143e20903fc74805db326e49a
+
 
 export default function ManageDeliveries({ openSidebar }) {
   const { deliveries, fetchDeliveries } = useContext(DeliveryContext);

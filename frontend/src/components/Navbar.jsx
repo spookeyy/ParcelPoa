@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/Logo.png";
 
@@ -10,108 +10,114 @@ function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 py-1 px-2 bg-yellow-500 shadow z-50">
-      <div className="container mx-auto flex justify-between items-center">
-        <div className="flex items-center">
+    <nav className="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 left-0 border-b border-gray-200 dark:border-gray-600">
+      <div className="max-w-screen-xl mx-auto flex items-center justify-between p-4">
+        <Link to="/" className="flex items-center space-x-2">
           <img
             src={logo}
             alt="ParcelPoa Logo"
-            className="h-14 w-auto md:h-16 md:w-auto mr-4 sm:mr-0"
+            className="h-8 md:h-10"
           />
-          <h1 className="font-bold text-3xl ">ParcelPoa</h1>
-        </div>
-        <div className="sm:hidden">
+          <span className="text-2xl bg-gradient-to-br from-yellow-200 to-yellow-600 text-transparent bg-clip-text font-semibold whitespace-nowrap dark:text-white">
+            ParcelPoa
+          </span>
+        </Link>
+        <div className="flex md:hidden">
           <button
             onClick={toggleMenu}
-            className="text-black-700 focus:outline-none"
+            type="button"
+            className="inline-flex items-center justify-center p-2 rounded-md text-yellow-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+            aria-controls="mobile-menu"
+            aria-expanded={isOpen}
           >
-            {isOpen ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 "
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16m-7 6h7"
-                />
-              </svg>
-            )}
+            <span className="sr-only">Open main menu</span>
+             <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
+        </svg>
           </button>
         </div>
-        <nav
-          className={`sm:flex sm:items-center ${isOpen ? "block" : "hidden"}`}
-        >
-          <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-2 sm:mt-0 position sticky">
-            <Link
-              to="/"
-              className="text-black-700 font-medium hover:text-white hover:underline"
-            >
-              Home
-            </Link>
-            {/* <Link
-              to="/dashboard"
-              className="text-black-700 font-medium hover:text-white hover:underline"
-            >
-              Dashboard
-            </Link> */}
-            <Link
-              to="/tracking"
-              className="text-black-700 hover:text-white font-medium hover:underline"
-            >
-              Track Order
-            </Link>
-            <Link
-              to="/contact-us"
-              className="text-black-700 font-medium hover:text-white hover:underline"
-            >
-              Contact Us
-            </Link>
-            <Link
-              to="/about"
-              className="text-black-700 font-medium hover:text-white hover:underline "
-            >
-              About Us
-            </Link>
-            <Link
-              to="/signup"
-              className="text-black-700 font-medium hover:text-white hover:underline"
-            >
-              Sign Up
-            </Link>
-            <Link
-              to="/login"
-              className="text-black-700 font-medium hover:text-white hover:underline"
-            >
-              Log In
-            </Link>
-          </div>
-          {/* <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mt-4 sm:mt-0">
-            <Link to="/signup" className="bg-indigo-500 text-white font-medium py-2 px-4 rounded-full hover:bg-indigo-600 text-center">Sign Up</Link>
-            <Link to="/login" className="bg-transparent hover:bg-indigo-500 text-indigo-700 font-semibold hover:text-white py-2 px-4 rounded-full border border-indigo-500 hover:border-transparent text-center">Log In</Link>
-          </div> */}
-        </nav>
+        <div className="hidden md:flex md:items-center md:justify-end md:space-x-6">
+          <Link
+            to="/"
+            className="bg-gradient-to-br from-yellow-200 to-yellow-600 text-transparent bg-clip-text hover:text-green-700 dark:text-white dark:hover:text-green-500"
+          >
+            Home
+          </Link>
+          <Link
+            to="/about"
+            className="bg-gradient-to-br from-yellow-200 to-yellow-600 text-transparent bg-clip-text hover:text-green-700 dark:text-white dark:hover:text-green-500"
+          >
+            About
+          </Link>
+          <Link
+            to="/tracking"
+            className="bg-gradient-to-br from-yellow-200 to-yellow-600 text-transparent bg-clip-text hover:text-green-700 dark:text-white dark:hover:text-green-500"
+          >
+            Track Order
+          </Link>
+          <Link
+            to="/contact-us"
+            className="bg-gradient-to-br from-yellow-200 to-yellow-600 text-transparent bg-clip-text hover:text-green-700 dark:text-white dark:hover:text-green-500"
+          >
+            Contact Us
+          </Link>
+          <Link
+            to="/signup"
+            className="bg-gradient-to-br from-yellow-200 to-yellow-600 text-transparent bg-clip-text hover:text-green-700 dark:text-white dark:hover:text-green-500"
+          >
+            Sign Up
+          </Link>
+          <Link
+            to="/login"
+            className="bg-gradient-to-br from-yellow-200 to-yellow-600 text-transparent bg-clip-text hover:text-green-700 dark:text-white dark:hover:text-green-500"
+          >
+            Log In
+          </Link>
+        </div>
       </div>
-    </header>
+
+      {/* Mobile Menu */}
+      <div className={`${isOpen ? 'block' : 'hidden'} md:hidden`}>
+        <div className="space-y-1 px-2 pt-2 pb-3">
+          <Link
+            to="/"
+            className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-700 hover:bg-gray-50 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white"
+          >
+            Home
+          </Link>
+          <Link
+            to="/about"
+            className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-700 hover:bg-gray-50 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white"
+          >
+            About
+          </Link>
+          <Link
+            to="/tracking"
+            className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-700 hover:bg-gray-50 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white"
+          >
+            Track Order
+          </Link>
+          <Link
+            to="/contact-us"
+            className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-700 hover:bg-gray-50 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white"
+          >
+            Contact Us
+          </Link>
+          <Link
+            to="/signup"
+            className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-700 hover:bg-gray-50 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white"
+          >
+            Sign Up
+          </Link>
+          <Link
+            to="/login"
+            className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-700 hover:bg-gray-50 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white"
+          >
+            Log In
+          </Link>
+        </div>
+      </div>
+    </nav>
   );
 }
 

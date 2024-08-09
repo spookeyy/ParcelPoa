@@ -38,7 +38,7 @@ export default function Login() {
   return (
     <>
       <Navbar />
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-yellow-100 to-yellow-400">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-yellow-100 to-yellow-400 pt-32 pb-32">
         <div className="login-container flex flex-col p-8 bg-gradient-to-bl from-yellow-200 to-yellow-400 bg-opacity-20 backdrop-blur-md shadow-lg rounded-lg max-w-md w-full m-4">
           <div className="flex items-center justify-center ">
             <img
