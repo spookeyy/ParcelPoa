@@ -7,6 +7,45 @@ import ManageDeliveries from "./ManageDeliveries";
 
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [totalDeliveries, setTotalDeliveries] = useState(0);
+  const [delivered, setDelivered] = useState(0);
+  const [inTransit, setInTransit] = useState(0);
+  const [assignedDeliveries, setAssignedDeliveries] = useState([]);
+
+  useEffect(() => {
+    const jwtToken = localStorage.getItem("jwt");
+
+    fetch(`${server}/assigned_deliveries`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error("Failed to fetch deliveries");
+      })
+      .then((data) => {
+        setAssignedDeliveries(data);
+        setTotalDeliveries(data.length);
+
+        const deliveredCount = data.filter(
+          (delivery) => delivery.status === "Delivered"
+        ).length;
+        setDelivered(deliveredCount);
+
+        const inTransitCount = data.filter(
+          (delivery) => delivery.status === "In Transit"
+        ).length;
+        setInTransit(inTransitCount);
+      })
+      .catch((error) => {
+        console.error("Error fetching deliveries:", error);
+      });
+  }, []);
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -44,12 +83,7 @@ export default function Dashboard() {
                     count={45}
                     color="text-yellow-500"
                   />
-                  <StatsCard
-                    icon="fa-hourglass-half"
-                    title="Pending Deliveries"
-                    count={75}
-                    color="text-blue-500"
-                  />
+                  
                   <StatsCard
                     icon="fa-truck-loading"
                     title="In Transit"
@@ -68,6 +102,6 @@ export default function Dashboard() {
         </Routes>
         </div>
       </div>
-    // </div>
+   
   );
 }

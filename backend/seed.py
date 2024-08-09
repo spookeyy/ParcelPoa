@@ -6,7 +6,8 @@ from faker import Faker
 from flask import Flask
 from sqlalchemy import text
 from models import db, User, Parcel, Delivery, Notification, Tracking, Order
-from app import app
+from app import app, mail
+from flask_mail import Message
 
 faker = Faker()
 
@@ -21,30 +22,52 @@ def generate_email(name):
     domain = random.choice(['gmail.com', 'yahoo.com', 'outlook.com'])
     return f'{username}@{domain}'
 
+def send_notification(email, subject, body):
+    with app.app_context():
+        msg = Message(subject, recipients=[email], body=body)
+        mail.send(msg)
+
 with app.app_context():
     db.drop_all()
     db.create_all()
 
     def seed_users(num_users=10):
+        # Create admin user
+        admin = User(
+            name='Admin',
+            email='admin@gmail.com',
+            phone_number=generate_phone_number(),
+            user_role='Admin',
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
+            profile_picture='default.png',
+            status='Available',
+            Request='Approved'
+        )
+        admin.set_password('admin1234')  # 8-character password
+        db.session.add(admin)
+
         user_roles = ['Business', 'Agent']
-        users = []
+        users = [admin]
         for _ in range(num_users):
             name = faker.name()
+            user_role = random.choice(user_roles)
             user = User(
                 name=name,
                 email=generate_email(name),
                 phone_number=generate_phone_number(),
-                user_role=random.choice(user_roles),
+                user_role=user_role,
                 created_at=datetime.now(timezone.utc),
                 updated_at=datetime.now(timezone.utc),
                 profile_picture='default.png',
-                status='Available'
+                status='Available',
+                Request='Approved' if user_role == 'Business' else 'Pending'
             )
             user.set_password('password')
             users.append(user)
             db.session.add(user)
         db.session.commit()
-        print(f"Seeded {num_users} users.")
+        print(f"Seeded {num_users + 1} users (including admin).")
         return users
 
     def seed_parcels(users, num_parcels=20):
@@ -80,12 +103,12 @@ with app.app_context():
 
     def seed_deliveries(parcels, users, num_deliveries=15):
         deliveries = []
-        agents = [user for user in users if user.user_role == 'Agent']
+        agents = [user for user in users if user.user_role == 'Agent' and user.Request == 'Approved']
         statuses = ['Scheduled', 'In Transit', 'Delivered']
         for parcel in random.sample(parcels, num_deliveries):
             delivery = Delivery(
                 parcel_id=parcel.parcel_id,
-                agent_id=random.choice(agents).user_id if random.choice([True, False]) else None,
+                agent_id=random.choice(agents).user_id if agents else None,
                 pickup_time=datetime.now(timezone.utc),
                 delivery_time=datetime.now(timezone.utc) + timedelta(days=random.randint(1, 5)),
                 status=random.choice(statuses),
@@ -167,3 +190,18 @@ with app.app_context():
     orders = seed_orders(users, parcels)
     notifications = seed_notifications(users)
     trackings = seed_tracking(parcels)
+
+    # Approve or reject pending agents
+    admin = User.query.filter_by(user_role='Admin').first()
+    pending_agents = User.query.filter_by(user_role='Agent', Request='Pending').all()
+    for agent in pending_agents:
+        if random.choice([True, False]):
+            agent.Request = 'Approved'
+            agent.status = 'Available'
+            send_notification(agent.email, 'Agent Request Approved', f'Your agent request has been approved. Welcome to our system!')
+        else:
+            agent.Request = 'Rejected'
+            agent.status = 'Unavailable'
+            send_notification(agent.email, 'Agent Request Rejected', f'We regret to inform you that your agent request has been rejected.')
+    db.session.commit()
+    print(f"Processed {len(pending_agents)} pending agent requests.")

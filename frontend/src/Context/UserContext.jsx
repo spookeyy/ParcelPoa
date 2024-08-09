@@ -79,12 +79,25 @@ export const UserProvider = ({ children }) => {
           localStorage.setItem("access_token", res.access_token);
           setCurrentUser(res.user);
 
+
           if (res.user.role === "Agent" || res.user.role === "Business") {
             toast.success(`Logged in Successfully as ${res.user.role}!`);
             nav(res.user.role === "Agent" ? "/agent" : "/seller");
+
+          const { role } = res.user;
+          const routes = {
+            Agent: "/agent",
+            Business: "/seller",
+            Admin: "/admin/requests", //TODO: change this later to "/admin" after peter creates the admin dashboard
+          };
+
+          if (role in routes) {
+            toast.success(`Logged in Successfully as ${role}!`);
+            nav(routes[role]);
+
           } else {
-            console.error("Unexpected role:", res.user.role);
-            throw new Error(`Unexpected role: ${res.user.role}`);
+            console.error("Unexpected role:", role);
+            throw new Error(`Unexpected role: ${role}`);
           }
         } else if (res.message) {
           throw new Error(res.message);
@@ -98,6 +111,7 @@ export const UserProvider = ({ children }) => {
         throw error;
       });
   }
+
 
   // UPDATE USER
   const updateUser = (name, email, phone_number) => {
@@ -186,7 +200,37 @@ export const UserProvider = ({ children }) => {
     }
   }, [authToken, onChange, fetchUserProfile]);
 
+
   // REQUEST PASSWORD RESET
+
+
+  // current user
+  const getCurrentUser = () => {
+    return fetch(`${server}/current_user`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.user_id) {
+          setCurrentUser(data);
+        } else {
+          setAuthToken(null);
+          localStorage.removeItem("access_token");
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching current user:", error);
+        setAuthToken(null);
+        localStorage.removeItem("access_token");
+      });
+  };
+
+
+  // Request Password Reset
+
   const requestPasswordReset = (email, frontendUrl) => {
     return fetch(`${config.server}/request-reset-password`, {
       method: "POST",
@@ -232,6 +276,54 @@ export const UserProvider = ({ children }) => {
       });
   };
 
+  // APPROVE AGENT REQUEST
+  const approveAgentRequest = (agentId) => {
+    return fetch(`${server}/approve-agent/${agentId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        if (res.message) {
+          toast.success(res.message);
+          return res;
+        } else {
+          throw new Error("An unexpected error occurred");
+        }
+      })
+      .catch((error) => {
+        toast.error("An error occurred");
+        throw error;
+      });
+  };
+
+  // REJECT AGENT REQUEST
+  const rejectAgentRequest = (agentId) => {
+    return fetch(`${server}/reject-agent/${agentId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        if (res.message) {
+          toast.success(res.message);
+          return res;
+        } else {
+          throw new Error("An unexpected error occurred");
+        }
+      })
+      .catch((error) => {
+        toast.error("An error occurred");
+        throw error;
+      });
+  };
+
   const contextData = {
     currentUser,
     setCurrentUser,
@@ -245,7 +337,10 @@ export const UserProvider = ({ children }) => {
     onChange,
     setOnChange,
     resetPassword,
+    approveAgentRequest,
+    rejectAgentRequest,
   };
+
 
   return (
     <UserContext.Provider value={contextData}>{children}</UserContext.Provider>

@@ -60,12 +60,12 @@ function Navbar() {
             >
               Home
             </Link>
-            <Link
+            {/* <Link
               to="/dashboard"
               className="text-blue-700 font-medium hover:text-indigo-800 hover:underline"
             >
               Dashboard
-            </Link>
+            </Link> */}
             <Link
               to="/tracking"
               className="text-blue-700 hover:text-indigo-800 font-medium hover:underline"

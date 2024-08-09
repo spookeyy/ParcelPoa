@@ -233,53 +233,76 @@ def change_password():
     db.session.commit()
     return jsonify({"message": "Password changed successfully"})
 
-
-# PARCEL ROUTES
-# @app.route('/parcels', methods=['POST'])
-# @jwt_required()
-# def create_parcel():
-#     data = request.get_json()
-#     user = User.query.get(get_jwt_identity())
+#ADMIN
+# approve agent 
+@app.route('/approve-agent/<int:agent_id>', methods=['PUT'])
+@jwt_required()
+def approve_agent(agent_id):
+    current_user = User.query.get(get_jwt_identity())
     
-#     if user.user_role != 'Business':
-#         return jsonify({"message": "Only business can create parcels"}), 403
+    if current_user.user_role != 'Admin':
+        return jsonify({"message": "Only admins can approve agent requests"}), 403
+    
+    agent = User.query.get(agent_id)
+    if not agent:
+        return jsonify({"message": "Agent not found"}), 404
+    
+    if agent.Request != 'Pending':
+        return jsonify({"message": "Agent is not in pending status"}), 400
+    
+    agent.Request = 'Approved'
+    agent.status = 'Available'
+    db.session.commit()
+    
+    # Send notification to the agent
+    if is_valid_email(agent.email):
+        send_notification(agent.email, 'Agent Request Approved', 
+                          f'Your agent request has been approved. Welcome to our system!')
+    else:
+        print(f"Invalid email for agent {agent_id}: {agent.email}. Notification not sent.")
+    
+    return jsonify({"message": "Agent request approved successfully"}), 200
 
-#     existing_tracking_numbers = {parcel.tracking_number for parcel in Parcel.query.all()}
-#     tracking_number = generate_unique_tracking_number(existing_tracking_numbers)
+@app.route('/reject-agent/<int:agent_id>', methods=['PUT'])
+@jwt_required()
+def reject_agent(agent_id):
+    current_user = User.query.get(get_jwt_identity())
+    
+    # Check if the current user is an admin
+    if current_user.user_role != 'Admin':
+        return jsonify({"message": "Only admins can reject agent requests"}), 403
+    
+    agent = User.query.get(agent_id)
+    if not agent:
+        return jsonify({"message": "Agent not found"}), 404
+    
+    if agent.Request != 'Pending':
+        return jsonify({"message": "Agent is not in pending status"}), 400
+    
+    agent.Request = 'Rejected'
+    agent.status = 'Unavailable'  # Set the status to Unavailable
+    db.session.commit()
+    
+    # Send notification to the agent
+    if is_valid_email(agent.email):
+        send_notification(agent.email, 'Agent Request Rejected', 
+                          f'Your agent request has been rejected. Please try again later.')
+    else:
+        print(f"Invalid email for agent {agent_id}: {agent.email}. Notification not sent.")
+    
+    return jsonify({"message": "Agent request rejected successfully"}), 200
 
-#     parcel = Parcel(
-#         sender_id=data['sender_id'],
-#         tracking_number=tracking_number,
-#         recipient_name=data['recipient_name'],
-#         recipient_address=data['recipient_address'],
-#         recipient_phone=data['recipient_phone'],
-#         description=data['description'],
-#         weight=data['weight'],
-#         status=data['status'],
-#         current_location=data['current_location'],
-#         sender_email=data['sender_email'],
-#         recipient_email=data['recipient_email'],
-#         category=data['category'],
-#         created_at=datetime.now(),
-#         updated_at=datetime.now()
-#     )
-#     db.session.add(parcel)
 
-#     db.session.flush()  # assigns an id to the parcel without committing it to the database
 
-#     new_tracking = Tracking(
-#         parcel_id=parcel.parcel_id,
-#         location=parcel.current_location,
-#         status=parcel.status
-#     )
-#     db.session.add(new_tracking)
-#     db.session.commit()
-
-#     # Send notifications to sender(seller) and recipient
-#     send_notification(parcel.sender_email, 'Parcel Registered', f'Your parcel with tracking number {parcel.tracking_number} has been processed.')
-#     send_notification(parcel.recipient_email, 'Parcel Coming Your Way', f'A parcel with tracking number {parcel.tracking_number} is on its way to you.')
-
-#     return jsonify({"message": "Parcel created successfully", "tracking_number": parcel.tracking_number}), 201
+# get all businesses as an admin
+@app.route('/get-businesses', methods=['GET'])
+@jwt_required()
+def get_businesses():
+    current_user = User.query.get(get_jwt_identity())
+    if current_user.user_role != 'Admin':
+        return jsonify({"message": "Only admins can get businesses"}), 403
+    businesses = User.query.filter_by(user_role='Business').all()
+    return jsonify([business.to_dict() for business in businesses])
 
 
 @app.route('/parcels', methods=['GET'])
@@ -419,10 +442,11 @@ def create_delivery():
 @jwt_required()
 def get_assigned_deliveries():
     user = User.query.get(get_jwt_identity())
+    print(f"User: {user}")
     if user.user_role != 'Agent':
         return jsonify({"message": "Only agents can get assigned deliveries"}), 403
     deliveries = Delivery.query.filter_by(agent_id=user.user_id).all()
-    print('assigned deliveries', deliveries)
+    print(f"Deliveries: {deliveries}") 
     return jsonify([delivery.to_dict() for delivery in deliveries])
 
 @app.route('/update_delivery_status/<int:delivery_id>', methods=['PUT'])
@@ -547,6 +571,7 @@ def schedule_pickup():
     # Create a new order
     new_order = Order(
         user_id=current_user_id,
+        order_number=generate_order_number(),
         parcel_id=new_parcel.parcel_id,
         created_at=datetime.now(),
         updated_at=datetime.now()
@@ -558,10 +583,15 @@ def schedule_pickup():
     if pickup_time_str.endswith('Z'):
         pickup_time_str = pickup_time_str[:-1]  # Remove the 'Z'
     pickup_time = datetime.fromisoformat(pickup_time_str).replace(tzinfo=timezone.utc)
-
+    
+    # Ensure selected_agent is provided
+    selected_agent = data.get('agent_id')
+    if not selected_agent:
+        return jsonify({"message": "Agent ID must be provided"}), 400
+    
     new_delivery = Delivery(
         parcel_id=new_parcel.parcel_id,
-        agent_id=user.user_id,
+        agent_id=selected_agent,
         pickup_time=pickup_time,
         status='Scheduled'
     )
@@ -574,26 +604,35 @@ def schedule_pickup():
     )
     db.session.add(new_tracking)
     
-    # agent = User.query.get(data['agent_id'])  # TODO: Check on this line
-    # agent.status = 'Unavailable'
+    # Update the status of the selected agent to 'Unavailable'
+    agent = User.query.get(selected_agent)
+    if agent:
+        agent.status = 'Unavailable'
+    else:
+        return jsonify({"message": "Invalid agent ID provided"}), 400
+    
     db.session.commit()
 
     recipient_email = data.get('recipient_email')
     if recipient_email:
         subject = f"Your parcel {new_parcel.tracking_number} is scheduled for pickup on {pickup_time.isoformat()}"
         body = f"Dear {data.get('recipient_name')},\n\nYour parcel {new_parcel.tracking_number} is scheduled for pickup on {pickup_time.isoformat()}."
-        send_notification(recipient_email, subject, body)    
-    selected_agent = data.get('agent_id')
+        send_notification(recipient_email, subject, body)
+    
     if selected_agent:
-        subject = f"New parcel {new_parcel.tracking_number} scheduled for pickup"
-        body = f"A new parcel {new_parcel.tracking_number} is scheduled for you to pickup on {pickup_time.isoformat()}.\n Please log in to your dashboard to accept the pickup.\n Location: {new_parcel.current_location}"
-        send_notification(selected_agent, subject, body)
+        agent_user = User.query.get(selected_agent)
+        if agent_user:
+            agent_email = agent_user.email
+            subject = f"New parcel {new_parcel.tracking_number} scheduled for pickup"
+            body = f"A new parcel {new_parcel.tracking_number} is scheduled for you to pickup on {pickup_time.isoformat()}.\nPlease log in to your dashboard to accept the pickup.\nLocation: {new_parcel.current_location}"
+            send_notification(agent_email, subject, body)
 
     return jsonify({
         "message": "Pickup scheduled successfully",
         "tracking_number": new_parcel.tracking_number,
         "pickup_time": pickup_time.isoformat()
     }), 201
+
 
 # Route to get all orders for a business
 @app.route('/business/orders', methods=['GET'])
@@ -650,16 +689,28 @@ def cancel_order(order_id):
     return jsonify({"message": "Order cancelled successfully"}), 200
 
 # get agents
-@app.route('/agents', methods=['GET'])
+@app.route('/get-agents', methods=['GET'])
 @jwt_required()
 def get_agents():
     user = User.query.get(get_jwt_identity())
-    if user.user_role != 'Business':
-        return jsonify({"message": "Only businesses can get agents"}), 403
+    if user.user_role != 'Admin':
+        return jsonify({"message": "Only admins can get agents"}), 403
     agents = User.query.filter_by(user_role='Agent').all()
+    print('agents', agents)
     return jsonify([agent.to_dict() for agent in agents])
 
 
+#available agents
+@app.route('/get-available-agents', methods=['GET'])
+@jwt_required()
+def get_available_agents():
+    user = User.query.get(get_jwt_identity())
+    if user.user_role == 'Agent':
+        return jsonify({"message": "Only admins and Businesses can get available agents"}), 403
+    
+    agents = User.query.filter_by(user_role='Agent', status='Available').all()
+    print('agents', agents)
+    return jsonify([agent.to_dict() for agent in agents])
 
 
 # TODO: ORDER ROUTES
@@ -679,8 +730,17 @@ def get_orders():
 # TODO: NOTIFICATION
 
 def send_notification(email, subject, body):
-    msg = Message(subject, recipients=[email], body=body)
-    mail.send(msg)
+    if not is_valid_email(email):
+        print(f"Invalid email address: {email}. Notification not sent.")
+        return
+
+    with app.app_context():
+        try:
+            msg = Message(subject, recipients=[email], body=body)
+            mail.send(msg)
+            print(f"Notification sent to {email}")
+        except Exception as e:
+            print(f"Failed to send notification to {email}: {str(e)}")
 
 # generate tracking numbers
 def generate_unique_tracking_number(existing_numbers):
@@ -689,6 +749,14 @@ def generate_unique_tracking_number(existing_numbers):
         tracking_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
         if tracking_number not in existing_numbers:
             return tracking_number
+
+
+def generate_order_number():
+    while True:
+        order_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+        existing_order = Order.query.filter_by(order_number=order_number).first()
+        if existing_order is None:
+            return order_number
 
 
 # RESET PASSWORD
@@ -797,6 +865,12 @@ def send_email(to_email, reset_url):
 
     return True
 
+#is valid email
+import re
+
+def is_valid_email(email):
+    pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+    return re.match(pattern, email) is not None
 
 # Handle image upload:
 import base64

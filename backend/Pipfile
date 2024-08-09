@@ -23,7 +23,13 @@ flask-bcrypt = "*"
 flask-jwt-extended = "*"
 =======
 pillow = "*"
+<<<<<<< HEAD
 >>>>>>> 4d791e8038c4c31038278c959049a1536bc7a587
+=======
+flask-migrate = "*"
+flask-bcrypt = "*"
+flask-jwt-extended = "*"
+>>>>>>> d5f5d9371feb39b76b25cf513c0b8c8b4e4b22ac
 
 [dev-packages]
 
