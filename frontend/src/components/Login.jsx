@@ -118,7 +118,7 @@ export default function Login() {
               Don't have an account?{" "}
               <Link
                 to="/signup"
-                className="text-yellow-600 hover:underline hover:text-yellow-800 font-medium transition duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+                className="text-yellow-800 hover:underline hover:text-yellow-800 font-medium transition duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
               >
                 Sign up
               </Link>
@@ -130,7 +130,7 @@ export default function Login() {
               >
                 <Link
                   to="/request-reset-password"
-                  className="text-sm text-yellow-600 hover:underline hover:text-yellow-800 font-medium transition duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+                  className="text-sm text-yellow-800 hover:underline hover:text-yellow-800 font-medium transition duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
                 >
                   Forgot Password?
                 </Link>
