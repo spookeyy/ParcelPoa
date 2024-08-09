@@ -297,6 +297,34 @@ def reject_agent(agent_id):
     return jsonify({"message": "Agent request rejected successfully"}), 200
 
 
+#/agent-details
+@app.route('/agent-details/<int:agent_id>', methods=['GET'])
+@jwt_required()
+def get_agent_details(agent_id):
+    current_user = User.query.get(get_jwt_identity())
+    if not current_user:
+        return jsonify({"message": "User not found, please login"}), 403
+    agent = User.query.filter_by(user_role='Agent', user_id=agent_id).first()
+    if not agent:
+        return jsonify({"message": "Agent not found"}), 404
+    return jsonify(agent.to_dict())
+
+#/update-agent-status
+@app.route('/update-agent-status/<int:agent_id>', methods=['PUT'])
+@jwt_required()
+def update_agent_status(agent_id):
+    current_user = User.query.get(get_jwt_identity())
+    if current_user.user_role != 'Admin':
+        return jsonify({"message": "Only admins can update agent request status"}), 403
+    if not current_user:
+        return jsonify({"message": "User not found, please login"}), 403
+    agent = User.query.filter_by(user_role='Agent', user_id=agent_id).first()
+    if not agent:
+        return jsonify({"message": "Agent not found"}), 404
+    data = request.get_json()
+    agent.Request = data.get('Request')
+    db.session.commit()
+    return jsonify({"message": "Agent Request status updated successfully"})
 
 # get all businesses as an admin
 @app.route('/get-businesses', methods=['GET'])
