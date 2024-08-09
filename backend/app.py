@@ -60,7 +60,7 @@ def register():
     phone_number = data.get("phone_number")
     phone_number_exists = User.query.filter_by(phone_number=phone_number).first()
     if phone_number_exists:
-        return jsonify({"error": "Phone number already exists"}), 400
+        return jsonify({"message": "Phone number already exists"}), 400
 
     
     required_fields = ['name', 'email', 'phone_number', 'user_role', 'password']

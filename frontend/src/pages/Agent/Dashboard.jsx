@@ -13,7 +13,7 @@ export default function Dashboard() {
   const [totalDeliveries, setTotalDeliveries] = useState(0);
   // const [delivered, setDelivered] = useState(0);
   // const [inTransit, setInTransit] = useState(0);
-  // const [assignedDeliveries, setAssignedDeliveries] = useState([]);
+  const [assignedDeliveries, setAssignedDeliveries] = useState([]);
   const [totalParcels, setTotalParcels] = useState(0);
   const [deliveredParcels, setDeliveredParcels] = useState(0);
   const [inTransitParcels, setInTransitParcels] = useState(0);
@@ -168,10 +168,10 @@ export default function Dashboard() {
                     color="text-green-500"
                   />
                   <StatsCard
-                    icon="fa-truck-loading"
+                    icon="fa-shipping-fast"
                     title="In Transit Parcels"
                     count={inTransitParcels}
-                    color="text-red-500"
+                    color="text-yellow-500"
                   />
                 </div>
 

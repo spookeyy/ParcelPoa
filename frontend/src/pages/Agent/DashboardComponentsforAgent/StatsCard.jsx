@@ -7,6 +7,7 @@ import {
   FaTruckLoading,
   FaBox,
   FaCheckSquare,
+  FaShippingFast,
 } from "react-icons/fa";
 
 const iconMap = {
@@ -16,6 +17,7 @@ const iconMap = {
   "fa-truck-loading": <FaTruckLoading />,
   "fa-box": <FaBox />,
   "fa-check-square": <FaCheckSquare />,
+  "fa-shipping-fast": <FaShippingFast />,
 };
 
 export default function StatsCard({ icon, title, count, color }) {

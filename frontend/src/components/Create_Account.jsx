@@ -31,6 +31,7 @@ function Create_Account() {
     if (phone_number.trim() === "") {
       setPhoneError("Phone number is required");
       hasError = true;
+      // if phone exists in database
     } else {
       setPhoneError("");
     }
