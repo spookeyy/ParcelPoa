@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Modal from '../Agent/Modal';
-import SellerProfile from './SellerPofie';
-
-import {
-  FaUser,
-  FaSignOutAlt,
-} from "react-icons/fa";
+import React, { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import Modal from "../Agent/Modal";
+import SellerProfile from "./SellerPofie";
+import { toast } from "react-toastify";
+import { FaUser, FaSignOutAlt } from "react-icons/fa";
+import { UserContext } from "../../Context/UserContext";
 
 function SellerSidebar() {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [userName, setUserName] = useState("");
+
+  const { logout } = useContext(UserContext); // Get the logout function from UserContext
 
   useEffect(() => {
     const storedUserName = localStorage.getItem("name");
@@ -21,7 +21,7 @@ function SellerSidebar() {
     }
   }, []);
 
-  const userInitial = userName ? userName.charAt(0).toUpperCase() : 'S';
+  const userInitial = userName ? userName.charAt(0).toUpperCase() : "S";
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -37,8 +37,8 @@ function SellerSidebar() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("userName");
+    logout();
+    toast.success("Logged out successfully");
     navigate("/login");
   };
 
@@ -50,25 +50,25 @@ function SellerSidebar() {
           onClick={toggleDropdown}
         >
           {userInitial}
-          </div>
-          {isDropdownOpen && (
-            <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-md shadow-lg py-2 border border-gray-200 z-10 transition-transform transform duration-300 ease-in-out translate-y-1">
-              <div
-                onClick={openProfileModal}
-                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer transition-colors duration-300"
-              >
-                <FaUser className="mr-3 text-blue-500" />
-                Profile
-              </div>
-              <div
-                onClick={handleLogout}
-                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer transition-colors duration-300"
-              >
-                <FaSignOutAlt className="mr-3 text-red-500" />
-                Log Out
-              </div>
+        </div>
+        {isDropdownOpen && (
+          <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-md shadow-lg py-2 border border-gray-200 z-10 transition-transform transform duration-300 ease-in-out translate-y-1">
+            <div
+              onClick={openProfileModal}
+              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer transition-colors duration-300"
+            >
+              <FaUser className="mr-3 text-blue-500" />
+              Profile
             </div>
-          )}
+            <div
+              onClick={handleLogout}
+              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer transition-colors duration-300"
+            >
+              <FaSignOutAlt className="mr-3 text-red-500" />
+              Log Out
+            </div>
+          </div>
+        )}
       </div>
       <Modal isOpen={isProfileModalOpen} onClose={closeProfileModal}>
         <SellerProfile onClose={closeProfileModal} />
@@ -78,4 +78,3 @@ function SellerSidebar() {
 }
 
 export default SellerSidebar;
-
