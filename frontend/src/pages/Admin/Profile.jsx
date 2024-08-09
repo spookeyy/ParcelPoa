@@ -13,15 +13,13 @@ function Profile() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [userName, setUserName] = useState("");
-  const { currentUser, logout } = useContext(UserContext);
+  const { currentUser, logout, fetchUserProfile } = useContext(UserContext);
   useEffect(() => {
-    const storedUserName = localStorage.getItem("name");
-    if (storedUserName) {
-      setUserName(storedUserName);
-    }
-  }, []);
+    currentUser && setUserName(currentUser.name);
+    fetchUserProfile();
+  }, [currentUser, fetchUserProfile]);
 
-  const userInitial = userName ? userName.charAt(0).toUpperCase() : 'S';
+  const userInitial = currentUser ? currentUser.name.charAt(0).toUpperCase() : "S";
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -44,7 +42,7 @@ function Profile() {
     <div className="inline-block">
       <div className="relative">
         <div
-          className="bg-blue-500 text-white w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-lg md:text-xl font-semibold cursor-pointer hover:bg-blue-600 hover:text-blue-500 transition-colors duration-300"
+          className="bg-yellow-700 mt-2 text-white w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-lg md:text-xl font-semibold cursor-pointer hover:bg-blue-600 hover:text-blue-500 transition-colors duration-300"
           onClick={toggleDropdown}
         >
           {userInitial}
