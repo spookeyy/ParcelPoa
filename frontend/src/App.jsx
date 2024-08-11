@@ -29,9 +29,9 @@ import Agent_Details from "./pages/Seller/Agent_Details";
 import Invoice from "./pages/Seller/Invoice";
 import Messages_List from "./pages/Seller/Messages_List";
 import Messages_Details from "./pages/Seller/Messages_Details";
-import Order_List from "./pages/Seller/Order_List";
-import Order_Details from "./pages/Seller/Order_Details";
-import Dashboard_Part from "./pages/Seller/Dashboard_Part";
+// import Order_List from "./pages/Seller/Order_List";
+// import Order_Details from "./pages/Seller/Order_Details";
+// import Dashboard_Part from "./pages/Seller/Dashboard_Part";
 import Tracking from "./pages/Seller/Tracking";
 import SellerPofie from "./pages/Seller/SellerPofie";
 import SellerLayout from "./components/SellerLayout";
@@ -112,7 +112,7 @@ function App() {
               <Route path="/seller" element={<SellerLayout />}>
                 <Route path="/seller" element={<Home />} />
                 <Route path="/seller/signup" element={<Create_Account />} />
-                <Route path="/seller/agents" element={<Agents />} />
+                <Route path="/seller/agents" element={<ProtectedRoute element={<Agents />} />} />
                 <Route path="/seller/agent/:id" element={<Agent_Details />} />
                 <Route path="/seller/invoice/:id" element={<Invoice />} />
                 <Route
@@ -123,33 +123,33 @@ function App() {
                   path="/seller/message/:id"
                   element={<Messages_Details />}
                 />
-                <Route path="/seller/order-list" element={<Order_List />} />
-                <Route path="/seller/order/:id" element={<Order_Details />} />
+                {/* <Route path="/seller/order-list" element={<Order_List />} />
+                <Route path="/seller/order/:id" element={<Order_Details />} /> */}
                 <Route path="/seller/tracking" element={<Tracking />} />
-                <Route
+                {/* <Route
                   path="/seller/dashboard-part"
                   element={<Dashboard_Part />}
-                />
+                /> */}
                 <Route
                   path="/seller/seller-profile"
-                  element={<SellerPofie />}
+                  element={<ProtectedRoute element={<SellerPofie />} />}
                 />
               </Route>
 
               {/* Buyer Routes */}
               <Route path="/tracking" element={<OrderTracking />} />
-              <Route path="/order-list" element={<Order_List />} />
-              <Route path="/order/:id" element={<Order_Details />} />
+              {/* <Route path="/order-list" element={<Order_List />} />
+              <Route path="/order/:id" element={<Order_Details />} /> */}
               <Route path="/track/:trackingid" element={<OrderTracking />} />
               <Route path="/track-orders" element={<TrackOrders />} />
 
               {/* Agent Routes */}
-              <Route
+              {/* <Route
                 path="/agent"
                 element={<ProtectedRoute element={<AgentHome />} />}
-              />
+              /> */}
               <Route
-                path="/dashboard/*"
+                path="agent/dashboard/*"
                 element={<ProtectedRoute element={<Dashboard />} />}
               />
               <Route
