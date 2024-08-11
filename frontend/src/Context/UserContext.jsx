@@ -84,7 +84,7 @@ export const UserProvider = ({ children }) => {
 
           const { role } = res.user;
           const routes = {
-            Agent: "/agent",
+            Agent: "/agent/dashboard",
             Business: "/business/dashboard",
             Admin: "/admin/requests",
           };
