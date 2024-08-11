@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
-// import { useNavigate } from "react-router-dom";
 import Modal from "../Agent/Modal";
 import SellerProfile from "./SellerPofie";
 import { UserContext } from "../../Context/UserContext";
 import { FaUser, FaSignOutAlt } from "react-icons/fa";
+import { toast } from "react-toastify";
 
-function SellerSidebar() {
-  // const navigate = useNavigate();
+function ViewProfile() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [userName, setUserName] = useState("");
@@ -14,10 +13,12 @@ function SellerSidebar() {
   const { currentUser, logout } = useContext(UserContext);
 
   useEffect(() => {
-    currentUser && setUserName(currentUser.name);
+    if (currentUser && currentUser.name) {
+      setUserName(currentUser.name);
+    }
   }, [currentUser]);
 
-  const userInitial = currentUser ? currentUser.name.charAt(0).toUpperCase() : "B";
+  const userInitial = currentUser?.name?.charAt(0)?.toUpperCase() ?? "B";
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -25,7 +26,7 @@ function SellerSidebar() {
 
   const openProfileModal = () => {
     setIsProfileModalOpen(true);
-    setIsDropdownOpen(false); // Close dropdown
+    setIsDropdownOpen(false);
   };
 
   const closeProfileModal = () => {
@@ -33,7 +34,11 @@ function SellerSidebar() {
   };
 
   const handleLogout = () => {
-    logout();
+    if (currentUser) {
+      logout();
+    } else {
+      toast.error("Please login first");
+    }
   };
 
   return (
@@ -69,7 +74,6 @@ function SellerSidebar() {
       </Modal>
     </div>
   );
-
 }
 
-export default SellerSidebar;
+export default ViewProfile;
