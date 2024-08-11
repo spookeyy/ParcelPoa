@@ -1,8 +1,8 @@
-
 import React from "react";
 import Navbar from "./Navbar";
 import { Link } from "react-router-dom";
 import { FloatingWhatsApp } from "react-floating-whatsapp";
+import FacebookMessengerChat from "./FacebookMessengerChat";
 
 export default function Landing() {
   return (
@@ -41,7 +41,6 @@ export default function Landing() {
                   >
                     Track Order
                   </Link>
-
                 </div>
               </div>
               <div className="mt-16 md:mt-0 w-full">
@@ -72,6 +71,8 @@ export default function Landing() {
             notificationTimestamp="Just now"
             notificationDuration={2000}
           />
+
+          <FacebookMessengerChat />
         </div>
       </div>
     </div>
