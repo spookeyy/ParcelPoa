@@ -725,7 +725,7 @@ def get_order_details(order_id):
     if user.user_role != 'Business':
         return jsonify({"message": "Access denied"}), 403
     
-    order = Order.query.filter_by(id=order_id, user_id=current_user_id).first()
+    order = Order.query.filter_by(order_id=order_id, user_id=current_user_id).first()
     if not order:
         return jsonify({"message": "Order not found"}), 404
     
@@ -741,7 +741,7 @@ def cancel_order(order_id):
     if user.user_role != 'Business':
         return jsonify({"message": "Access denied"}), 403
     
-    order = Order.query.filter_by(id=order_id, user_id=current_user_id).first()
+    order = Order.query.filter_by(order_id=order_id, user_id=current_user_id).first()
     if not order:
         return jsonify({"message": "Order not found"}), 404
     
