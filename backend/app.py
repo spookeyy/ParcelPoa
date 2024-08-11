@@ -7,7 +7,7 @@ from flask import Flask, request, jsonify,url_for
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from flask_apscheduler import APScheduler
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from requests_oauthlib import OAuth1
@@ -21,13 +21,23 @@ from sqlalchemy.orm import joinedload
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
+logging.info("Application starting...")
+
+load_dotenv()
+
+config = dotenv_values(".env")
+logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 CORS(app)
-app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db'
+# app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db'
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
+print(f"Connecting to database: {app.config['SQLALCHEMY_DATABASE_URI']}")
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "super-secret-key")
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "another-secret-key")
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=1) # expires in 1 day
 
 CORS(app)
 
@@ -829,7 +839,7 @@ def generate_order_number():
 
 # RESET PASSWORD
 from flask_mail import Mail, Message
-from dotenv import load_dotenv
+from dotenv import dotenv_values, load_dotenv
 import os
 
 load_dotenv()
