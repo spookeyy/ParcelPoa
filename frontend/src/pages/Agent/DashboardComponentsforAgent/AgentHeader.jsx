@@ -29,6 +29,7 @@ export default function AgentHeader() {
     })
       .then((response) => response.json())
       .then((profile) => {
+        console.log("Profile:", profile);
         setUserName(profile.name);
         setStatus(profile.status || "Available");
       })
@@ -37,7 +38,13 @@ export default function AgentHeader() {
       });
   }, []);
 
-  const userInitial = userName.charAt(0).toUpperCase();
+  const userInitial = userName
+    ? userName
+        .split(" ")
+        .map((name) => name[0])
+        .join("")
+    : "";
+    console.log("userInitial:", userInitial);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);

@@ -31,17 +31,27 @@ export default function ParcelCard({ parcel }) {
       </div>
 
       <div className="text-sm text-gray-700">
-        <span className="font-bold">Order Date:</span> {parcel.created_at}
+        <span className="font-bold">Items:</span> {parcel.description}
       </div>
-
       <div className="text-sm text-gray-700">
+        <span className="font-bold">Recipient Name:</span>{" "}
+        {parcel.recipient_name}
+      </div>
+      <div className="text-sm text-gray-700">
+        <span className="font-bold">Recipient Phone:</span>{" "}
+        {parcel.recipient_phone}
+      </div>
+      <div className="text-sm text-gray-700">
+        <span className="font-bold">Recipient Address:</span>{" "}
+        {parcel.recipient_address}
+      </div>
+      {/* <div className="text-sm text-gray-700">
         <span className="font-bold">Recipient Email:</span>{" "}
         {parcel.recipient_email}
-      </div>
+      </div> */}
 
       <div className="text-sm text-gray-700">
-        <span className="font-bold">Sender Email:</span>{" "}
-        {parcel.sender?.sender_email}
+        <span className="font-bold">Sender Email:</span> {parcel.sender_email}
       </div>
 
       <div className="flex justify-between items-center mt-4">

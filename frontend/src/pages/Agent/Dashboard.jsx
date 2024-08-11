@@ -11,8 +11,8 @@ import { UserContext } from "../../Context/UserContext";
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [totalDeliveries, setTotalDeliveries] = useState(0);
-  // const [delivered, setDelivered] = useState(0);
-  // const [inTransit, setInTransit] = useState(0);
+  const [delivered, setDelivered] = useState(0);
+  const [inTransit, setInTransit] = useState(0);
   const [assignedDeliveries, setAssignedDeliveries] = useState([]);
   const [totalParcels, setTotalParcels] = useState(0);
   const [deliveredParcels, setDeliveredParcels] = useState(0);
