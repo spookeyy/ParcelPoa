@@ -11,6 +11,7 @@ import {
   faBox,
   faTruck,
   faShippingFast,
+  faMapMarkerAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { useTracking } from "../../Context/TrackingContext";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
@@ -22,7 +23,8 @@ library.add(
   faCheckCircle,
   faBox,
   faTruck,
-  faShippingFast
+  faShippingFast,
+  faMapMarkerAlt
 );
 
 const OrderTracking = () => {
@@ -71,7 +73,7 @@ const OrderTracking = () => {
       <div className="order-tracking p-4 sm:p-6 bg-gradient-to-r from-yellow-50 to-yellow-200 shadow-lg rounded-lg max-w-3xl mx-auto mt-8 min-h-screen">
         <h2 className="text-3xl font-bold text-center mb-4 text-yellow-900 flex items-center justify-center">
           <FontAwesomeIcon
-            icon={faBox}
+            icon={faMapMarkerAlt}
             className="mr-2 text-4xl text-yellow-700 animate-pulse"
           />
           Track Your Order
@@ -93,7 +95,7 @@ const OrderTracking = () => {
               required
             />
             <FontAwesomeIcon
-              icon={faSearch}
+              icon={faMapMarkerAlt}
               className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 mt-3"
             />
           </div>
@@ -101,7 +103,7 @@ const OrderTracking = () => {
             type="submit"
             className="w-full bg-yellow-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition duration-150 ease-in-out flex items-center justify-center"
           >
-            <FontAwesomeIcon icon={faSearch} className="mr-2" />
+            <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
             Track Order
           </button>
         </form>
