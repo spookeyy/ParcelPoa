@@ -84,14 +84,14 @@ export default function AgentHeader() {
   };
 
   return (
-    <header className="bg-white fixed top-0 left-0 right-0 p-4 md:p-6 rounded-lg shadow-md mb-4 md:mb-6 border border-gray-200 z-50">
+    <header className="bg-yellow-500 fixed top-0 left-0 right-0 p-4 md:p-6 rounded-lg shadow-md mb-4 md:mb-6 border border-gray-200 z-50">
       <h1 className="text-2xl md:text-3xl font-bold text-gray-900 text-center">
         Agent Dashboard
       </h1>
       <Sidebar isOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="bg-blue-500 text-white p-2 rounded-lg shadow-md absolute top-4 left-4 z-50 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-300"
+          className="bg-yellow-700 text-white p-2 rounded-lg shadow-md absolute top-4 left-4 z-50 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-300"
           aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
           aria-expanded={sidebarOpen}
         >
@@ -100,7 +100,7 @@ export default function AgentHeader() {
       <div className="absolute right-4 top-4 md:right-6 md:top-6 flex items-center">
         <div className="relative ml-16">
           <div
-            className="bg-blue-500 text-white w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-lg md:text-xl font-semibold cursor-pointer hover:bg-blue-600 hover:text-blue-500 transition-colors duration-300"
+            className="bg-yellow-800  w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-lg md:text-xl font-semibold cursor-pointer hover:bg-yellow-600  transition-colors duration-300"
             onClick={toggleDropdown}
           >
             {userInitial}
