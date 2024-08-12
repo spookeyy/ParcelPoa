@@ -17,7 +17,7 @@ export default function CommunicationTools() {
     setMessage("");
     setRecipient("");
     // For demonstration, let's just navigate back
-    navigate("/dashboard");
+    navigate("/agent/dashboard");
   };
 
   return (

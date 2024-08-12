@@ -71,8 +71,9 @@ export default function Landing() {
             notificationTimestamp="Just now"
             notificationDuration={2000}
           />
-
-          <FacebookMessengerChat />
+          <div className="fixed bottom-16 right-4 z-50">
+            <FacebookMessengerChat />
+          </div>
         </div>
       </div>
     </div>
