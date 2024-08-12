@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -11,6 +11,7 @@ import {
   faBox,
   faTruck,
   faShippingFast,
+  faMapMarkerAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { useTracking } from "../../Context/TrackingContext";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
@@ -22,36 +23,50 @@ library.add(
   faCheckCircle,
   faBox,
   faTruck,
-  faShippingFast
+  faShippingFast,
+  faMapMarkerAlt
 );
 
 const OrderTracking = () => {
   const { trackingNumber } = useParams();
+  const location = useLocation();
   const { trackingData, fetchTrackingData, loading, error } = useTracking();
   const [localTrackingNumber, setLocalTrackingNumber] = useState(
     trackingNumber || ""
   );
 
   useEffect(() => {
+    const frontendUrl = window.location.origin;
     if (trackingNumber) {
-      fetchTrackingData(trackingNumber);
+      setLocalTrackingNumber(trackingNumber);
+      fetchTrackingData(trackingNumber, frontendUrl);
     }
   }, [trackingNumber, fetchTrackingData]);
+
+  useEffect(() => {
+    const frontendUrl = window.location.origin;
+    const params = new URLSearchParams(location.search);
+    const trackingFromUrl = params.get("tracking");
+    if (trackingFromUrl) {
+      setLocalTrackingNumber(trackingFromUrl);
+      fetchTrackingData(trackingFromUrl, frontendUrl);
+    }
+  }, [location, fetchTrackingData]);
 
   const handleTrackOrder = (e) => {
     e.preventDefault();
     if (!localTrackingNumber) {
       return;
     }
-    fetchTrackingData(localTrackingNumber);
+    const frontendUrl = window.location.origin;
+    fetchTrackingData(localTrackingNumber, frontendUrl);
   };
-
   const statusIcon = (status) => {
     switch (status) {
       case "Delivered":
         return { icon: faCheckCircle, color: "bg-green-500" };
       case "Out for Delivery":
-        return { icon: faShippingFast, color: "bg-blue-500" };
+        return { icon: faShippingFast, color: "bg-yellow-500" };
       case "In Transit":
         return { icon: faTruck, color: "bg-yellow-500" };
       case "Scheduled for Pickup":
@@ -68,11 +83,11 @@ const OrderTracking = () => {
   return (
     <>
       <Navbar />
-      <div className="order-tracking p-4 sm:p-6 bg-gradient-to-r from-blue-50 to-blue-200 shadow-lg rounded-lg max-w-3xl mx-auto mt-8 min-h-screen">
-        <h2 className="text-3xl font-bold text-center mb-4 text-blue-900 flex items-center justify-center">
+      <div className="order-tracking p-4 sm:p-6 bg-gradient-to-r from-yellow-50 to-yellow-200 shadow-lg rounded-lg max-w-3xl mx-auto mt-8 min-h-screen">
+        <h2 className="text-3xl font-bold text-center mb-4 text-yellow-900 flex items-center justify-center">
           <FontAwesomeIcon
-            icon={faBox}
-            className="mr-2 text-4xl text-blue-700 animate-pulse"
+            icon={faMapMarkerAlt}
+            className="mr-2 text-4xl text-yellow-700 animate-pulse"
           />
           Track Your Order
         </h2>
@@ -88,25 +103,25 @@ const OrderTracking = () => {
               type="text"
               value={localTrackingNumber}
               onChange={(e) => setLocalTrackingNumber(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600 transition duration-150 ease-in-out"
+              className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 transition duration-150 ease-in-out"
               aria-label="Enter tracking number"
               required
             />
             <FontAwesomeIcon
-              icon={faSearch}
+              icon={faMapMarkerAlt}
               className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 mt-3"
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 transition duration-150 ease-in-out flex items-center justify-center"
+            className="w-full bg-yellow-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition duration-150 ease-in-out flex items-center justify-center"
           >
-            <FontAwesomeIcon icon={faSearch} className="mr-2" />
+            <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
             Track Order
           </button>
         </form>
         {loading && (
-          <p className="mt-4 text-blue-600 text-center flex items-center justify-center">
+          <p className="mt-4 text-yellow-600 text-center flex items-center justify-center">
             <FontAwesomeIcon icon={faSpinner} spin className="mr-2 text-2xl" />
             <span>Loading...</span>
           </p>
@@ -122,7 +137,7 @@ const OrderTracking = () => {
         )}
         {trackingData && trackingData.length > 0 && (
           <div className="mt-6 p-4 max-w-3xl mx-auto bg-white shadow-md rounded-lg">
-            <h3 className="text-xl font-semibold text-blue-800 mb-3 text-center">
+            <h3 className="text-xl font-semibold text-yellow-800 mb-3 text-center">
               Tracking History
             </h3>
             <ul role="list" className="divide-y divide-gray-200 mb-6">

@@ -1,56 +1,113 @@
-
-
-import React, { useState, useEffect } from "react";
-import config from "../../config.json"; // Import the server URL
+/* eslint-disable react/prop-types */
+import React, { useContext, useEffect, useState } from "react";
+import { DeliveryContext } from "../../Context/DeliveryContext";
+import { toast } from "react-toastify";
+import { server } from "../../../config";
 
 export default function ManageDeliveries({ openSidebar }) {
-  const [deliveries, setDeliveries] = useState([]);
-  const [notification, setNotification] = useState(null);
+  const { deliveries, fetchDeliveries } = useContext(DeliveryContext);
+  const [notification, setNotification] = useState("");
 
   useEffect(() => {
-    // Fetch delivery data from the backend
-    fetch(`${config.server}/api/deliveries`) // Use the server URL from config
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
+    fetchDeliveries();
+    console.log("Deliveries:", deliveries);
+  }, [fetchDeliveries, deliveries]);
+
+  const handleStatusChange = async (deliveryId, parcelId, newStatus) => {
+    try {
+      const response = await fetch(
+        `${server}/update_delivery_status/${deliveryId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+          body: JSON.stringify({ status: newStatus }),
         }
-        return response.json();
-      })
-      .then((data) => {
-        setDeliveries(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching deliveries:", error);
-      });
-  }, []);
+      );
 
-  useEffect(() => {
-    if (notification) {
-      // Simulate notification
-      console.log(notification);
+      if (!response.ok) throw new Error("Failed to update delivery status");
+
+      if (newStatus === "Delivered") {
+        const markDeliveredResponse = await fetch(
+          `${server}/mark_as_delivered/${parcelId}`,
+          {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            },
+          }
+        );
+
+        if (!markDeliveredResponse.ok)
+          throw new Error("Failed to mark parcel as delivered");
+      }
+
+      fetchDeliveries();
+      setNotification(`Delivery status changed to ${newStatus}`);
+      toast.success(`Delivery status updated to ${newStatus}`);
+    } catch (error) {
+      console.error("Error updating delivery status:", error);
+      toast.error("Failed to update delivery status");
     }
-  }, [notification]);
-
-  const handleStatusChange = (id, newStatus) => {
-    const updatedDelivery = deliveries.find((delivery) => delivery.id === id);
-    setDeliveries((prevDeliveries) =>
-      prevDeliveries.map((delivery) =>
-        delivery.id === id ? { ...delivery, status: newStatus } : delivery
-      )
-    );
-    setNotification(
-      `Delivery ${updatedDelivery.parcel} status changed to ${newStatus}`
-    );
   };
 
-  const filteredDeliveries = {
-    inTransit: deliveries.filter((delivery) => delivery.status === "In Transit"),
-    scheduled: deliveries.filter((delivery) => delivery.status === "Scheduled"),
-    delivered: deliveries.filter((delivery) => delivery.status === "Delivered"),
-  };
+  const renderDeliveryTable = (deliveries, title, actionText, newStatus) => (
+    <div className="w-full overflow-x-auto mb-6">
+      <h2 className="text-xl font-bold mb-2">{title}</h2>
+      <table className="w-full min-w-full border-collapse text-left">
+        <thead>
+          <tr>
+            <th className="border p-2">Tracking Number</th>
+            <th className="border p-2">Parcel</th>
+            <th className="border p-2">Recipient</th>
+            <th className="border p-2">Status</th>
+            <th className="border p-2">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {deliveries.map((delivery) => (
+            <tr key={delivery.delivery_id}>
+              <td className="border p-2">{delivery.parcel.tracking_number}</td>
+              <td className="border p-2">{delivery.parcel.description}</td>
+              <td className="border p-2">{delivery.parcel.recipient_name}</td>
+              <td className="border p-2">{delivery.status}</td>
+              <td className="border p-2">
+                {actionText && (
+                  <button
+                    onClick={() =>
+                      handleStatusChange(
+                        delivery.delivery_id,
+                        delivery.parcel.parcel_id,
+                        newStatus
+                      )
+                    }
+                    className="w-full px-4 py-2 rounded bg-yellow-500 text-white hover:bg-yellow-600"
+                  >
+                    {actionText}
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  const scheduledDeliveries = deliveries.filter(
+    (d) => d.status === "Scheduled"
+  );
+  const inTransitDeliveries = deliveries.filter(
+    (d) => d.status === "In Transit"
+  );
+  const deliveredDeliveries = deliveries.filter(
+    (d) => d.status === "Delivered"
+  );
 
   return (
-    <div className="p-6 bg-white rounded shadow-md flex flex-col items-center mx-auto max-w-4xl mt-12 mb-12">
+    <div className="p-6 bg-white rounded shadow-md flex flex-col items-center mx-auto max-w-6xl mt-12 mb-12">
       <button
         onClick={openSidebar}
         className="bg-blue-500 text-white p-2 rounded-lg shadow-md absolute top-4 left-4 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -66,101 +123,24 @@ export default function ManageDeliveries({ openSidebar }) {
         </div>
       )}
 
-      {/* In Transit Deliveries */}
-      <div className="w-full overflow-x-auto mb-6">
-        <h2 className="text-xl font-bold mb-2">In Transit</h2>
-        <table className="w-full min-w-full border-collapse text-left">
-          <thead>
-            <tr>
-              <th className="border p-2">Parcel</th>
-              <th className="border p-2">Status</th>
-              <th className="border p-2">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredDeliveries.inTransit.map((delivery) => (
-              <tr key={delivery.id}>
-                <td className="border p-2">{delivery.parcel}</td>
-                <td className="border p-2">{delivery.status}</td>
-                <td className="border p-2">
-                  <button
-                    onClick={() =>
-                      handleStatusChange(delivery.id, "Delivered")
-                    }
-                    className="w-full px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600"
-                  >
-                    Mark as Delivered
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Scheduled Deliveries */}
-      <div className="w-full overflow-x-auto mb-6">
-        <h2 className="text-xl font-bold mb-2">Scheduled</h2>
-        <table className="w-full min-w-full border-collapse text-left">
-          <thead>
-            <tr>
-              <th className="border p-2">Parcel</th>
-              <th className="border p-2">Status</th>
-              <th className="border p-2">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredDeliveries.scheduled.map((delivery) => (
-              <tr key={delivery.id}>
-                <td className="border p-2">{delivery.parcel}</td>
-                <td className="border p-2">{delivery.status}</td>
-                <td className="border p-2">
-                  <button
-                    onClick={() =>
-                      handleStatusChange(delivery.id, "In Transit")
-                    }
-                    className="w-full px-4 py-2 rounded bg-yellow-500 text-white hover:bg-yellow-600"
-                  >
-                    Mark as In Transit
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Delivered Deliveries */}
-      <div className="w-full overflow-x-auto mb-6">
-        <h2 className="text-xl font-bold mb-2">Delivered</h2>
-        <table className="w-full min-w-full border-collapse text-left">
-          <thead>
-            <tr>
-              <th className="border p-2">Parcel</th>
-              <th className="border p-2">Status</th>
-              <th className="border p-2">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredDeliveries.delivered.map((delivery) => (
-              <tr key={delivery.id}>
-                <td className="border p-2">{delivery.parcel}</td>
-                <td className="border p-2">{delivery.status}</td>
-                <td className="border p-2">
-                  {/* No action button for delivered items */}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <button
-        onClick={openSidebar}
-        className="w-full sm:w-48 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-      >
-        Open Sidebar
-      </button>
+      {renderDeliveryTable(
+        scheduledDeliveries,
+        "Scheduled Deliveries",
+        "Mark as In Transit",
+        "In Transit"
+      )}
+      {renderDeliveryTable(
+        inTransitDeliveries,
+        "In Transit Deliveries",
+        "Mark as Delivered",
+        "Delivered"
+      )}
+      {renderDeliveryTable(
+        deliveredDeliveries,
+        "Delivered Parcels",
+        null,
+        null
+      )}
     </div>
   );
 }

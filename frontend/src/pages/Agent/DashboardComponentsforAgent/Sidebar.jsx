@@ -11,10 +11,12 @@ export default function Sidebar({ isOpen, toggleSidebar, navigateTo }) {
       } transition-transform duration-300 z-40 lg:w-80 md:w-64`}
     >
       <div className="bg-blue-600 text-white p-4 flex items-center justify-between">
-        <span className="text-xl font-bold sm:text-2xl md:text-3xl">Dashboard</span>
-        <button 
-          onClick={toggleSidebar} 
-          className="text-3xl font-bold sm:text-4xl"
+        <span className="text-xl font-bold sm:text-2xl md:text-3xl">
+          Dashboard
+        </span>
+        <button
+          onClick={toggleSidebar}
+          className="text-2xl font-bold sm:text-3xl"
           aria-label="Close sidebar"
         >
           &times;
@@ -28,7 +30,16 @@ export default function Sidebar({ isOpen, toggleSidebar, navigateTo }) {
               to="/manage-deliveries"
               className="flex items-center text-gray-800 hover:text-blue-600 hover:bg-gray-100 p-3 rounded transition duration-200 text-sm sm:text-base"
             >
-              <i className="fas fa-box mr-3 text-lg sm:text-xl"></i> Manage Deliveries
+              <i className="fas fa-box mr-3 text-lg sm:text-xl"></i> Manage
+              Deliveries
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/"
+              className="flex items-center text-gray-800 hover:text-blue-600 hover:bg-gray-100 p-3 rounded transition duration-200 text-sm sm:text-base"
+            >
+              <i className="fas fa-box mr-3 text-lg sm:text-xl"></i> Invoices
             </Link>
           </li>
           <li>
@@ -36,10 +47,11 @@ export default function Sidebar({ isOpen, toggleSidebar, navigateTo }) {
               to="/communication-tools"
               className="flex items-center text-gray-800 hover:text-blue-600 hover:bg-gray-100 p-3 rounded transition duration-200 text-sm sm:text-base"
             >
-              <i className="fas fa-comments mr-3 text-lg sm:text-xl"></i> Communication Tools
+              <i className="fas fa-comments mr-3 text-lg sm:text-xl"></i>{" "}
+              Communication Tools
             </Link>
           </li>
-         
+
           {/* <li>
             <Link
               to="/agent-profile"
@@ -56,14 +68,6 @@ export default function Sidebar({ isOpen, toggleSidebar, navigateTo }) {
               <i className="fas fa-plus mr-3 text-lg sm:text-xl"></i> Create Parcel
             </button>
           </li> */}
-          <li>
-            <button
-              onClick={() => navigate("/update-parcel-status")}
-              className="flex items-center text-gray-800 hover:text-blue-600 hover:bg-gray-100 p-3 rounded transition duration-200 text-sm sm:text-base"
-            >
-              <i className="fas fa-edit mr-3 text-lg sm:text-xl"></i> Update Parcel Status
-            </button>
-          </li>
           {/* <li>
             <button
               onClick={() => navigateTo(true)}
@@ -88,7 +92,8 @@ export default function Sidebar({ isOpen, toggleSidebar, navigateTo }) {
               }}
               className="flex items-center text-gray-800 hover:text-blue-600 hover:bg-gray-100 p-3 rounded transition duration-200 text-sm sm:text-base"
             >
-              <i className="fas fa-home mr-3 text-lg sm:text-xl"></i> Go to Dashboard
+              <i className="fas fa-home mr-3 text-lg sm:text-xl"></i> Go to
+              Dashboard
             </button>
           </li>
         </ul>

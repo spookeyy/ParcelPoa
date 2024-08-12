@@ -1,11 +1,23 @@
+/* eslint-disable react/prop-types */
 import React from "react";
-import { FaChartLine, FaTruck, FaHourglassHalf, FaTruckLoading } from "react-icons/fa";
+import {
+  FaChartLine,
+  FaTruck,
+  FaHourglassHalf,
+  FaTruckLoading,
+  FaBox,
+  FaCheckSquare,
+  FaShippingFast,
+} from "react-icons/fa";
 
 const iconMap = {
   "fa-chart-line": <FaChartLine />,
   "fa-truck": <FaTruck />,
   "fa-hourglass-half": <FaHourglassHalf />,
-  "fa-truck-loading": <FaTruckLoading />
+  "fa-truck-loading": <FaTruckLoading />,
+  "fa-box": <FaBox />,
+  "fa-check-square": <FaCheckSquare />,
+  "fa-shipping-fast": <FaShippingFast />,
 };
 
 export default function StatsCard({ icon, title, count, color }) {

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import SellerSidebar from "../pages/Seller/SellerSidebar";
+import ViewProfile from "../pages/Seller/ViewProfile";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -10,28 +10,27 @@ export default function Header() {
     <header className="bg-indigo-200 fixed top-0 left-0 right-0 z-10 shadow-lg py-3 ">
       <div className="container mx-auto flex justify-between items-center position sticky">
         <Link to="/" className="flex items-center">
-          <img src="/src/assets/Logo.png" alt="Logo" className="h-10 w-10" />
+          <img src="/src/assets/Logo.png" alt="Logo" className="h-16 w-16" />
         </Link>
         <div className="flex space-x-4 items-center text-sm">
-          <Link to="/seller" className="text-blue-700 hover:text-indigo-800 text-medium transition-colors">
+          {/* <Link to="/seller" className="text-blue-700 hover:text-indigo-800 text-medium transition-colors">
             Dashboard
-          </Link>
-          <Link to="/seller/agents" className="text-blue-700 hover:text-indigo-800 text-medium transition-colors">
-            Agents List
-          </Link>
-          <Link to="/business/dashboard" className="text-blue-700 hover:text-indigo-800 text-medium transition-colors">
+          </Link> */}
+
+          <Link
+            to="/business/dashboard"
+            className="text-blue-700 hover:text-indigo-800 text-medium transition-colors"
+          >
             Business Dashboard
           </Link>
           <div className="inline-block">
-            <SellerSidebar />
+            <ViewProfile />
           </div>
         </div>
       </div>
     </header>
   );
 }
-
-
 
 // import React from "react";
 // import { Link } from "react-router-dom";
@@ -50,7 +49,7 @@ export default function Header() {
 //           <img src="/src/assets/Logo.png" alt="Logo" className="logo" />
 //         </Link>
 //         <div className="flex space-x-4 items-center">
-          
+
 //           {/* Orders */}
 //           <Link
 //             to="/order-list"

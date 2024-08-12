@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect ,useContext} from "react";
 import { server } from "../../../../config";
 import {
   FaUser,
@@ -6,10 +6,10 @@ import {
   FaCheckCircle,
   FaTimesCircle,
 } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
 import Modal from "../Modal";
 import AgentProfile from "../AgentProfile";
 import Sidebar from "./Sidebar";
+import {UserContext} from "../../../Context/UserContext";
 
 export default function AgentHeader() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -17,8 +17,8 @@ export default function AgentHeader() {
   const [status, setStatus] = useState("Available");
   const [userName, setUserName] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { currentUser, logout } = useContext(UserContext);
 
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetch(`${server}/profile`, {
@@ -29,6 +29,7 @@ export default function AgentHeader() {
     })
       .then((response) => response.json())
       .then((profile) => {
+        console.log("Profile:", profile);
         setUserName(profile.name);
         setStatus(profile.status || "Available");
       })
@@ -37,7 +38,13 @@ export default function AgentHeader() {
       });
   }, []);
 
-  const userInitial = userName.charAt(0).toUpperCase();
+  const userInitial = userName
+    ? userName
+        .split(" ")
+        .map((name) => name[0])
+        .join("")
+    : "";
+    console.log("userInitial:", userInitial);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -73,8 +80,7 @@ export default function AgentHeader() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("access_token");
-    navigate("/");
+    logout();
   };
 
   return (
@@ -138,6 +144,7 @@ export default function AgentHeader() {
                   Profile
                 </div>
                 <div
+                 currentUser={currentUser}
                   onClick={handleLogout}
                   className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer transition-colors duration-300"
                 >

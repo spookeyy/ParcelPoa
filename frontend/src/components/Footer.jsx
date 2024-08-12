@@ -1,17 +1,18 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
-    <footer className="bg-indigo-700 text-white py-6">
+    <footer className="bg-yellow-600 text-white py-6">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center text-center md:text-left mb-4">
           <nav className="mb-4 md:mb-0">
             <ul className="flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0">
-              <li><a href="/about" className="hover:text-gray-400 transition duration-300 text-sm">About Us</a></li>
-              <li><a href="/contact" className="hover:text-gray-400 transition duration-300 text-sm">Contact Us</a></li>
-              <li><a href="/privacy-policy" className="hover:text-gray-400 transition duration-300 text-sm">Privacy Policy</a></li>
-              <li><a href="/terms" className="hover:text-gray-400 transition duration-300 text-sm">Terms of Service</a></li>
-              <li><a href="/returns" className="hover:text-gray-400 transition duration-300 text-sm">Returns</a></li>
+              <li><Link to="/about" className="hover:text-gray-400 transition duration-300 text-sm">About Us</Link></li>
+              <li><Link to="/contact-us" className="hover:text-gray-400 transition duration-300 text-sm">Contact Us</Link></li>
+              <li><Link to="/privacy-policy" className="hover:text-gray-400 transition duration-300 text-sm">Privacy Policy</Link></li>
+              <li><Link to="/terms" className="hover:text-gray-400 transition duration-300 text-sm">Terms of Service</Link></li>
+              <li><Link to="/returns" className="hover:text-gray-400 transition duration-300 text-sm">Returns</Link></li>
             </ul>
           </nav>
           <div className="text-center md:text-right">

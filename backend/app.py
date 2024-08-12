@@ -1,13 +1,14 @@
 import os
 import random
 import string
+from dotenv import dotenv_values, load_dotenv
 from geopy.geocoders import Nominatim
 import smtplib
 from flask import Flask, request, jsonify,url_for
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from flask_apscheduler import APScheduler
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from requests_oauthlib import OAuth1
@@ -17,15 +18,29 @@ from models import db, User, Parcel, Delivery, Notification, Tracking, Order
 from flask_cors import CORS
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from sqlalchemy.orm import joinedload
+import logging
 
-app = Flask(__name__)
+logging.basicConfig(level=logging.DEBUG)
+logging.info("Application starting...")
+
+load_dotenv()
+
+# config = dotenv_values(".env")
+logging.basicConfig(level=logging.INFO)
+
+
+app = Flask(__name__, static_folder='static')
 CORS(app)
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db'
+# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
+print(f"Connecting to database: {app.config['SQLALCHEMY_DATABASE_URI']}")
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "super-secret-key")
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "another-secret-key")
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=1) # expires in 1 day
 
-CORS(app)
 
 migrate = Migrate(app, db)
 db.init_app(app)
@@ -40,6 +55,9 @@ s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 #     scheduler.init_app(app)
 #     scheduler.start()
 
+
+logging.info("Database initialized")
+    
 # JWT Configurations
 blacklist = set()
 @jwt.token_in_blocklist_loader
@@ -56,7 +74,7 @@ def register():
     phone_number = data.get("phone_number")
     phone_number_exists = User.query.filter_by(phone_number=phone_number).first()
     if phone_number_exists:
-        return jsonify({"error": "Phone number already exists"}), 400
+        return jsonify({"message": "Phone number already exists"}), 400
 
     
     required_fields = ['name', 'email', 'phone_number', 'user_role', 'password']
@@ -103,8 +121,10 @@ def login():
                 "role": user.user_role
             }
         }), 200
-    else:
+    elif user and not bcrypt.check_password_hash(user.password_hash, data['password']):
         return jsonify({"message": "Invalid credentials"}), 401
+    else:
+        return jsonify({"message": "User not found"}), 401
 
 
 @app.route('/current_user', methods=['GET'])
@@ -194,7 +214,17 @@ def update_profile():
     user.updated_at = datetime.now()
     db.session.commit()
     
-    return jsonify({"message": "Profile updated successfully"})
+    profile_picture_url = url_for('static', filename=user.profile_picture, _external=True) if user.profile_picture else None
+    
+    return jsonify({
+        "message": "Profile updated successfully",
+        "profile": {
+            "name": user.name,
+            "email": user.email,
+            "phone_number": user.phone_number,
+            "profile_picture": profile_picture_url
+        }
+    })
 
 @app.route('/update-status', methods=['PUT'])
 @jwt_required()
@@ -293,6 +323,34 @@ def reject_agent(agent_id):
     return jsonify({"message": "Agent request rejected successfully"}), 200
 
 
+#/agent-details
+@app.route('/agent-details/<int:agent_id>', methods=['GET'])
+@jwt_required()
+def get_agent_details(agent_id):
+    current_user = User.query.get(get_jwt_identity())
+    if not current_user:
+        return jsonify({"message": "User not found, please login"}), 403
+    agent = User.query.filter_by(user_role='Agent', user_id=agent_id).first()
+    if not agent:
+        return jsonify({"message": "Agent not found"}), 404
+    return jsonify(agent.to_dict())
+
+#/update-agent-status
+@app.route('/update-agent-status/<int:agent_id>', methods=['PUT'])
+@jwt_required()
+def update_agent_status(agent_id):
+    current_user = User.query.get(get_jwt_identity())
+    if current_user.user_role != 'Admin':
+        return jsonify({"message": "Only admins can update agent request status"}), 403
+    if not current_user:
+        return jsonify({"message": "User not found, please login"}), 403
+    agent = User.query.filter_by(user_role='Agent', user_id=agent_id).first()
+    if not agent:
+        return jsonify({"message": "Agent not found"}), 404
+    data = request.get_json()
+    agent.Request = data.get('Request')
+    db.session.commit()
+    return jsonify({"message": "Agent Request status updated successfully"})
 
 # get all businesses as an admin
 @app.route('/get-businesses', methods=['GET'])
@@ -377,12 +435,18 @@ def delete_parcel(parcel_id):
 @app.route('/update_status/<int:parcel_id>', methods=['PUT'])
 @jwt_required()
 def update_parcel_status(parcel_id):
+    logging.debug(f"Updating status for parcel ID: {parcel_id}")
+    logging.debug(f"Received data: {request.get_json()}")
     current_user = User.query.get(get_jwt_identity())
     if current_user.user_role != 'Agent':
         return jsonify({"message": "Only agents can update parcel status"}), 403
     
+    # Find the parcel based on the parcel_id
+    parcel = Parcel.query.get(parcel_id)
+    if not parcel:
+        return jsonify({"message": "Parcel not found"}), 404
+    
     data = request.get_json()
-    parcel = Parcel.query.get_or_404(parcel_id)
     if parcel.status == 'Delivered':
         return jsonify({"message": "Cannot update delivered parcel status"}), 400
     if data['status'] not in ['Picked Up', 'Out for Delivery', 'In Transit', 'Delivered']:
@@ -403,11 +467,27 @@ def update_parcel_status(parcel_id):
 
     # Send notifications
     if old_status != parcel.status:
-        send_notification(parcel.sender_email, 'Parcel Status Update', f'Your parcel with tracking number {parcel.tracking_number} is now {parcel.status}.')
-        send_notification(parcel.recipient_email, 'Parcel Status Update', f'The parcel with tracking number {parcel.tracking_number} is now {parcel.status}.')
+        send_notification(parcel.sender.email, 'Parcel Status Update', f'Your parcel with tracking number {parcel.tracking_number} is now {parcel.status}.')
+        send_notification(parcel.recipient_email, 'Parcel Status Update', f'The parcel with tracking number {parcel.tracking_number} is now {parcel.status}. \n visit http://localhost:5173/track/{parcel.tracking_number} to track your parcel.')
 
     return jsonify({"message": "Parcel status updated successfully"}), 200
 
+# agent associated parcels:
+@app.route('/agent_parcels', methods=['GET'])
+@jwt_required()
+def get_agent_parcels():
+    user = User.query.get(get_jwt_identity())
+    
+    if user.user_role != 'Agent':
+        return jsonify({"message": "Only agents can view their assigned parcels"}), 403
+    
+    deliveries = Delivery.query.filter_by(agent_id=user.user_id).all()
+
+    parcels = [delivery.parcel for delivery in deliveries if delivery.parcel]
+    
+    parcels_data = [parcel.to_dict() for parcel in parcels]
+    
+    return jsonify(parcels_data)
 
 
 # DELIVERY ROUTES
@@ -445,22 +525,36 @@ def get_assigned_deliveries():
     print(f"User: {user}")
     if user.user_role != 'Agent':
         return jsonify({"message": "Only agents can get assigned deliveries"}), 403
-    deliveries = Delivery.query.filter_by(agent_id=user.user_id).all()
-    print(f"Deliveries: {deliveries}") 
-    return jsonify([delivery.to_dict() for delivery in deliveries])
+    # Load the parcel relationship
+    deliveries = Delivery.query.options(joinedload(Delivery.parcel)).filter_by(agent_id=user.user_id).all()
+    print(f"Deliveries: {deliveries}")
+    deliveries_data = [
+        {
+            **delivery.to_dict(),
+            'parcel': delivery.parcel.to_dict() if delivery.parcel else None
+        } for delivery in deliveries
+    ]
+    return jsonify(deliveries_data)
 
 @app.route('/update_delivery_status/<int:delivery_id>', methods=['PUT'])
 @jwt_required()
 def update_delivery_status(delivery_id):
     current_user = User.query.get(get_jwt_identity())
-    if current_user.user_role != 'Business' or current_user.user_role != 'Agent':
+    if current_user.user_role not in ['Business', 'Agent']:
         return jsonify({"message": "Only agents and businesses can update delivery status"}), 403
+
     data = request.get_json()
     delivery = Delivery.query.get_or_404(delivery_id)
+
+    if 'status' not in data:
+        return jsonify({"message": "Status is required"}), 400
+
     delivery.status = data['status']
     delivery.updated_at = datetime.now()
     db.session.commit()
+    
     return jsonify({"message": "Delivery status updated successfully"}), 200
+
 
 # mark parcel as delivered
 @app.route('/mark_as_delivered/<int:parcel_id>', methods=['PUT'])
@@ -479,8 +573,8 @@ def mark_as_delivered(parcel_id):
 
 
 
-#TODO: TRACKING ROUTES
-@app.route('/track/<string:tracking_number>', methods=['GET'])
+# TRACKING ROUTES
+@app.route('/track/<string:tracking_number>', methods=['GET', 'POST'])
 def track_parcel(tracking_number):
     parcel = Parcel.query.filter_by(tracking_number=tracking_number).first()
     if parcel is None:
@@ -657,7 +751,7 @@ def get_order_details(order_id):
     if user.user_role != 'Business':
         return jsonify({"message": "Access denied"}), 403
     
-    order = Order.query.filter_by(id=order_id, user_id=current_user_id).first()
+    order = Order.query.filter_by(order_id=order_id, user_id=current_user_id).first()
     if not order:
         return jsonify({"message": "Order not found"}), 404
     
@@ -673,7 +767,7 @@ def cancel_order(order_id):
     if user.user_role != 'Business':
         return jsonify({"message": "Access denied"}), 403
     
-    order = Order.query.filter_by(id=order_id, user_id=current_user_id).first()
+    order = Order.query.filter_by(order_id=order_id, user_id=current_user_id).first()
     if not order:
         return jsonify({"message": "Order not found"}), 404
     
@@ -705,10 +799,10 @@ def get_agents():
 @jwt_required()
 def get_available_agents():
     user = User.query.get(get_jwt_identity())
-    if user.user_role == 'Agent':
-        return jsonify({"message": "Only admins and Businesses can get available agents"}), 403
+    # if user.user_role == 'Agent':
+    #     return jsonify({"message": "Only admins and Businesses can get available agents"}), 403
     
-    agents = User.query.filter_by(user_role='Agent', status='Available').all()
+    agents = User.query.filter_by(user_role='Agent', status='Available', Request='Approved').all()
     print('agents', agents)
     return jsonify([agent.to_dict() for agent in agents])
 
@@ -722,13 +816,112 @@ def get_orders():
     user = User.query.get(get_jwt_identity())
     if user.user_role != 'Business':
         return jsonify({"message": "Only businesses can get orders"}), 403
-    orders = Order.query.all()
+    orders = Order.query.filter_by(user_id=user.user_id).all()
     return jsonify([order.to_dict() for order in orders])
 
 
 
 # TODO: NOTIFICATION
+# Get all notifications for the current user
+@app.route('/notifications', methods=['GET'])
+@jwt_required()
+def get_notifications():
+    current_user_id = get_jwt_identity()
+    notifications = Notification.query.filter_by(user_id=current_user_id).order_by(Notification.created_at.desc()).all()
+    return jsonify([notification.to_dict() for notification in notifications])
 
+# Create a new notification TODO:
+@app.route('/notifications', methods=['POST'])
+@jwt_required()
+def create_notification():
+    current_user_id = get_jwt_identity()
+    data = request.json
+    recipient_id = data.get('recipient_id')
+    if not recipient_id:
+        return jsonify({"message": "recipient_id is required"}), 400
+
+    recipient = User.query.get(recipient_id)
+    if not recipient:
+        return jsonify({"message": "Recipient not found"}), 404
+
+    notification = Notification(
+        user_id=recipient_id,
+        message=data['message'],
+        type=data['type'],
+        status='Sent'
+    )
+    db.session.add(notification)
+    db.session.commit()
+    
+    return jsonify(notification.to_dict()), 201
+
+# Get a specific notification
+@app.route('/notifications/<int:notification_id>', methods=['GET'])
+@jwt_required()
+def get_notification(notification_id):
+    current_user_id = get_jwt_identity()
+    notification = Notification.query.filter_by(notification_id=notification_id, user_id=current_user_id).first()
+    
+    if not notification:
+        return jsonify({"message": "Notification not found"}), 404
+
+    return jsonify(notification.to_dict())
+
+# Update a notification's status
+@app.route('/notifications/<int:notification_id>', methods=['PUT'])
+@jwt_required()
+def update_notification(notification_id):
+    current_user_id = get_jwt_identity()
+    notification = Notification.query.filter_by(notification_id=notification_id, user_id=current_user_id).first()
+    
+    if not notification:
+        return jsonify({"message": "Notification not found"}), 404
+
+    data = request.json
+    if 'status' in data:
+        notification.status = data['status']
+        db.session.commit()
+        return jsonify(notification.to_dict())
+    
+    return jsonify({"message": "No changes made"}), 400
+
+# Delete a notification
+@app.route('/notifications/<int:notification_id>', methods=['DELETE'])
+@jwt_required()
+def delete_notification(notification_id):
+    current_user_id = get_jwt_identity()
+    notification = Notification.query.filter_by(notification_id=notification_id, user_id=current_user_id).first()
+    
+    if not notification:
+        return jsonify({"message": "Notification not found"}), 404
+
+    db.session.delete(notification)
+    db.session.commit()
+    return jsonify({"message": "Notification deleted successfully"}), 200
+
+# Mark all notifications as read
+@app.route('/notifications/mark-all-read', methods=['PUT'])
+@jwt_required()
+def mark_all_notifications_read():
+    current_user_id = get_jwt_identity()
+    notifications = Notification.query.filter_by(user_id=current_user_id, status='Delivered').all()
+    
+    for notification in notifications:
+        notification.status = 'Read'
+    
+    db.session.commit()
+    return jsonify({"message": "All notifications marked as read"}), 200
+
+# Get unread notification count
+@app.route('/notifications/unread-count', methods=['GET'])
+@jwt_required()
+def get_unread_notification_count():
+    current_user_id = get_jwt_identity()
+    unread_count = Notification.query.filter_by(user_id=current_user_id, status='Delivered').count()
+    return jsonify({"unread_count": unread_count})
+
+
+# send email notifications to users/parties
 def send_notification(email, subject, body):
     if not is_valid_email(email):
         print(f"Invalid email address: {email}. Notification not sent.")
@@ -753,7 +946,7 @@ def generate_unique_tracking_number(existing_numbers):
 
 def generate_order_number():
     while True:
-        order_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+        order_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
         existing_order = Order.query.filter_by(order_number=order_number).first()
         if existing_order is None:
             return order_number
@@ -761,10 +954,9 @@ def generate_order_number():
 
 # RESET PASSWORD
 from flask_mail import Mail, Message
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
+# from dotenv import dotenv_values, load_dotenv
+# import os
+# load_dotenv()
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
@@ -772,7 +964,7 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = os.environ.get('GMAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.environ.get('GMAIL_APP_PASSWORD')
-app.config['MAIL_DEFAULT_SENDER'] = 'parcelpoa@gmail.com'
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
 
 mail = Mail(app)
 
@@ -875,7 +1067,11 @@ def is_valid_email(email):
 # Handle image upload:
 import base64
 import os
-from flask import current_app
+from flask import current_app, send_from_directory
+
+@app.route('/static/<path:path>')
+def send_static(path):
+    return send_from_directory('static', path)
 
 def save_base64_image(base64_string, filename):
     if ',' in base64_string:
@@ -892,7 +1088,7 @@ def save_base64_image(base64_string, filename):
     with open(file_path, 'wb') as f:
         f.write(image_data)
     
-    return os.path.join('uploads', filename)
+    return os.path.join('static', 'uploads', filename)
 
 # FACEBOOK webhook
 # oauth = OAuth1(app)
@@ -910,6 +1106,8 @@ def save_base64_image(base64_string, filename):
 #     access_token_url='/oauth/access_token',
 #     authorize_url='https://www.facebook.com/dialog/oauth'
 # )
+# db_check()
+logging.info("Application setup completed")
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)

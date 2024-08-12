@@ -22,14 +22,6 @@ export default function CommunicationTools() {
 
   return (
     <div className="flex flex-col h-screen p-6 bg-white rounded shadow-md relative pt-32">
-      {/* Open Sidebar Button */}
-      <button
-        onClick={() => navigate("/dashboard")}
-        className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600"
-      >
-        Open Sidebar
-      </button>
-
       {/* Back Button */}
       <button
         onClick={() => navigate("/dashboard")}

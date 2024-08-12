@@ -1,16 +1,14 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-
+import React ,{useContext}from 'react';
+import { Link } from 'react-router-dom';
+import {UserContext} from "../../Context/UserContext"
 export default function AgentHome() {
-  const navigate = useNavigate();
-
+ const {currentUser,logout} = useContext(UserContext);
   const handleLogout = () => {
-    localStorage.removeItem('access_token');
-    navigate('/login');
+    logout();
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-300 to-indigo-700">
+    <div className="min-h-screen flex flex-col bg-white">
       {/* Navbar */}
       <nav className="bg-indigo-200 shadow-md p-4 fixed top-0 left-0 right-0 z-10">
         <div className="container mx-auto flex justify-between items-center">
@@ -20,7 +18,7 @@ export default function AgentHome() {
           <div className="flex space-x-4">
             <Link to="/" className="text-blue-500 hover:text-blue-700">Home</Link>
             <Link to="/dashboard" className="text-blue-500 hover:text-blue-700">Dashboard</Link>
-            <button onClick={handleLogout} className="text-blue-500 hover:text-blue-700">
+            <button currentUser={currentUser} onClick={handleLogout} className="text-blue-500 hover:text-blue-700">
               Logout
             </button>
           </div>
@@ -28,7 +26,7 @@ export default function AgentHome() {
       </nav>
 
       {/* Main Content */}
-      <div className="pt-20 flex-grow flex flex-col items-center bg-gradient-to-br from-blue-300 to-indigo-700 py-4 px-2 sm:px-4 lg:px-6">
+      <div className="pt-20 flex-grow flex flex-col items-center bg-white py-4 px-2 sm:px-4 lg:px-6">
         <div className="w-full max-w-3xl bg-gradient-to-bl from-blue-200 to-indigo-400 rounded-lg shadow-lg p-4 sm:p-6 lg:p-8">
           <div className="text-center">
             <h1 className="text-3xl font-extrabold text-blue-500 mb-3 sm:text-4xl md:text-5xl">

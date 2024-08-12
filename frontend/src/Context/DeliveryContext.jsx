@@ -56,9 +56,19 @@ export function DeliveryProvider({ children }) {
           Authorization: `Bearer ${auth_token}`,
         },
       })
-        .then((response) => response.json())
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
         .then((res) => {
+          console.log("Fetched deliveries:", res);
           setDeliveries(res);
+        })
+        .catch((error) => {
+          console.error("Error fetching deliveries:", error);
+          toast.error("Failed to fetch deliveries");
         });
     }
   }, [auth_token]);

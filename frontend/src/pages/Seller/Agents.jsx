@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
@@ -29,7 +30,7 @@ const FilterBar = ({ filters, onFilterChange, onReset }) => (
     </select>
     <button
       onClick={onReset}
-      className="bg-red-600 text-white py-1 px-3 rounded-md text-base hover:bg-red-700"
+      className="bg-yellow-300  py-1 px-3 rounded-md text-base hover:bg-yellow-500"
       aria-label="Reset filters"
     >
       Reset Filter
@@ -64,10 +65,9 @@ export default function Agents() {
     fetchAgents();
   }, []);
 
-  const handleView = (id) => {
-    navigate(`/agent-trends/${id}`);
+  const handleView = (user_id) => {
+    navigate(`/admin/agent/${user_id}`);
   };
-
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this client request?")) {
       try {
@@ -103,9 +103,11 @@ export default function Agents() {
   );
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-4 md:p-6 bg-gray-50 mt-4 min-h-screen">
       {/* Title */}
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">Agents List</h1>
+      <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-gray-800">
+        Agents List
+      </h1>
 
       <FilterBar
         filters={filters}
@@ -114,65 +116,64 @@ export default function Agents() {
       />
 
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-lg">
+        <table className="min-w-full bg-white border border-yellow-600 rounded-lg shadow-lg">
           <thead>
-            <tr className="bg-gray-100 text-gray-600 text-base">
-              <th className="px-4 py-2 text-left font-medium">Profile Image</th>
-              <th className="px-4 py-2 text-left font-medium">Agent ID</th>
-              <th className="px-4 py-2 text-left font-medium">Name</th>
-              <th className="px-4 py-2 text-left font-medium">Email</th>
-              <th className="px-4 py-2 text-left font-medium">Phone</th>
-              {/* <th className="px-4 py-2 text-left font-medium">Address</th>
-              <th className="px-4 py-2 text-left font-medium">Deliveries</th> */}
-              <th className="px-4 py-2 text-left font-medium">Status</th>
-              <th className="px-4 py-2 text-left font-medium">Actions</th>
+            <tr className="bg-yellow-100 text-yellow-800 text-sm md:text-base">
+              <th className="px-2 md:px-4 py-2 text-left font-medium border border-yellow-300">
+                Profile Image
+              </th>
+              <th className="px-2 md:px-4 py-2 text-left font-medium border border-yellow-300">
+                Agent ID
+              </th>
+              <th className="px-2 md:px-4 py-2 text-left font-medium border border-yellow-300">
+                Name
+              </th>
+              <th className="px-2 md:px-4 py-2 text-left font-medium border border-yellow-300">
+                Email
+              </th>
+              <th className="px-2 md:px-4 py-2 text-left font-medium border border-yellow-300">
+                Phone
+              </th>
+              <th className="px-2 md:px-4 py-2 text-left font-medium border border-yellow-300">
+                Status
+              </th>
             </tr>
           </thead>
-          <tbody className="text-gray-700 text-sm">
+          <tbody className="text-yellow-900 text-xs md:text-sm">
             {filteredAgentRequests.map((agent) => (
               <tr
-                key={agent.id}
-                className="hover:bg-gray-50 transition-colors duration-300"
+                key={agent.user_id}
+                className="hover:bg-yellow-50 transition-colors duration-300"
               >
-                <td className="px-4 py-2">
+                <td className="px-2 md:px-4 py-2 border border-yellow-200">
                   <img
                     src={agent.profile_picture}
                     alt={`${agent.name}'s profile`}
-                    className="w-12 h-12 rounded-full object-cover"
+                    className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover"
                   />
                 </td>
-                <td className="px-4 py-2">{agent.id}</td>
-                <td className="px-4 py-2">{agent.name}</td>
-                <td className="px-4 py-2">{agent.email}</td>
-                <td className="px-4 py-2">{agent.phone_number}</td>
-                {/* <td className="px-4 py-2">{agent.address}</td>
-                <td className="px-4 py-2">{agent.deliveries}</td> */}
-                <td className="px-4 py-2">
+                <td className="px-2 md:px-4 py-2 border border-yellow-200">
+                  {agent.user_id}
+                </td>
+                <td className="px-2 md:px-4 py-2 border border-yellow-200">
+                  {agent.name}
+                </td>
+                <td className="px-2 md:px-4 py-2 border border-yellow-200">
+                  {agent.email}
+                </td>
+                <td className="px-2 md:px-4 py-2 border border-yellow-200">
+                  {agent.phone_number}
+                </td>
+                <td className="px-2 md:px-4 py-2 border border-yellow-200">
                   <span
-                    className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${
+                    className={`inline-flex items-center px-2 md:px-3 py-1 text-xs md:text-sm font-medium rounded-full ${
                       agent.status === "Available"
                         ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-yellow-800"
+                        : "bg-red-100 text-red-800"
                     }`}
                   >
                     {agent.status}
                   </span>
-                </td>
-                <td className="px-4 py-2 flex items-center gap-2">
-                  <button
-                    onClick={() => handleView(agent.id)}
-                    className="text-blue-600 hover:text-blue-800 transition-colors duration-300 text-base"
-                    aria-label={`View Agent ID: ${agent.id}`}
-                  >
-                    <PencilIcon className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(agent.id)}
-                    className="text-gray-600 hover:text-gray-800 transition-colors duration-300 text-base"
-                    aria-label={`Delete Agent ID: ${agent.id}`}
-                  >
-                    <TrashIcon className="w-5 h-5" />
-                  </button>
                 </td>
               </tr>
             ))}
@@ -181,4 +182,5 @@ export default function Agents() {
       </div>
     </div>
   );
+
 }

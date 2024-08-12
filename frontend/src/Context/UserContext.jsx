@@ -3,32 +3,35 @@ import React, { createContext, useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import config from "../../config.json"; // Import the server URL
+import { server } from "../../config";
 
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const nav = useNavigate();
-  const [currentUser, setCurrentUser] = useState(null);
+
+  const [currentUser, setCurrentUser] = useState();
   const [onChange, setOnChange] = useState(false);
   const [authToken, setAuthToken] = useState(() =>
-    localStorage.getItem("access_token") || null
+    localStorage.getItem("access_token")
+      ? localStorage.getItem("access_token")
+      : null
   );
 
   // REGISTER USER
   const addUser = (name, email, phone_number, password, user_role) => {
     return new Promise((resolve, reject) => {
-      fetch(`${config.server}/register`, {
+      fetch(`${server}/register`, {
         method: "POST",
         body: JSON.stringify({
-          name,
-          email,
-          phone_number,
-          password,
-          user_role,
+          name: name,
+          email: email,
+          phone_number: phone_number,
+          password: password,
+          user_role: user_role,
         }),
         headers: {
-          "Content-Type": "application/json",
+          "Content-type": "application/json",
         },
       })
         .then((response) => {
@@ -61,11 +64,11 @@ export const UserProvider = ({ children }) => {
 
   // LOGIN USER
   function login(email, password) {
-    return fetch(`${config.server}/login`, {
+    return fetch(`${server}/login`, {
       method: "POST",
       body: JSON.stringify({
-        email,
-        password,
+        email: email,
+        password: password,
       }),
       headers: {
         "Content-Type": "application/json",
@@ -79,22 +82,28 @@ export const UserProvider = ({ children }) => {
           localStorage.setItem("access_token", res.access_token);
           setCurrentUser(res.user);
 
+<<<<<<< HEAD
 
           if (res.user.role === "Agent" || res.user.role === "Business") {
             toast.success(`Logged in Successfully as ${res.user.role}!`);
             nav(res.user.role === "Agent" ? "/agent" : "/seller");
 
+=======
+>>>>>>> be4f0d90fab629a52b9f7c4ce3d07a30b21f8c99
           const { role } = res.user;
           const routes = {
-            Agent: "/agent",
-            Business: "/seller",
-            Admin: "/admin/requests", //TODO: change this later to "/admin" after peter creates the admin dashboard
+            Agent: "/agent/dashboard",
+            Business: "/business/dashboard",
+            Admin: "/admin/requests",
           };
 
           if (role in routes) {
             toast.success(`Logged in Successfully as ${role}!`);
             nav(routes[role]);
+<<<<<<< HEAD
 
+=======
+>>>>>>> be4f0d90fab629a52b9f7c4ce3d07a30b21f8c99
           } else {
             console.error("Unexpected role:", role);
             throw new Error(`Unexpected role: ${role}`);
@@ -112,10 +121,9 @@ export const UserProvider = ({ children }) => {
       });
   }
 
-
   // UPDATE USER
   const updateUser = (name, email, phone_number) => {
-    fetch(`${config.server}/profile`, {
+    fetch(`${server}/profile`, {
       method: "PUT",
       body: JSON.stringify({
         name,
@@ -123,7 +131,7 @@ export const UserProvider = ({ children }) => {
         phone_number,
       }),
       headers: {
-        "Content-Type": "application/json",
+        "Content-type": "application/json",
         Authorization: `Bearer ${authToken}`,
       },
     })
@@ -144,7 +152,7 @@ export const UserProvider = ({ children }) => {
 
   // LOGOUT
   const logout = () => {
-    fetch(`${config.server}/logout`, {
+    fetch(`${server}/logout`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -170,9 +178,9 @@ export const UserProvider = ({ children }) => {
       });
   };
 
-  // FETCH USER PROFILE
+  // fetch user profile
   const fetchUserProfile = useCallback(() => {
-    fetch(`${config.server}/profile`, {
+    fetch(`${server}/profile`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${authToken}`,
@@ -200,10 +208,13 @@ export const UserProvider = ({ children }) => {
     }
   }, [authToken, onChange, fetchUserProfile]);
 
+<<<<<<< HEAD
 
   // REQUEST PASSWORD RESET
 
 
+=======
+>>>>>>> be4f0d90fab629a52b9f7c4ce3d07a30b21f8c99
   // current user
   const getCurrentUser = () => {
     return fetch(`${server}/current_user`, {
@@ -228,11 +239,13 @@ export const UserProvider = ({ children }) => {
       });
   };
 
-
   // Request Password Reset
+<<<<<<< HEAD
 
+=======
+>>>>>>> be4f0d90fab629a52b9f7c4ce3d07a30b21f8c99
   const requestPasswordReset = (email, frontendUrl) => {
-    return fetch(`${config.server}/request-reset-password`, {
+    return fetch(`${server}/request-reset-password`, {
       method: "POST",
       body: JSON.stringify({ email, frontend_url: frontendUrl }),
       headers: {
@@ -253,9 +266,9 @@ export const UserProvider = ({ children }) => {
       });
   };
 
-  // RESET PASSWORD
+  // Reset Password
   const resetPassword = (token, newPassword) => {
-    return fetch(`${config.server}/reset-password/${token}`, {
+    return fetch(`${server}/reset-password/${token}`, {
       method: "POST",
       body: JSON.stringify({ new_password: newPassword }),
       headers: {
@@ -324,6 +337,75 @@ export const UserProvider = ({ children }) => {
       });
   };
 
+  // FETCH AGENT DETAILS
+  const fetchAgentDetails = (agentId) => {
+    return fetch(`${server}/agent-details/${agentId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        if (res.agent) {
+          return res.agent;
+        } else {
+          throw new Error("An unexpected error occurred");
+        }
+      })
+      .catch((error) => {
+        toast.error("An error occurred while fetching agent details");
+        throw error;
+      });
+  };
+
+  // FETCH ALL AGENTS
+  const fetchAllAgents = () => {
+    return fetch(`${server}/agents`, { 
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        if (res.agents) {
+          return res.agents;
+        } else {
+          throw new Error("An unexpected error occurred");
+        }
+      })
+      .catch((error) => {
+        toast.error("An error occurred while fetching agents");
+        throw error;
+      });
+  };
+
+  //fetch orders:
+  const fetchOrders = () => {
+    return fetch(`${server}/business/orders`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        if (res.orders) {
+          return res.orders;
+        } else {
+          throw new Error("An unexpected error occurred");
+        }
+      })
+      .catch((error) => {
+        toast.error("An error occurred while fetching orders");
+        throw error;
+      });
+  }
+
   const contextData = {
     currentUser,
     setCurrentUser,
@@ -339,10 +421,14 @@ export const UserProvider = ({ children }) => {
     resetPassword,
     approveAgentRequest,
     rejectAgentRequest,
+    fetchAgentDetails,
+    fetchAllAgents,
+    setAuthToken,
+    fetchOrders
   };
-
 
   return (
     <UserContext.Provider value={contextData}>{children}</UserContext.Provider>
   );
 };
+
