@@ -67,7 +67,7 @@ export default function Parcels() {
             onClick={() => setActiveFilter(filter)}
             className={`px-5 py-2 rounded-full font-medium text-sm sm:text-base transition duration-300 ease-in-out ${
               activeFilter === filter
-                ? "bg-blue-600 text-white shadow-lg"
+                ? "bg-yellow-600 text-white shadow-lg"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
