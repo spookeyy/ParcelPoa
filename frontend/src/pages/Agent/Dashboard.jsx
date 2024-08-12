@@ -124,7 +124,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex h-full overflow-hidden bg-gradient-to-br from-blue-300 to-indigo-700">
+    <div className="flex h-full overflow-hidden bg-gradient-to-br from-yellow-200 to-yellow-400">
       <AgentHeader />
       <div className="mt-24 flex-1 overflow-y-auto px-4 py-2">
         <Routes>
