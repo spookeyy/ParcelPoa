@@ -31,7 +31,7 @@ import Messages_List from "./pages/Seller/Messages_List";
 import Messages_Details from "./pages/Seller/Messages_Details";
 // import Order_List from "./pages/Seller/Order_List";
 // import Order_Details from "./pages/Seller/Order_Details";
-// import Dashboard_Part from "./pages/Seller/Dashboard_Part";
+import Dashboard_Part from "./pages/Seller/Dashboard_Part";
 import Tracking from "./pages/Seller/Tracking";
 import SellerPofie from "./pages/Seller/SellerPofie";
 import SellerLayout from "./components/SellerLayout";
@@ -48,7 +48,7 @@ import OrderTracking from "./pages/Buyer/OrderTracking";
 import TrackOrders from "./pages/Buyer/TrackOrders";
 
 // Agent Pages
-import AgentHome from "./pages/Agent/AgentHome";
+// import AgentHome from "./pages/Agent/AgentHome";
 import Dashboard from "./pages/Agent/Dashboard";
 import DeliveryDetails from "./pages/Agent/DeliveryDetails";
 import DeliveryConfirmation from "./pages/Agent/DeliveryConfirmation";
@@ -101,6 +101,10 @@ function App() {
                 path="/reset-password/:token"
                 element={<ResetPassword />}
               />
+
+              {/* <Route path="/send-notification" element={<SendNotification />} /> */}
+
+              {/* Public Pages */}
               <Route path="/about" element={<About />} />
               <Route path="/contact-us" element={<Contact />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
@@ -112,7 +116,10 @@ function App() {
               <Route path="/seller" element={<SellerLayout />}>
                 <Route path="/seller" element={<Home />} />
                 <Route path="/seller/signup" element={<Create_Account />} />
-                <Route path="/seller/agents" element={<ProtectedRoute element={<Agents />} />} />
+                <Route
+                  path="/seller/agents"
+                  element={<ProtectedRoute element={<Agents />} />}
+                />
                 <Route path="/seller/agent/:id" element={<Agent_Details />} />
                 <Route path="/seller/invoice/:id" element={<Invoice />} />
                 <Route
@@ -126,10 +133,10 @@ function App() {
                 {/* <Route path="/seller/order-list" element={<Order_List />} />
                 <Route path="/seller/order/:id" element={<Order_Details />} /> */}
                 <Route path="/seller/tracking" element={<Tracking />} />
-                {/* <Route
+                <Route
                   path="/seller/dashboard-part"
                   element={<Dashboard_Part />}
-                /> */}
+                />
                 <Route
                   path="/seller/seller-profile"
                   element={<ProtectedRoute element={<SellerPofie />} />}
@@ -140,7 +147,10 @@ function App() {
               <Route path="/tracking" element={<OrderTracking />} />
               {/* <Route path="/order-list" element={<Order_List />} />
               <Route path="/order/:id" element={<Order_Details />} /> */}
-              <Route path="/track/:trackingid" element={<OrderTracking />} />
+              <Route
+                path="/track/:trackingNumber?"
+                element={<OrderTracking />}
+              />
               <Route path="/track-orders" element={<TrackOrders />} />
 
               {/* Agent Routes */}

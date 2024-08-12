@@ -41,7 +41,9 @@ export default function AgentProfile({ onClose }) {
           name: data.name,
           phoneNumber: data.phone_number,
           userRole: data.user_role,
-          profilePicture: data.profile_picture || profile.profilePicture,
+          profilePicture: data.profile_picture
+            ? `${data.profile_picture}?t=${new Date().getTime()}`
+            : profile.profilePicture,
         });
       } else {
         // redirect non-agent users them to a home page
@@ -90,6 +92,11 @@ export default function AgentProfile({ onClose }) {
       if (!response.ok) throw new Error("Profile update failed");
       const data = await response.json();
       setMessage(data.message);
+      setProfile((prevProfile) => ({
+        ...prevProfile,
+        ...data.profile,
+        profilePicture: data.profile.profile_picture,
+      }));
       toast.success("Profile updated successfully");
       setTimeout(onClose, 2000);
     } catch (error) {

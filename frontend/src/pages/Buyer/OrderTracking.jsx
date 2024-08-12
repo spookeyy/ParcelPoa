@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -29,25 +29,38 @@ library.add(
 
 const OrderTracking = () => {
   const { trackingNumber } = useParams();
+  const location = useLocation();
   const { trackingData, fetchTrackingData, loading, error } = useTracking();
   const [localTrackingNumber, setLocalTrackingNumber] = useState(
     trackingNumber || ""
   );
 
   useEffect(() => {
+    const frontendUrl = window.location.origin;
     if (trackingNumber) {
-      fetchTrackingData(trackingNumber);
+      setLocalTrackingNumber(trackingNumber);
+      fetchTrackingData(trackingNumber, frontendUrl);
     }
   }, [trackingNumber, fetchTrackingData]);
+
+  useEffect(() => {
+    const frontendUrl = window.location.origin;
+    const params = new URLSearchParams(location.search);
+    const trackingFromUrl = params.get("tracking");
+    if (trackingFromUrl) {
+      setLocalTrackingNumber(trackingFromUrl);
+      fetchTrackingData(trackingFromUrl, frontendUrl);
+    }
+  }, [location, fetchTrackingData]);
 
   const handleTrackOrder = (e) => {
     e.preventDefault();
     if (!localTrackingNumber) {
       return;
     }
-    fetchTrackingData(localTrackingNumber);
+    const frontendUrl = window.location.origin;
+    fetchTrackingData(localTrackingNumber, frontendUrl);
   };
-
   const statusIcon = (status) => {
     switch (status) {
       case "Delivered":

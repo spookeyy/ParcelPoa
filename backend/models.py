@@ -46,6 +46,7 @@ class User(db.Model):
             'status': self.status,
             'Request': self.Request
         }
+    
 class Parcel(db.Model):
     __tablename__ = 'parcels'
 
