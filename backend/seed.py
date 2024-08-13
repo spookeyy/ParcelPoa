@@ -42,7 +42,9 @@ with app.app_context():
             updated_at=datetime.now(timezone.utc),
             profile_picture='default.png',
             status='Available',
-            Request='Approved'
+            Request='Approved',
+            primary_region='Nairobi',
+            operation_areas='Nairobi,Mombasa,Kisumu'
         )
         admin.set_password('admin1234')  # 8-character password
         db.session.add(admin)
@@ -61,7 +63,9 @@ with app.app_context():
                 updated_at=datetime.now(timezone.utc),
                 profile_picture='default.png',
                 status='Available',
-                Request='Approved' if user_role == 'Business' else 'Pending'
+                Request='Approved' if user_role == 'Business' else 'Pending',
+                primary_region=faker.city(),
+                operation_areas=','.join(faker.cities(3))
             )
             user.set_password('password')
             users.append(user)
@@ -127,6 +131,7 @@ with app.app_context():
             user = random.choice([u for u in users if u.user_role == 'Business'])
             parcel = random.choice(parcels)
             order = Order(
+                order_number=''.join(random.choices(string.ascii_uppercase + string.digits, k=8)),
                 user_id=user.user_id,
                 parcel_id=parcel.parcel_id,
                 created_at=datetime.now(timezone.utc),
