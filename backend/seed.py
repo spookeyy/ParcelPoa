@@ -65,7 +65,7 @@ with app.app_context():
                 status='Available',
                 Request='Approved' if user_role == 'Business' else 'Pending',
                 primary_region=faker.city(),
-                operation_areas=','.join(faker.cities(3))
+                operation_areas=','.join([faker.city() for _ in range(3)])  # Generate 3 random cities
             )
             user.set_password('password')
             users.append(user)
@@ -73,6 +73,7 @@ with app.app_context():
         db.session.commit()
         print(f"Seeded {num_users + 1} users (including admin).")
         return users
+
 
     def seed_parcels(users, num_parcels=20):
         parcels = []
