@@ -71,10 +71,10 @@ def register():
     if User.query.filter_by(email=data['email']).first():
         return jsonify({'message': 'Email already exists'}), 400
 
-    phone_number = data.get("phone_number")
-    phone_number_exists = User.query.filter_by(phone_number=phone_number).first()
-    if phone_number_exists:
-        return jsonify({"message": "Phone number already exists"}), 400
+    elif data.get("phone_number"): # check if phone_number = data.get("phone_number")
+        phone_number_exists = User.query.filter_by(phone_number=data.get("phone_number")).first()
+        if phone_number_exists:
+            return jsonify({"message": "Phone number already exists"}), 400
 
     
     required_fields = ['name', 'email', 'phone_number', 'user_role', 'password']
@@ -94,9 +94,12 @@ def register():
         email=data.get('email'),
         phone_number=data.get('phone_number'),
         user_role=data.get('user_role'),
+        # region=data.get('region'), 
         created_at=datetime.now(),
         updated_at=datetime.now(),
         password_hash=hashed_password,
+        primary_region=data.get('primary_region'),
+        operation_areas=','.join(data.get('operation_areas', [])),
     )
     db.session.add(new_user)
     db.session.commit()
@@ -189,6 +192,9 @@ def profile():
         'user_role': user.user_role,
         'profile_picture': profile_picture_url,
         'status': user.status if user.status else 'Available',
+        'primary_region': user.primary_region,
+        'operation_areas': user.operation_areas.split(',') if user.operation_areas else []
+
     })
 
 # update profile
@@ -204,6 +210,8 @@ def update_profile():
     user.name = data.get('name', user.name)
     user.email = data.get('email', user.email)
     user.phone_number = data.get('phone_number', user.phone_number)
+    user.primary_region = data.get('primary_region', user.primary_region)
+    user.operation_areas = ','.join(data.get('operation_areas', user.operation_areas.split(',')))
     
     profile_picture = data.get('profile_picture')
     if profile_picture and profile_picture.startswith('data:image'):
@@ -215,6 +223,7 @@ def update_profile():
     db.session.commit()
     
     profile_picture_url = url_for('static', filename=user.profile_picture, _external=True) if user.profile_picture else None
+
     
     return jsonify({
         "message": "Profile updated successfully",
@@ -222,7 +231,9 @@ def update_profile():
             "name": user.name,
             "email": user.email,
             "phone_number": user.phone_number,
-            "profile_picture": profile_picture_url
+            "profile_picture": profile_picture_url,
+            "primary_region": user.primary_region,
+            "operation_areas": user.operation_areas
         }
     })
 
@@ -644,6 +655,9 @@ def schedule_pickup():
     
     data = request.get_json()
     
+    sender_location = data.get('current_location', user.primary_region)  # Use business's primary region if not provided
+    sender_region = get_region_from_address(sender_location)
+
     # Create a new parcel
     new_parcel = Parcel(
         sender_id=current_user_id,
@@ -655,7 +669,7 @@ def schedule_pickup():
         weight=data['weight'],
         category=data['category'],
         status='Scheduled for Pickup',
-        current_location='Nairobi (Store location)',
+        current_location=sender_location,
         sender_email=user.email,
         recipient_email=data['recipient_email']
     )
@@ -678,14 +692,47 @@ def schedule_pickup():
         pickup_time_str = pickup_time_str[:-1]  # Remove the 'Z'
     pickup_time = datetime.fromisoformat(pickup_time_str).replace(tzinfo=timezone.utc)
     
-    # Ensure selected_agent is provided
-    selected_agent = data.get('agent_id')
-    if not selected_agent:
+    # Format pickup time as "2024-08-12 Time: 12:20 PM"
+    formatted_pickup_time = pickup_time.strftime('%Y-%m-%d Time: %I:%M %p')
+
+    selected_agent_id = data.get('agent_id')
+    if not selected_agent_id:
         return jsonify({"message": "Agent ID must be provided"}), 400
-    
+
+    # Convert selected_agent_id to an integer
+    try:
+        selected_agent_id = int(selected_agent_id)
+    except ValueError:
+        return jsonify({"message": "Invalid agent ID format"}), 400
+
+    sender_region = get_region_from_address(new_parcel.current_location)
+
+    if sender_region == 'Other':
+        available_agents = User.query.filter_by(
+            user_role='Agent',
+            status='Available',
+            Request='Approved'
+        ).all()
+    else:
+        available_agents = User.query.filter(
+            User.user_role == 'Agent',
+            User.status == 'Available',
+            User.Request == 'Approved',
+            (User.primary_region == sender_region) | (User.operation_areas.like(f'%{sender_region}%'))
+        ).all()
+
+    if not available_agents:
+        return jsonify({"message": f"No available agents in the region: {sender_region}"}), 400
+
+    # Check if the provided agent_id is among the available agents
+    selected_agent = next((agent for agent in available_agents if agent.user_id == selected_agent_id), None)
+
+    if not selected_agent:
+        return jsonify({"message": "Provided agent ID is not available in the specified region"}), 400
+
     new_delivery = Delivery(
         parcel_id=new_parcel.parcel_id,
-        agent_id=selected_agent,
+        agent_id=selected_agent.user_id,
         pickup_time=pickup_time,
         status='Scheduled'
     )
@@ -698,33 +745,34 @@ def schedule_pickup():
     )
     db.session.add(new_tracking)
     
-    # Update the status of the selected agent to 'Unavailable'
-    agent = User.query.get(selected_agent)
-    if agent:
-        agent.status = 'Unavailable'
-    else:
-        return jsonify({"message": "Invalid agent ID provided"}), 400
+    # # Update the status of the selected agent to 'Unavailable'
+    # agent = User.query.get(selected_agent)
+    # if agent:
+    #     agent.status = 'Unavailable'
+    # else:
+    #     return jsonify({"message": "Invalid agent ID provided"}), 400
+    
+
     
     db.session.commit()
 
     recipient_email = data.get('recipient_email')
     if recipient_email:
-        subject = f"Your parcel {new_parcel.tracking_number} is scheduled for pickup on {pickup_time.isoformat()}"
-        body = f"Dear {data.get('recipient_name')},\n\nYour parcel {new_parcel.tracking_number} is scheduled for pickup on {pickup_time.isoformat()}."
+        subject = f"Your parcel {new_parcel.tracking_number} is scheduled for pickup on {formatted_pickup_time}"
+        body = f"Dear {data.get('recipient_name')},\n\nYour parcel {new_parcel.tracking_number} is scheduled for pickup on {formatted_pickup_time}."
         send_notification(recipient_email, subject, body)
     
     if selected_agent:
-        agent_user = User.query.get(selected_agent)
-        if agent_user:
-            agent_email = agent_user.email
-            subject = f"New parcel {new_parcel.tracking_number} scheduled for pickup"
-            body = f"A new parcel {new_parcel.tracking_number} is scheduled for you to pickup on {pickup_time.isoformat()}.\nPlease log in to your dashboard to accept the pickup.\nLocation: {new_parcel.current_location}"
-            send_notification(agent_email, subject, body)
+        agent_email = selected_agent.email
+        subject = f"New parcel {new_parcel.tracking_number} scheduled for pickup"
+        body = f"A new parcel {new_parcel.tracking_number} is scheduled for you to pickup on {formatted_pickup_time}.\nPlease log in to your dashboard to accept the pickup.\nLocation: {new_parcel.current_location}"
+        send_notification(agent_email, subject, body)
+
 
     return jsonify({
         "message": "Pickup scheduled successfully",
         "tracking_number": new_parcel.tracking_number,
-        "pickup_time": pickup_time.isoformat()
+        "pickup_time": formatted_pickup_time
     }), 201
 
 
@@ -798,13 +846,60 @@ def get_agents():
 @app.route('/get-available-agents', methods=['GET'])
 @jwt_required()
 def get_available_agents():
-    user = User.query.get(get_jwt_identity())
-    # if user.user_role == 'Agent':
-    #     return jsonify({"message": "Only admins and Businesses can get available agents"}), 403
+    primary_region = request.args.get('primary_region')
+    operational_area = request.args.get('operational_area')
     
-    agents = User.query.filter_by(user_role='Agent', status='Available', Request='Approved').all()
-    print('agents', agents)
+    if not primary_region:
+        return jsonify({"message": "Primary region parameter is required"}), 400
+
+    query = User.query.filter(
+        User.user_role == 'Agent',
+        User.status == 'Available',
+        User.Request == 'Approved'
+    )
+
+    if primary_region != 'Other':
+        query = query.filter(
+            (User.primary_region == primary_region) |
+            (User.operation_areas.like(f'%{primary_region}%'))
+        )
+
+    if operational_area and operational_area != 'Other':
+        query = query.filter(User.operation_areas.like(f'%{operational_area}%'))
+
+    agents = query.all()
+
     return jsonify([agent.to_dict() for agent in agents])
+
+
+
+@app.route('/update-agent-regions', methods=['PUT'])
+@jwt_required()
+def update_agent_regions():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    
+    if user.user_role != 'Agent':
+        return jsonify({"message": "Only agents can update their regions"}), 403
+    
+    data = request.get_json()
+    user.primary_region = data.get('primary_region', user.primary_region)
+    user.operation_areas = ','.join(data.get('operation_areas', []))
+    db.session.commit()
+    
+    return jsonify({"message": "Agent regions updated successfully"})
+
+# get-business-primary-region
+@app.route('/get-business-primary-region', methods=['GET'])
+@jwt_required()
+def get_business_primary_region():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    
+    if user.user_role != 'Business':
+        return jsonify({"message": "Only businesses can get their primary region"}), 403
+    
+    return jsonify({"primary_region": user.primary_region}) 
 
 
 # TODO: ORDER ROUTES
@@ -951,12 +1046,54 @@ def generate_order_number():
         if existing_order is None:
             return order_number
 
+# def get_region_from_address(address):
+    geolocator = Nominatim(user_agent="my_user_agent")
+    location = geolocator.geocode(address)
+    if location:
+        return location.address
+    else:
+        return None
+
+def get_region_from_address(address):
+    if address is None:
+        return 'Other'  # or handle None as needed
+
+    nairobi_regions = [
+        'Embakasi', 'Kasarani', 'Pangani', 'Ngara', 
+        'Ruaraka', 'Muthaiga', 'Lavington', 'Parklands', 'Westlands'
+    ]
+    address_lower = address.lower()
+    
+    for region in nairobi_regions:
+        if region.lower() in address_lower:
+            return 'Nairobi'
+    if 'nairobi' in address_lower:
+        return 'Nairobi'
+    return 'Other'
+
+
+# @app.route('/get-regions', methods=['GET'])
+# def get_regions():
+#     regions = {
+#         'Primary': ['Nairobi', 'Other'],
+#         'Operational': ['Embakasi', 'Kasarani', 'Pangani', 'Ngara', 'Ruaraka', 'Muthaiga', 'Lavington', 'Parklands', 'Westlands']
+#     }
+#     return jsonify(regions)
+
+
+@app.route('/get-regions', methods=['GET'])
+def get_regions():
+    regions = {
+        'Nairobi': ['Embakasi', 'Kasarani', 'Pangani', 'Ngara', 'Ruaraka', 'Muthaiga', 'Lavington', 'Parklands', 'Westlands'],
+        'Other': []  # You can add other primary regions here if needed
+    }
+    return jsonify(regions)
+
+
 
 # RESET PASSWORD
 from flask_mail import Mail, Message
-# from dotenv import dotenv_values, load_dotenv
-# import os
-# load_dotenv()
+# from itsdangerous import URLSafeTimedSerializer
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
@@ -1079,7 +1216,7 @@ def save_base64_image(base64_string, filename):
     
     image_data = base64.b64decode(base64_string)
     
-    upload_dir = os.path.join(current_app.root_path, 'static', 'uploads')
+    upload_dir = os.path.join(current_app.root_path, 'static', 'uploads') #TODO:: change this
     if not os.path.exists(upload_dir):
         os.makedirs(upload_dir)
     
@@ -1088,7 +1225,7 @@ def save_base64_image(base64_string, filename):
     with open(file_path, 'wb') as f:
         f.write(image_data)
     
-    return os.path.join('static', 'uploads', filename)
+    return os.path.join('uploads', filename)
 
 # FACEBOOK webhook
 # oauth = OAuth1(app)

@@ -21,6 +21,9 @@ class User(db.Model):
     profile_picture = Column(String, default='default.png', nullable=True)
     status = Column(Enum('Available', 'Unavailable', name='user_statuses'), default='Available', nullable=True)
     Request = Column(Enum('Approved', 'Pending', 'Rejected', name='approval_statuses'), default='Pending', nullable=True)
+    primary_region = Column(String(100), nullable=True)
+    operation_areas = Column(String(500), nullable=True)
+    # region = Column(String(100), nullable=True)
 
     parcels = relationship('Parcel', back_populates='sender', foreign_keys='Parcel.sender_id')
     deliveries = relationship('Delivery', back_populates='agent', foreign_keys='Delivery.agent_id')
@@ -44,7 +47,10 @@ class User(db.Model):
             'updated_at': self.updated_at,
             'profile_picture': self.profile_picture,
             'status': self.status,
-            'Request': self.Request
+            'Request': self.Request,
+            'primary_region': self.primary_region,
+            'operation_areas': self.operation_areas.split(',') if self.operation_areas else []
+            # 'region': self.region
         }
     
 class Parcel(db.Model):
