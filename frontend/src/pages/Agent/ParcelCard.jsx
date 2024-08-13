@@ -14,7 +14,7 @@ export default function ParcelCard({ parcel }) {
       "Scheduled for Pickup": "bg-gray-500",
       "Picked Up": "bg-green-800",
       "Out for Delivery": "bg-blue-500",
-      "In Transit": "bg-yellow-500",
+      "In Transit": "bg-yellow-800",
       Delivered: "bg-green-500",
       Cancelled: "bg-red-500",
     }[parcel.status] || "bg-gray-500";
