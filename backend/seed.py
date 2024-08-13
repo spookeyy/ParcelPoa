@@ -24,7 +24,7 @@ def generate_email(name):
 
 def send_notification(email, subject, body):
     with app.app_context():
-        msg = Message(subject, recipients=[email], body=body)
+        msg = Message(subject, sender=app.config['MAIL_DEFAULT_SENDER'], recipients=[email], body=body)
         mail.send(msg)
 
 with app.app_context():
