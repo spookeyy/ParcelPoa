@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import  Profile from "./Profile";
+import Logo from "../../assets/Logo.png";
 
 function Navbar() {
     return (
@@ -11,8 +12,8 @@ function Navbar() {
                     <div className="flex">
                         <div className="flex-shrink-0 flex items-center">
                             <img
-                                className="h-8 w-8"
-                                src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
+                                className="h-16 w-16"
+                                src={Logo}
                                 alt="Workflow"
                             />
                         </div>

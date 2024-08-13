@@ -9,98 +9,92 @@ import Header from "./Header";
 
 function BusinessDashboard() {
   const { currentUser } = useContext(UserContext);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-200 to-yellow-600">
+    <div className="min-h-screen bg-white">
       <Header />
       {currentUser && (
-        <p className="bg-gradient-to-br from-yellow-200 to-yellow-600 items-center text-center bg-clip-text mt-2 text-xl lg:text-xl">
-          Welcome, <span className="font-bold">{currentUser.name}</span>
+        <p className="text-center text-gray-800 mt-4 text-xl lg:text-2xl">
+          <span className="font-bold">{currentUser.name}</span>
         </p>
       )}
-      <div className="pt-32 flex-grow flex flex-col items-center   py-4 px-2 sm:px-4 lg:px-6 pb-32">
-        <div className="w-full mt-0 max-w-2xl bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:p-8">
+      <div className="pt-16 mt-0 flex-grow flex flex-col items-center py-8 px-4 lg:px-8">
+        <div className="w-full mt-8max-w-4xl bg-gray-100 rounded-xl shadow-md p-6 lg:p-10">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-yellow-500 mb-3 sm:text-4xl md:text-5xl">
+            <h1 className="text-xl font-medium text-gray-800 mb-4 sm:text-4xl md:text-5xl">
               Welcome to ParcelPoa
             </h1>
-            <p className="text-base text-yellow-500 mb-4 sm:text-lg md:text-xl">
-              Empowering agents to manage deliveries efficiently and
-              effectively. Join us and explore all the features designed just
-              for you!
+            <p className="text-lg text-gray-600 mb-8 sm:text-xl">
+              Manage your shipments, track parcels, and optimize your logistics
+              operations all in one place. Streamline your business processes
+              and enhance your customers' experience with our comprehensive
+              tools.
             </p>
-
-            {/* <Link to="/dashboard">
-              <button className="bg-blue-500 text-yellow-500 px-6 py-3 rounded-lg shadow-md transform hover:bg-white hover:text-blue-500 hover:scale-105 transition duration-300 ease-in-out">
-                Go to Dashboard
-              </button>
-            </Link> */}
           </div>
-
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 text-center">
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 position-relative z-0">
+            {/* Pickup Scheduling */}
+            <button
+              onClick={() => navigate("/business/schedule-pickup")}
+              className="flex flex-col items-center bg-white p-6 rounded-lg shadow-md hover:shadow-lg hover:bg-yellow-200 transition-shadow duration-200 transform hover:scale-105 z-10"
+            >
+              <div className="bg-yellow-100 p-4 rounded-full mb-4">
+                <i className="fas fa-calendar-alt text-yellow-600 text-3xl"></i>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                Create Order and Schedule Pickup
+              </h3>
+              <p className="text-gray-600 text-sm">
+                Create and schedule orders altogether effortlessly with our
+                intuitive tools, guaranteeing timely pickups and deliveries.
+              </p>
+            </button>
             {/* Manage Orders */}
             <button
               onClick={() => navigate("/business/orders")}
-              className="flex flex-col items-center bg-gradient-to-br from-yellow-200 to-yellow-600 p-8 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-200 transform hover:scale-105"
+              className="flex flex-col items-center bg-white p-6 rounded-lg shadow-md hover:shadow-lg hover:bg-yellow-200 transition-shadow duration-200 transform hover:scale-105 z-10"
             >
-              <div className="bg-white p-4 rounded-full shadow-md mb-4">
+              <div className="bg-yellow-100 p-4 rounded-full mb-4">
                 <i className="fas fa-box text-yellow-600 text-3xl"></i>
               </div>
-              <h3 className="text-xl font-semibold text-white mb-2">
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">
                 Order Management
               </h3>
-              <p className="text-white max-w-xs text-sm">
+              <p className="text-gray-600 text-sm">
                 Streamline your order process with our comprehensive order
                 management tools.
-              </p>
-            </button>
-
-            {/* Analytics and Reporting */}
-            <button
-              onClick={() => navigate("/seller/agents")}
-              className="flex flex-col items-center bg-gradient-to-br from-yellow-200 to-yellow-600 p-8 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-200 transform hover:scale-105"
-            >
-              <div className="bg-white p-4 rounded-full shadow-md mb-4">
-                <i className="fas fa-chart-line text-yellow-600 text-3xl"></i>
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-2">Agents</h3>
-              <p className="text-white max-w-xs text-sm">
-                View your agents for now
               </p>
             </button>
 
             {/* Parcel Tracking */}
             <button
               onClick={() => navigate("/business/parcel-tracking")}
-              className="flex flex-col items-center bg-gradient-to-br from-yellow-200 to-yellow-600 p-8 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-200 transform hover:scale-105"
+              className="flex flex-col items-center bg-white p-6 rounded-lg shadow-md hover:shadow-lg hover:bg-yellow-200 transition-shadow duration-200 transform hover:scale-105 z-10"
             >
-              <div className="bg-white p-4 rounded-full shadow-md mb-4">
+              <div className="bg-yellow-100 p-4 rounded-full mb-4">
                 <i className="fas fa-map-marker-alt text-yellow-600 text-3xl"></i>
               </div>
-              <h3 className="text-xl font-semibold text-white mb-2">
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">
                 Parcel Tracking
               </h3>
-              <p className="text-white max-w-xs text-sm">
+              <p className="text-gray-600 text-sm">
                 Monitor the status of your parcels in real-time with our
                 tracking system.
               </p>
             </button>
-
-            {/* Pickup Scheduling */}
+            {/* Agents */}
             <button
-              onClick={() => navigate("/business/schedule-pickup")}
-              className="flex flex-col items-center bg-gradient-to-br from-yellow-200 to-yellow-600 p-8 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-200 transform hover:scale-105"
+              onClick={() => navigate("/seller/agents")}
+              className="flex flex-col items-center bg-white p-6 rounded-lg shadow-md hover:shadow-lg hover:bg-yellow-200 transition-shadow duration-200 transform hover:scale-105 z-10"
             >
-              <div className="bg-white p-4 rounded-full shadow-md mb-4">
-                <i className="fas fa-calendar-alt text-yellow-600 text-3xl"></i>
+              <div className="bg-yellow-100 p-4 rounded-full mb-4">
+                <i className="fas fa-users text-yellow-600 text-3xl"></i>
               </div>
-              <h3 className="text-xl font-semibold text-white mb-2">
-                Pickup Scheduling
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                Agents
               </h3>
-              <p className="text-white max-w-xs text-sm">
-                Schedule pickups seamlessly and ensure timely deliveries with
-                our easy scheduling tools.
+              <p className="text-gray-600 text-sm">
+                View and manage your agents
               </p>
             </button>
           </div>

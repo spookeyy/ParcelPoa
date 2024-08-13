@@ -19,16 +19,14 @@ export const UserProvider = ({ children }) => {
   );
 
   // REGISTER USER
-  const addUser = (name, email, phone_number, password, user_role) => {
+  const addUser = (
+    userData
+  ) => {
     return new Promise((resolve, reject) => {
       fetch(`${server}/register`, {
         method: "POST",
         body: JSON.stringify({
-          name: name,
-          email: email,
-          phone_number: phone_number,
-          password: password,
-          user_role: user_role,
+          ...userData,
         }),
         headers: {
           "Content-type": "application/json",
@@ -36,7 +34,13 @@ export const UserProvider = ({ children }) => {
       })
         .then((response) => {
           if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            return response.json().then((err) => {
+              throw new Error(
+                err.message ||
+                  err.error ||
+                  `HTTP error! status: ${response.status}`
+              );
+            });
           }
           return response.json();
         })
@@ -45,9 +49,6 @@ export const UserProvider = ({ children }) => {
           if (res.message && res.message.includes("successfully")) {
             toast.success(res.message);
             resolve(res);
-          } else if (res.error) {
-            toast.error(res.error);
-            reject(new Error(res.error));
           } else {
             console.error("Unexpected response structure:", res);
             toast.error("An unexpected error occurred");
@@ -84,7 +85,7 @@ export const UserProvider = ({ children }) => {
 
           const { role } = res.user;
           const routes = {
-            Agent: "/agent",
+            Agent: "/agent/dashboard",
             Business: "/business/dashboard",
             Admin: "/admin/requests",
           };

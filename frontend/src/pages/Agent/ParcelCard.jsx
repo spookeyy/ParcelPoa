@@ -14,13 +14,13 @@ export default function ParcelCard({ parcel }) {
       "Scheduled for Pickup": "bg-gray-500",
       "Picked Up": "bg-green-800",
       "Out for Delivery": "bg-blue-500",
-      "In Transit": "bg-yellow-500",
+      "In Transit": "bg-yellow-800",
       Delivered: "bg-green-500",
       Cancelled: "bg-red-500",
     }[parcel.status] || "bg-gray-500";
 
   return (
-    <div className="bg-gradient-to-bl from-blue-200 to-indigo-400 p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 flex flex-col space-y-4">
+    <div className="bg-gradient-to-bl from-yellow-100 to-yellow-300 p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 flex flex-col space-y-4">
       <div className="text-lg font-semibold">
         <span className="font-bold">PARCEL ID:</span> {parcel.parcel_id}
       </div>
@@ -31,17 +31,27 @@ export default function ParcelCard({ parcel }) {
       </div>
 
       <div className="text-sm text-gray-700">
-        <span className="font-bold">Order Date:</span> {parcel.created_at}
+        <span className="font-bold">Items:</span> {parcel.description}
       </div>
-
       <div className="text-sm text-gray-700">
+        <span className="font-bold">Recipient Name:</span>{" "}
+        {parcel.recipient_name}
+      </div>
+      <div className="text-sm text-gray-700">
+        <span className="font-bold">Recipient Phone:</span>{" "}
+        {parcel.recipient_phone}
+      </div>
+      <div className="text-sm text-gray-700">
+        <span className="font-bold">Recipient Address:</span>{" "}
+        {parcel.recipient_address}
+      </div>
+      {/* <div className="text-sm text-gray-700">
         <span className="font-bold">Recipient Email:</span>{" "}
         {parcel.recipient_email}
-      </div>
+      </div> */}
 
       <div className="text-sm text-gray-700">
-        <span className="font-bold">Sender Email:</span>{" "}
-        {parcel.sender?.sender_email}
+        <span className="font-bold">Sender Email:</span> {parcel.sender_email}
       </div>
 
       <div className="flex justify-between items-center mt-4">

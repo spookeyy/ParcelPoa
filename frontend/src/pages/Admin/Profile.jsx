@@ -19,7 +19,11 @@ function Profile() {
     fetchUserProfile();
   }, [currentUser, fetchUserProfile]);
 
-  const userInitial = currentUser ? currentUser.name.charAt(0).toUpperCase() : "S";
+ const userInitial =
+   currentUser && typeof currentUser.name === "string"
+     ? currentUser.name.charAt(0).toUpperCase()
+     : "S";
+
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);

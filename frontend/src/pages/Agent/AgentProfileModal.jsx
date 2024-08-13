@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Modal from "../Modal"; // Make sure Modal is correctly imported
-import AgentProfile from "../AgentProfile";
+import AgentProfile from "./AgentProfile";
 
 export default function AgentProfileModal() {
   const [isModalOpen, setIsModalOpen] = useState(false);
