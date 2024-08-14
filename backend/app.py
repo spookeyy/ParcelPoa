@@ -173,7 +173,7 @@ def delete_user(user_id):
     return jsonify({"message": "User deleted successfully"})
 
 
-# user profile
+# TODO: whitney (profile picture update) GET request and PUT request.  there is another function down.  
 @app.route('/profile', methods=['GET'])
 @jwt_required()
 def profile():
@@ -1178,7 +1178,7 @@ def send_email(to_email, reset_url):
 
     return True
 
-#is valid email
+#is valid email # TODO: whitney
 import re
 
 def is_valid_email(email):
