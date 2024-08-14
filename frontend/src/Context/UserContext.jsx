@@ -86,7 +86,7 @@ export const UserProvider = ({ children }) => {
           const routes = {
             Agent: "/agent",
             Business: "/business/dashboard",
-            Admin: "/admin/requests", //TODO: change this later to "/admin" after peter creates the admin dashboard
+            Admin: "/admin/requests",
           };
 
           if (role in routes) {
@@ -360,6 +360,29 @@ export const UserProvider = ({ children }) => {
       });
   };
 
+  //fetch orders:
+  const fetchOrders = () => {
+    return fetch(`${server}/business/orders`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        if (res.orders) {
+          return res.orders;
+        } else {
+          throw new Error("An unexpected error occurred");
+        }
+      })
+      .catch((error) => {
+        toast.error("An error occurred while fetching orders");
+        throw error;
+      });
+  }
+
   const contextData = {
     currentUser,
     setCurrentUser,
@@ -378,6 +401,7 @@ export const UserProvider = ({ children }) => {
     fetchAgentDetails,
     fetchAllAgents,
     setAuthToken,
+    fetchOrders
   };
 
   return (

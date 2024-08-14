@@ -18,11 +18,17 @@ function Navbar() {
             alt="ParcelPoa Logo"
             className="h-8 md:h-10"
           />
+<<<<<<< HEAD
           <span className="text-2xl bg-gradient-to-br from-yellow-200 to-yellow-600 text-transparent bg-clip-text font-semibold whitespace-nowrap dark:text-white">
             ParcelPoa
           </span>
         </Link>
         <div className="flex md:hidden">
+=======
+          <h1 className="font-bold text-3xl">ParcelPoa</h1>
+        </div>
+        <div className="sm:hidden">
+>>>>>>> 919b44a278a6a5cf3dea58d9e59b2e3a3122d166
           <button
             onClick={toggleMenu}
             type="button"
@@ -30,6 +36,7 @@ function Navbar() {
             aria-controls="mobile-menu"
             aria-expanded={isOpen}
           >
+<<<<<<< HEAD
             <span className="sr-only">Open main menu</span>
              <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
@@ -40,10 +47,33 @@ function Navbar() {
           <Link
             to="/"
             className="bg-gradient-to-br from-yellow-200 to-yellow-600 text-transparent bg-clip-text hover:text-green-700 dark:text-white dark:hover:text-green-500"
+=======
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16m-7 6h7"}
+              />
+            </svg>
+          </button>
+        </div>
+        <nav className="hidden sm:flex sm:items-center space-x-4">
+          <Link
+            to="/"
+            className="text-black-700 font-medium hover:text-white hover:underline"
+>>>>>>> 919b44a278a6a5cf3dea58d9e59b2e3a3122d166
           >
             Home
           </Link>
           <Link
+<<<<<<< HEAD
             to="/about"
             className="bg-gradient-to-br from-yellow-200 to-yellow-600 text-transparent bg-clip-text hover:text-green-700 dark:text-white dark:hover:text-green-500"
           >
@@ -52,27 +82,132 @@ function Navbar() {
           <Link
             to="/tracking"
             className="bg-gradient-to-br from-yellow-200 to-yellow-600 text-transparent bg-clip-text hover:text-green-700 dark:text-white dark:hover:text-green-500"
+=======
+            to="/tracking"
+            className="text-black-700 font-medium hover:text-white hover:underline"
+>>>>>>> 919b44a278a6a5cf3dea58d9e59b2e3a3122d166
           >
             Track Order
           </Link>
           <Link
             to="/contact-us"
+<<<<<<< HEAD
             className="bg-gradient-to-br from-yellow-200 to-yellow-600 text-transparent bg-clip-text hover:text-green-700 dark:text-white dark:hover:text-green-500"
+=======
+            className="text-black-700 font-medium hover:text-white hover:underline"
+>>>>>>> 919b44a278a6a5cf3dea58d9e59b2e3a3122d166
           >
             Contact Us
           </Link>
           <Link
+<<<<<<< HEAD
             to="/signup"
             className="bg-gradient-to-br from-yellow-200 to-yellow-600 text-transparent bg-clip-text hover:text-green-700 dark:text-white dark:hover:text-green-500"
+=======
+            to="/about"
+            className="text-black-700 font-medium hover:text-white hover:underline"
+          >
+            About Us
+          </Link>
+          <Link
+            to="/signup"
+            className="text-black-700 font-medium hover:text-white hover:underline"
+>>>>>>> 919b44a278a6a5cf3dea58d9e59b2e3a3122d166
           >
             Sign Up
           </Link>
           <Link
             to="/login"
+<<<<<<< HEAD
             className="bg-gradient-to-br from-yellow-200 to-yellow-600 text-transparent bg-clip-text hover:text-green-700 dark:text-white dark:hover:text-green-500"
           >
             Log In
           </Link>
+=======
+            className="text-black-700 font-medium hover:text-white hover:underline"
+          >
+            Log In
+          </Link>
+        </nav>
+      </div>
+
+      {/* Mobile Menu */}
+      <div
+        className={`fixed top-0 right-0 w-2/3 max-w-sm bg-yellow-500 z-50 h-full transform transition-transform duration-300 ease-in-out ${
+          isOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="flex flex-col p-4">
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex items-center">
+              <img
+                src={logo}
+                alt="ParcelPoa Logo"
+                className="h-14 w-auto md:h-16 md:w-auto mr-2"
+              />
+              <h1 className="font-bold text-3xl">ParcelPoa</h1>
+            </div>
+            <button className="text-black" onClick={toggleMenu}>
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+          <nav className="flex flex-col space-y-4">
+            <Link
+              to="/"
+              className="text-black-700 font-medium hover:text-white"
+              onClick={toggleMenu}
+            >
+              Home
+            </Link>
+            <Link
+              to="/tracking"
+              className="text-black-700 font-medium hover:text-white"
+              onClick={toggleMenu}
+            >
+              Track Order
+            </Link>
+            <Link
+              to="/contact-us"
+              className="text-black-700 font-medium hover:text-white"
+              onClick={toggleMenu}
+            >
+              Contact Us
+            </Link>
+            <Link
+              to="/about"
+              className="text-black-700 font-medium hover:text-white"
+              onClick={toggleMenu}
+            >
+              About Us
+            </Link>
+            <Link
+              to="/signup"
+              className="text-black-700 font-medium hover:text-white"
+              onClick={toggleMenu}
+            >
+              Sign Up
+            </Link>
+            <Link
+              to="/login"
+              className="text-black-700 font-medium hover:text-white"
+              onClick={toggleMenu}
+            >
+              Log In
+            </Link>
+          </nav>
+>>>>>>> 919b44a278a6a5cf3dea58d9e59b2e3a3122d166
         </div>
       </div>
 

@@ -790,7 +790,7 @@ def get_orders():
     user = User.query.get(get_jwt_identity())
     if user.user_role != 'Business':
         return jsonify({"message": "Only businesses can get orders"}), 403
-    orders = Order.query.all()
+    orders = Order.query.filter_by(user_id=user.user_id).all()
     return jsonify([order.to_dict() for order in orders])
 
 

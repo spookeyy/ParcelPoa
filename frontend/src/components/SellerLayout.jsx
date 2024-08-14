@@ -1,15 +1,14 @@
 /* eslint-disable no-unused-vars */
-// src/components/SellerLayout.js
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import Header from './Header';
+import Header from '../pages/Business/Header';
 
 function SellerLayout() {
   return (
     <div>
       <Header />
       <main>
-        <Outlet />  {/* This is where the nested routes will render */}
+        <Outlet />
       </main>
     </div>
   );
