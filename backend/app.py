@@ -32,8 +32,8 @@ logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__, static_folder='static')
 CORS(app)
-app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db?mode=rw'
-# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
+# app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db?mode=rw'
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
 print(f"Connecting to database: {app.config['SQLALCHEMY_DATABASE_URI']}")
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -480,7 +480,7 @@ def update_parcel_status(parcel_id):
     # Send notifications
     if old_status != parcel.status:
         send_notification(parcel.sender.email, 'Parcel Status Update', f'Your parcel with tracking number {parcel.tracking_number} is now {parcel.status}.')
-        send_notification(parcel.recipient_email, 'Parcel Status Update', f'The parcel with tracking number {parcel.tracking_number} is now {parcel.status}. \n visit http://localhost:5173/track/{parcel.tracking_number} to track your parcel.')
+        send_notification(parcel.recipient_email, 'Parcel Status Update', f'The parcel with tracking number {parcel.tracking_number} is now {parcel.status}. \n visit https://parcelpoa.netlify.app/track/{parcel.tracking_number} to track your parcel.')
 
     return jsonify({"message": "Parcel status updated successfully"}), 200
 
