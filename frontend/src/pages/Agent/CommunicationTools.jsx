@@ -1,23 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { FloatingWhatsApp } from "react-floating-whatsapp";
+import { useNotification } from "../../Context/NotificationContext";
+import { UserContext } from "../../Context/UserContext";
 
 export default function CommunicationTools() {
   const [message, setMessage] = useState("");
   const [recipient, setRecipient] = useState("");
-  const [sendingMethod, setSendingMethod] = useState("platform"); // 'platform' or 'sms'
+  const [sendingMethod, setSendingMethod] = useState("platform");
   const navigate = useNavigate();
+  const { fetchNotifications, fetchUnreadCount } = useNotification();
+  const { authToken } = useContext(UserContext);
+
+  useEffect(() => {
+    if (authToken) {
+      fetchNotifications();
+      fetchUnreadCount();
+    }
+  }, [authToken, fetchNotifications, fetchUnreadCount]);
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-    // Handle sending message logic here
     console.log("Sending message:", { recipient, message, sendingMethod });
 
-    // After sending the message, you might want to redirect or clear the form
     setMessage("");
     setRecipient("");
-    // For demonstration, let's just navigate back
-    navigate("/dashboard");
+    // Refresh notifications after sending a message
+    fetchNotifications();
+    fetchUnreadCount();
+    navigate("/agent/dashboard");
   };
 
   return (
@@ -32,7 +43,9 @@ export default function CommunicationTools() {
 
       <div className="flex-1 flex items-center justify-center">
         <div className="w-full max-w-md bg-gray-100 p-6 rounded-lg shadow-md">
-          <h1 className="text-3xl font-bold mb-6 text-center">Communication Tools</h1>
+          <h1 className="text-3xl font-bold mb-6 text-center">
+            Communication Tools
+          </h1>
 
           <form onSubmit={handleSendMessage} className="space-y-6">
             <div className="mb-4">
@@ -60,7 +73,9 @@ export default function CommunicationTools() {
             </div>
 
             <div className="mb-6">
-              <label className="block text-gray-700 mb-2">Sending Method:</label>
+              <label className="block text-gray-700 mb-2">
+                Sending Method:
+              </label>
               <div className="flex items-center">
                 <input
                   type="radio"

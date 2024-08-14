@@ -14,13 +14,13 @@ export default function ParcelCard({ parcel }) {
       "Scheduled for Pickup": "bg-gray-500",
       "Picked Up": "bg-green-800",
       "Out for Delivery": "bg-blue-500",
-      "In Transit": "bg-yellow-500",
+      "In Transit": "bg-yellow-800",
       Delivered: "bg-green-500",
       Cancelled: "bg-red-500",
     }[parcel.status] || "bg-gray-500";
 
   return (
-    <div className="bg-gradient-to-bl from-blue-200 to-indigo-400 p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 flex flex-col space-y-4">
+    <div className="bg-gradient-to-bl from-yellow-100 to-yellow-300 p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 flex flex-col space-y-4">
       <div className="text-lg font-semibold">
         <span className="font-bold">PARCEL ID:</span> {parcel.parcel_id}
       </div>

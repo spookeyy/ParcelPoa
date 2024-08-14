@@ -1,13 +1,13 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { UserContext } from "../Context/UserContext";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { server } from "../../config.json";
 import Navbar from "./Navbar";
 
 function Create_Account() {
   const nav = useNavigate();
-
   const { addUser } = useContext(UserContext);
 
   const [fullName, setFullName] = useState("");
@@ -22,6 +22,16 @@ function Create_Account() {
   const [emailError, setEmailError] = useState(false);
   const [generalError, setGeneralError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [primaryRegion, setPrimaryRegion] = useState("");
+  const [operationAreas, setOperationAreas] = useState([]);
+  const [availableRegions, setAvailableRegions] = useState({});
+
+  useEffect(() => {
+    fetch(`${server}/get-regions`)
+      .then((response) => response.json())
+      .then((data) => setAvailableRegions(data))
+      .catch((error) => console.error("Error fetching regions:", error));
+  }, []);
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -60,7 +70,17 @@ function Create_Account() {
       return;
     }
 
-    addUser(fullName, email, phone_number, password, user_role)
+    const userData = {
+      name: fullName,
+      email,
+      phone_number,
+      password,
+      user_role,
+      primary_region: primaryRegion,
+      operation_areas: user_role === "Agent" ? operationAreas : [],
+    };
+
+    addUser(userData)
       .then(() => {
         // Clear form fields
         setFullName("");
@@ -69,6 +89,8 @@ function Create_Account() {
         setPassword("");
         setRepeatPassword("");
         setUserRole("");
+        setPrimaryRegion("");
+        setOperationAreas([]);
 
         nav("/login");
       })
@@ -294,28 +316,63 @@ function Create_Account() {
                     )}
                   </div>
 
+                <div>
+                  <label htmlFor="user_role" className="block text-sm font-medium text-gray-700 mb-1">
+                    Account Type
+                  </label>
+                  <select
+                    id="user_role"
+                    value={user_role}
+                    onChange={(e) => setUserRole(e.target.value)}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm"
+                  >
+                    <option value="" disabled>Select an option</option>
+                    <option value="Agent">Agent</option>
+                    <option value="Business">Business</option>
+                  </select>
+                </div>
+
+                {user_role && (
                   <div>
-                    <label
-                      htmlFor="agent-option"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Account Type
+                    <label htmlFor="primary_region" className="block text-sm font-medium text-gray-700 mb-1">
+                      Primary Region
                     </label>
                     <select
-                      id="agent-option"
-                      value={user_role}
-                      onChange={(e) => setUserRole(e.target.value)}
+                      id="primary_region"
+                      value={primaryRegion}
+                      onChange={(e) => setPrimaryRegion(e.target.value)}
                       required
                       className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm"
                     >
-                      <option value="" disabled>
-                        Select an option
-                      </option>
-                      <option value="Agent">Agent</option>
-                      <option value="Business">Business</option>
+                      <option value="" disabled>Select a region</option>
+                      {Object.keys(availableRegions).map((region, index) => (
+                        <option key={index} value={region}>{region}</option>
+                      ))}
                     </select>
                   </div>
-                </div>
+                )}
+
+                {user_role === 'Agent' && primaryRegion && (
+                  <div>
+                    <label htmlFor="operation_areas" className="block text-sm font-medium text-gray-700 mb-1">
+                      Operational Areas
+                    </label>
+                    <select
+                      id="operation_areas"
+                      multiple
+                      value={operationAreas}
+                      onChange={(e) => setOperationAreas(Array.from(e.target.selectedOptions, option => option.value))}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm"
+                    >
+                      {availableRegions[primaryRegion] && availableRegions[primaryRegion].map((area, index) => (
+                        <option key={index} value={area}>{area}</option>
+                      ))}
+                    </select>
+                    <p className="mt-1 text-xs text-gray-500">Hold Ctrl (Cmd on Mac) to select multiple areas</p>
+                  </div>
+                )}
 
                 <button
                   type="submit"
@@ -323,6 +380,7 @@ function Create_Account() {
                 >
                   Create Account
                 </button>
+              </div>
               </form>
             </div>
           </div>

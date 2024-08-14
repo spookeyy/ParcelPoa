@@ -87,13 +87,13 @@ export default function Sidebar({ isOpen, toggleSidebar, navigateTo }) {
           <li>
             <button
               onClick={() => {
-                navigate("/dashboard");
+                navigate("/");
                 toggleSidebar();
               }}
               className="flex items-center text-gray-800 hover:text-blue-600 hover:bg-gray-100 p-3 rounded transition duration-200 text-sm sm:text-base"
             >
               <i className="fas fa-home mr-3 text-lg sm:text-xl"></i> Go to
-              Dashboard
+              Home
             </button>
           </li>
         </ul>

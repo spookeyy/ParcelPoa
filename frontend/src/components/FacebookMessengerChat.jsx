@@ -6,7 +6,7 @@ function FacebookMessengerChat() {
     window.fbAsyncInit = function () {
       window.FB.init({
         xfbml: true,
-        version: "v17.0", // Use the latest version
+        version: "v17.0",
       });
     };
 
@@ -29,14 +29,16 @@ function FacebookMessengerChat() {
   }, []);
 
   return (
-    <div
-      className="fb-customerchat"
-      attribution="setup_tool"
-      page_id="YOUR_PAGE_ID"
-      theme_color="#0084FF"
-      logged_in_greeting="Hello! How can we assist you?"
-      logged_out_greeting="Log in to chat with us!"
-    />
+    <div className="fixed bottom-16 right-4 z-50">
+      <div
+        className="fb-customerchat"
+        attribution="setup_tool"
+        page_id="YOUR_PAGE_ID"
+        theme_color="#0084FF"
+        logged_in_greeting="Hello! How can we assist you?"
+        logged_out_greeting="Log in to chat with us!"
+      />
+    </div>
   );
 }
 

@@ -24,7 +24,7 @@ def generate_email(name):
 
 def send_notification(email, subject, body):
     with app.app_context():
-        msg = Message(subject, recipients=[email], body=body)
+        msg = Message(subject, sender=app.config['MAIL_DEFAULT_SENDER'], recipients=[email], body=body)
         mail.send(msg)
 
 with app.app_context():
@@ -42,7 +42,9 @@ with app.app_context():
             updated_at=datetime.now(timezone.utc),
             profile_picture='default.png',
             status='Available',
-            Request='Approved'
+            Request='Approved',
+            primary_region='Nairobi',
+            operation_areas='Nairobi,Mombasa,Kisumu'
         )
         admin.set_password('admin1234')  # 8-character password
         db.session.add(admin)
@@ -61,7 +63,9 @@ with app.app_context():
                 updated_at=datetime.now(timezone.utc),
                 profile_picture='default.png',
                 status='Available',
-                Request='Approved' if user_role == 'Business' else 'Pending'
+                Request='Approved' if user_role == 'Business' else 'Pending',
+                primary_region=faker.city(),
+                operation_areas=','.join([faker.city() for _ in range(3)])  # Generate 3 random cities
             )
             user.set_password('password')
             users.append(user)
@@ -69,6 +73,7 @@ with app.app_context():
         db.session.commit()
         print(f"Seeded {num_users + 1} users (including admin).")
         return users
+
 
     def seed_parcels(users, num_parcels=20):
         parcels = []
@@ -127,6 +132,7 @@ with app.app_context():
             user = random.choice([u for u in users if u.user_role == 'Business'])
             parcel = random.choice(parcels)
             order = Order(
+                order_number=''.join(random.choices(string.ascii_uppercase + string.digits, k=8)),
                 user_id=user.user_id,
                 parcel_id=parcel.parcel_id,
                 created_at=datetime.now(timezone.utc),

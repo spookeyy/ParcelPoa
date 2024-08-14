@@ -7,6 +7,9 @@ import Header from "./Header";
 function PickupScheduling() {
   const { authToken } = useContext(UserContext);
   const [availableAgents, setAvailableAgents] = useState([]);
+  const [regions, setRegions] = useState([]);
+  const [primaryRegion, setPrimaryRegion] = useState("");
+  const [operationalArea, setOperationalArea] = useState("");
   const [formData, setFormData] = useState({
     recipient_name: "",
     recipient_address: "",
@@ -20,14 +23,65 @@ function PickupScheduling() {
   });
 
   useEffect(() => {
-    const fetchAvailableAgents = async () => {
-      if (!authToken) return setAvailableAgents([]);
+    // Fetch primary region for business account
+    const fetchPrimaryRegion = async () => {
       try {
-        const response = await fetch(`${server}/get-available-agents`, {
+        const response = await fetch(`${server}/get-business-primary-region`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
         });
+        if (!response.ok) {
+          throw new Error("Failed to fetch primary region");
+        }
+        const data = await response.json();
+        setPrimaryRegion(data.primary_region); // Set the fetched primary region
+        console.log("Primary region:", data.primary_region);
+      } catch (error) {
+        console.error("Error fetching primary region:", error);
+        toast.error("Failed to fetch primary region");
+      }
+    };
+
+    fetchPrimaryRegion();
+  }, [authToken]);
+
+  useEffect(() => {
+    const fetchRegions = async () => {
+      try {
+        const response = await fetch(`${server}/get-regions`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch regions");
+        }
+        const regionsData = await response.json();
+        console.log("Regions data:", regionsData); // Log to inspect the response
+
+        // Extract arrays from the object and flatten them into a single array
+        const allRegions = Object.values(regionsData).flat();
+        console.log("All regions:", allRegions);
+
+        setRegions(allRegions);
+      } catch (error) {
+        console.error("Error fetching regions:", error);
+        toast.error("Failed to fetch regions");
+      }
+    };
+
+    fetchRegions();
+  }, []);
+
+  useEffect(() => {
+    const fetchAvailableAgents = async () => {
+      if (!authToken || !operationalArea) return setAvailableAgents([]);
+      try {
+        const response = await fetch(
+          `${server}/get-available-agents?primary_region=${primaryRegion}&operational_area=${operationalArea}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch available agents");
         }
@@ -40,13 +94,13 @@ function PickupScheduling() {
     };
 
     fetchAvailableAgents();
-  }, [authToken]);
+  }, [authToken, operationalArea, primaryRegion]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
-      [name]: value,
+      [name]: name === "agent_id" ? parseInt(value, 10) : value,
     }));
   };
 
@@ -180,26 +234,40 @@ function PickupScheduling() {
                       required
                     />
                     <select
-                      name="agent_id"
-                      value={formData.agent_id}
-                      onChange={handleChange}
+                      value={operationalArea}
+                      onChange={(e) => setOperationalArea(e.target.value)}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
-                      required
                     >
-                      <option value="">Select an agent</option>
-                      {availableAgents.map((agent) => (
-                        <option key={agent.user_id} value={agent.user_id}>
-                          {agent.name}
+                      <option value="">Select Agent Operational Area</option>
+                      {regions.map((region, index) => (
+                        <option key={index} value={region}>
+                          {region}
                         </option>
                       ))}
                     </select>
                   </div>
-                  <button
-                    type="submit"
-                    className="w-full py-3 bg-yellow-600 text-white font-semibold rounded-lg shadow-lg hover:bg-yellow-700 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+                  <select
+                    name="agent_id"
+                    value={formData.agent_id}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    required
                   >
-                    Schedule Pickup
-                  </button>
+                    <option value="">Select Available Agent</option>
+                    {availableAgents.map((agent) => (
+                      <option key={agent.user_id} value={agent.user_id}>
+                        {agent.name} - {agent.primary_region}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="text-center">
+                    <button
+                      type="submit"
+                      className="px-6 py-3 bg-gray-800 text-white rounded-lg shadow-md hover:bg-gray-900 transition duration-300"
+                    >
+                      Schedule Pickup
+                    </button>
+                  </div>
                 </form>
               </div>
             </div>

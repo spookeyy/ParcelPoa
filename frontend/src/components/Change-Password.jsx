@@ -18,20 +18,20 @@ export default function ChangePassword({ onClose }) {
       return;
     }
 
-    fetch(`${server}/change-password`, {
+    fetch(`${server}/change_password`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${authToken}`,
       },
       body: JSON.stringify({
-        current_password: currentPassword,
+        old_password: currentPassword,
         new_password: newPassword,
       }),
     })
       .then((response) => response.json())
       .then((data) => {
-        if (data.message === "Password updated successfully") {
+        if (data.message === "Password changed successfully") {
           toast.success(data.message);
           onClose(); // Close modal on successful password change
         } else {

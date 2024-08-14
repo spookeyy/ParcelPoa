@@ -61,6 +61,7 @@ import AgentProfile from "./pages/Agent/AgentProfile";
 import { UserProvider, UserContext } from "./Context/UserContext";
 import { TrackingProvider } from "./Context/TrackingContext";
 import { DeliveryProvider } from "./Context/DeliveryContext";
+import { NotificationProvider } from "./Context/NotificationContext";
 
 // Other Pages
 import Landing from "./components/landing";
@@ -85,158 +86,162 @@ function App() {
   return (
     <Router>
       <UserProvider>
-        <TrackingProvider>
-          <DeliveryProvider>
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Create_Account />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/change-password" element={<ChangePassword />} />
-              <Route
-                path="/request-reset-password"
-                element={<RequestResetPassword />}
-              />
-              <Route
-                path="/reset-password/:token"
-                element={<ResetPassword />}
-              />
-
-              {/* <Route path="/send-notification" element={<SendNotification />} /> */}
-
-              {/* Public Pages */}
-              <Route path="/about" element={<About />} />
-              <Route path="/contact-us" element={<Contact />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/returns" element={<Returns />} />
-              <Route path="/" element={<Landing />} />
-
-              {/* Seller Routes */}
-              <Route path="/seller" element={<SellerLayout />}>
-                <Route path="/seller" element={<Home />} />
-                <Route path="/seller/signup" element={<Create_Account />} />
+        <NotificationProvider>
+          <TrackingProvider>
+            <DeliveryProvider>
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Create_Account />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/change-password" element={<ChangePassword />} />
                 <Route
-                  path="/seller/agents"
-                  element={<ProtectedRoute element={<Agents />} />}
-                />
-                <Route path="/seller/agent/:id" element={<Agent_Details />} />
-                <Route path="/seller/invoice/:id" element={<Invoice />} />
-                <Route
-                  path="/seller/messages-list"
-                  element={<Messages_List />}
+                  path="/request-reset-password"
+                  element={<RequestResetPassword />}
                 />
                 <Route
-                  path="/seller/message/:id"
-                  element={<Messages_Details />}
+                  path="/reset-password/:token"
+                  element={<ResetPassword />}
                 />
-                {/* <Route path="/seller/order-list" element={<Order_List />} />
+
+                {/* <Route path="/send-notification" element={<SendNotification />} /> */}
+
+                {/* Public Pages */}
+                <Route path="/about" element={<About />} />
+                <Route path="/contact-us" element={<Contact />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/returns" element={<Returns />} />
+                <Route path="/" element={<Landing />} />
+
+                {/* Seller Routes */}
+                <Route path="/seller" element={<SellerLayout />}>
+                  <Route path="/seller" element={<Home />} />
+                  <Route path="/seller/signup" element={<Create_Account />} />
+                  <Route
+                    path="/seller/agents"
+                    element={<ProtectedRoute element={<Agents />} />}
+                  />
+                  <Route path="/seller/agent/:id" element={<Agent_Details />} />
+                  <Route path="/seller/invoice/:id" element={<Invoice />} />
+                  <Route
+                    path="/seller/messages-list"
+                    element={<Messages_List />}
+                  />
+                  <Route
+                    path="/seller/message/:id"
+                    element={<Messages_Details />}
+                  />
+                  {/* <Route path="/seller/order-list" element={<Order_List />} />
                 <Route path="/seller/order/:id" element={<Order_Details />} /> */}
-                <Route path="/seller/tracking" element={<Tracking />} />
-                <Route
-                  path="/seller/dashboard-part"
-                  element={<Dashboard_Part />}
-                />
-                <Route
-                  path="/seller/seller-profile"
-                  element={<ProtectedRoute element={<SellerPofie />} />}
-                />
-              </Route>
+                  <Route path="/seller/tracking" element={<Tracking />} />
+                  <Route
+                    path="/seller/dashboard-part"
+                    element={<Dashboard_Part />}
+                  />
+                  <Route
+                    path="/seller/seller-profile"
+                    element={<ProtectedRoute element={<SellerPofie />} />}
+                  />
+                </Route>
 
-              {/* Buyer Routes */}
-              <Route path="/tracking" element={<OrderTracking />} />
-              {/* <Route path="/order-list" element={<Order_List />} />
+                {/* Buyer Routes */}
+                <Route path="/tracking" element={<OrderTracking />} />
+                {/* <Route path="/order-list" element={<Order_List />} />
               <Route path="/order/:id" element={<Order_Details />} /> */}
-              <Route
-                path="/track/:trackingNumber?"
-                element={<OrderTracking />}
-              />
-              <Route path="/track-orders" element={<TrackOrders />} />
+                <Route
+                  path="/track/:trackingNumber?"
+                  element={<OrderTracking />}
+                />
+                <Route path="/track-orders" element={<TrackOrders />} />
 
-              {/* Agent Routes */}
-              {/* <Route
+                {/* Agent Routes */}
+                {/* <Route
                 path="/agent"
                 element={<ProtectedRoute element={<AgentHome />} />}
               /> */}
-              <Route
-                path="agent/dashboard/*"
-                element={<ProtectedRoute element={<Dashboard />} />}
-              />
-              <Route
-                path="/delivery-details/:id"
-                element={<ProtectedRoute element={<DeliveryDetails />} />}
-              />
-              <Route
-                path="/delivery-confirmation"
-                element={<ProtectedRoute element={<DeliveryConfirmation />} />}
-              />
-              <Route
-                path="/performance-metrics"
-                element={<ProtectedRoute element={<PerformanceMetrics />} />}
-              />
-              <Route
-                path="/manage-deliveries"
-                element={<ProtectedRoute element={<ManageDeliveries />} />}
-              />
-              <Route
-                path="/communication-tools"
-                element={<ProtectedRoute element={<CommunicationTools />} />}
-              />
-              <Route
-                path="/agent-profile"
-                element={<ProtectedRoute element={<AgentProfile />} />}
-              />
+                <Route
+                  path="agent/dashboard/*"
+                  element={<ProtectedRoute element={<Dashboard />} />}
+                />
+                <Route
+                  path="/delivery-details/:id"
+                  element={<ProtectedRoute element={<DeliveryDetails />} />}
+                />
+                <Route
+                  path="/delivery-confirmation"
+                  element={
+                    <ProtectedRoute element={<DeliveryConfirmation />} />
+                  }
+                />
+                <Route
+                  path="/performance-metrics"
+                  element={<ProtectedRoute element={<PerformanceMetrics />} />}
+                />
+                <Route
+                  path="/manage-deliveries"
+                  element={<ProtectedRoute element={<ManageDeliveries />} />}
+                />
+                <Route
+                  path="/communication-tools"
+                  element={<ProtectedRoute element={<CommunicationTools />} />}
+                />
+                <Route
+                  path="/agent-profile"
+                  element={<ProtectedRoute element={<AgentProfile />} />}
+                />
 
-              {/* Business Routes */}
-              <Route
-                path="/business/dashboard"
-                element={<ProtectedRoute element={<BusinessDashboard />} />}
-              />
-              <Route
-                path="/business/parcel-tracking"
-                element={<ProtectedRoute element={<ParcelTracking />} />}
-              />
-              <Route
-                path="/business/parcel-tracking/:trackingid"
-                element={<ProtectedRoute element={<ParcelTracking />} />}
-              />
-              <Route
-                path="/business/orders"
-                element={<ProtectedRoute element={<OrderManagement />} />}
-              />
-              <Route
-                path="/business/parcels"
-                element={<ProtectedRoute element={<ParcelForm />} />}
-              />
-              <Route
-                path="/business/schedule-pickup"
-                element={<ProtectedRoute element={<PickupScheduling />} />}
-              />
+                {/* Business Routes */}
+                <Route
+                  path="/business/dashboard"
+                  element={<ProtectedRoute element={<BusinessDashboard />} />}
+                />
+                <Route
+                  path="/business/parcel-tracking"
+                  element={<ProtectedRoute element={<ParcelTracking />} />}
+                />
+                <Route
+                  path="/business/parcel-tracking/:trackingid"
+                  element={<ProtectedRoute element={<ParcelTracking />} />}
+                />
+                <Route
+                  path="/business/orders"
+                  element={<ProtectedRoute element={<OrderManagement />} />}
+                />
+                <Route
+                  path="/business/parcels"
+                  element={<ProtectedRoute element={<ParcelForm />} />}
+                />
+                <Route
+                  path="/business/schedule-pickup"
+                  element={<ProtectedRoute element={<PickupScheduling />} />}
+                />
 
-              {/* Admin Routes */}
-              <Route
-                path="/admin/requests"
-                element={<ProtectedRoute element={<AgentRequests />} />}
-              />
-              <Route
-                path="/admin/profile"
-                element={<ProtectedRoute element={<Profile />} />}
-              />
-              <Route
-                path="/admin/agents"
-                element={<ProtectedRoute element={<AgentList />} />}
-              />
-              <Route
-                path="/admin/businesses"
-                element={<ProtectedRoute element={<BusinessList />} />}
-              />
-              <Route
-                path="/admin/agent/:id"
-                element={<ProtectedRoute element={<Agent_Details />} />}
-              />
-            </Routes>
-          </DeliveryProvider>
-        </TrackingProvider>
+                {/* Admin Routes */}
+                <Route
+                  path="/admin/requests"
+                  element={<ProtectedRoute element={<AgentRequests />} />}
+                />
+                <Route
+                  path="/admin/profile"
+                  element={<ProtectedRoute element={<Profile />} />}
+                />
+                <Route
+                  path="/admin/agents"
+                  element={<ProtectedRoute element={<AgentList />} />}
+                />
+                <Route
+                  path="/admin/businesses"
+                  element={<ProtectedRoute element={<BusinessList />} />}
+                />
+                <Route
+                  path="/admin/agent/:id"
+                  element={<ProtectedRoute element={<Agent_Details />} />}
+                />
+              </Routes>
+            </DeliveryProvider>
+          </TrackingProvider>
+        </NotificationProvider>
         <Footer />
         <ToastContainer
           position="top-center"
