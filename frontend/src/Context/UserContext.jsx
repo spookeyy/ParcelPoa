@@ -45,7 +45,7 @@ export const UserProvider = ({ children }) => {
           return response.json();
         })
         .then((res) => {
-          console.log("Server response:", res);
+          // console.log("Server response:", res);
           if (res.message && res.message.includes("successfully")) {
             toast.success(res.message);
             resolve(res);
@@ -77,7 +77,7 @@ export const UserProvider = ({ children }) => {
     })
       .then((response) => response.json())
       .then((res) => {
-        console.log("Login response", res);
+        // console.log("Login response", res);
         if (res.access_token && res.user) {
           setAuthToken(res.access_token);
           localStorage.setItem("access_token", res.access_token);
@@ -86,8 +86,8 @@ export const UserProvider = ({ children }) => {
         }
 
           if (res.user.role === "Agent" || res.user.role === "Business") {
-            toast.success(`Logged in Successfully as ${res.user.role}!`);
-            nav(res.user.role === "Agent" ? "/agent" : "/seller");
+            // toast.success(`Logged in Successfully as ${res.user.role}!`);
+            // nav(res.user.role === "Agent" ? "/agent" : "/seller");
 
 
           const { role } = res.user;
