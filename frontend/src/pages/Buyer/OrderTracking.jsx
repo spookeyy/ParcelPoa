@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -11,6 +11,7 @@ import {
   faBox,
   faTruck,
   faShippingFast,
+  faMapMarkerAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { useTracking } from "../../Context/TrackingContext";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
@@ -22,28 +23,44 @@ library.add(
   faCheckCircle,
   faBox,
   faTruck,
-  faShippingFast
+  faShippingFast,
+  faMapMarkerAlt
 );
 
 const OrderTracking = () => {
   const { trackingNumber } = useParams();
-  const { trackingData, fetchTrackingData, loading, error } = useTracking();
+  const location = useLocation();
+  const { parcelData, trackingHistory, fetchTrackingData, loading, error } =
+    useTracking();
   const [localTrackingNumber, setLocalTrackingNumber] = useState(
     trackingNumber || ""
   );
 
   useEffect(() => {
+    const frontendUrl = window.location.origin;
     if (trackingNumber) {
-      fetchTrackingData(trackingNumber);
+      setLocalTrackingNumber(trackingNumber);
+      fetchTrackingData(trackingNumber, frontendUrl);
     }
   }, [trackingNumber, fetchTrackingData]);
+
+  useEffect(() => {
+    const frontendUrl = window.location.origin;
+    const params = new URLSearchParams(location.search);
+    const trackingFromUrl = params.get("tracking");
+    if (trackingFromUrl) {
+      setLocalTrackingNumber(trackingFromUrl);
+      fetchTrackingData(trackingFromUrl, frontendUrl);
+    }
+  }, [location, fetchTrackingData]);
 
   const handleTrackOrder = (e) => {
     e.preventDefault();
     if (!localTrackingNumber) {
       return;
     }
-    fetchTrackingData(localTrackingNumber);
+    const frontendUrl = window.location.origin;
+    fetchTrackingData(localTrackingNumber, frontendUrl);
   };
 
   const statusIcon = (status) => {
@@ -71,7 +88,7 @@ const OrderTracking = () => {
       <div className="order-tracking p-4 sm:p-6 bg-gradient-to-r from-yellow-50 to-yellow-200 shadow-lg rounded-lg max-w-3xl mx-auto mt-8 min-h-screen">
         <h2 className="text-3xl font-bold text-center mb-4 text-yellow-900 flex items-center justify-center">
           <FontAwesomeIcon
-            icon={faBox}
+            icon={faMapMarkerAlt}
             className="mr-2 text-4xl text-yellow-700 animate-pulse"
           />
           Track Your Order
@@ -93,7 +110,7 @@ const OrderTracking = () => {
               required
             />
             <FontAwesomeIcon
-              icon={faSearch}
+              icon={faMapMarkerAlt}
               className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 mt-3"
             />
           </div>
@@ -101,7 +118,7 @@ const OrderTracking = () => {
             type="submit"
             className="w-full bg-yellow-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition duration-150 ease-in-out flex items-center justify-center"
           >
-            <FontAwesomeIcon icon={faSearch} className="mr-2" />
+            <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
             Track Order
           </button>
         </form>
@@ -120,15 +137,15 @@ const OrderTracking = () => {
             <span>{error}</span>
           </p>
         )}
-        {trackingData && trackingData.length > 0 && (
+        {parcelData && trackingHistory && trackingHistory.length > 0 && (
           <div className="mt-6 p-4 max-w-3xl mx-auto bg-white shadow-md rounded-lg">
             <h3 className="text-xl font-semibold text-yellow-800 mb-3 text-center">
               Tracking History
             </h3>
             <ul role="list" className="divide-y divide-gray-200 mb-6">
-              {trackingData.map((track, index) => (
+              {trackingHistory.map((track, index) => (
                 <li key={index} className="relative py-4">
-                  {index !== trackingData.length - 1 && (
+                  {index !== trackingHistory.length - 1 && (
                     <span
                       className="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200"
                       aria-hidden="true"
@@ -164,26 +181,18 @@ const OrderTracking = () => {
                 </li>
               ))}
             </ul>
-            {trackingData[0].gps_location && (
+            {parcelData.latitude && parcelData.longitude && (
               <div>
                 <h4 className="text-md font-semibold mb-2">Current Location</h4>
-                <p className="mb-3 text-sm">
-                  {trackingData[0].gps_location.address}
-                </p>
+                <p className="mb-3 text-sm">{parcelData.current_location}</p>
                 <MapContainer
-                  center={[
-                    trackingData[0].gps_location.latitude,
-                    trackingData[0].gps_location.longitude,
-                  ]}
+                  center={[parcelData.latitude, parcelData.longitude]}
                   zoom={13}
                   style={{ height: "300px", width: "100%" }}
                 >
                   <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                   <Marker
-                    position={[
-                      trackingData[0].gps_location.latitude,
-                      trackingData[0].gps_location.longitude,
-                    ]}
+                    position={[parcelData.latitude, parcelData.longitude]}
                   >
                     <Popup>Current parcel location</Popup>
                   </Marker>

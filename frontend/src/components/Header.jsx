@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import SellerSidebar from "../pages/Seller/SellerSidebar";
+import ViewProfile from "../pages/Seller/ViewProfile";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -16,20 +16,21 @@ export default function Header() {
           {/* <Link to="/seller" className="text-blue-700 hover:text-indigo-800 text-medium transition-colors">
             Dashboard
           </Link> */}
-         
-          <Link to="/business/dashboard" className="text-blue-700 hover:text-indigo-800 text-medium transition-colors">
+
+          <Link
+            to="/business/dashboard"
+            className="text-blue-700 hover:text-indigo-800 text-medium transition-colors"
+          >
             Business Dashboard
           </Link>
           <div className="inline-block">
-            <SellerSidebar />
+            <ViewProfile />
           </div>
         </div>
       </div>
     </header>
   );
 }
-
-
 
 // import React from "react";
 // import { Link } from "react-router-dom";
@@ -48,7 +49,7 @@ export default function Header() {
 //           <img src="/src/assets/Logo.png" alt="Logo" className="logo" />
 //         </Link>
 //         <div className="flex space-x-4 items-center">
-          
+
 //           {/* Orders */}
 //           <Link
 //             to="/order-list"

@@ -18,20 +18,20 @@ export default function ChangePassword({ onClose }) {
       return;
     }
 
-    fetch(`${server}/change-password`, {
+    fetch(`${server}/change_password`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${authToken}`,
       },
       body: JSON.stringify({
-        current_password: currentPassword,
+        old_password: currentPassword,
         new_password: newPassword,
       }),
     })
       .then((response) => response.json())
       .then((data) => {
-        if (data.message === "Password updated successfully") {
+        if (data.message === "Password changed successfully") {
           toast.success(data.message);
           onClose(); // Close modal on successful password change
         } else {
@@ -45,19 +45,19 @@ export default function ChangePassword({ onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-yellow-900 bg-opacity-50 z-50 p-4">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg mx-auto">
+    <div className="fixed inset-0 flex items-center justify-center bg-yellow-900 bg-opacity-50 z-50 p-2 sm:p-4">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm mx-auto">
         {/* Modal header */}
-        <div className="flex items-center justify-between p-4 border-b border-yellow-200 rounded-t">
-          <h2 className="text-lg sm:text-xl font-semibold text-yellow-500">
+        <div className="flex items-center justify-between p-3 border-b border-yellow-200 rounded-t">
+          <h2 className="text-base sm:text-lg font-semibold text-yellow-600">
             Change Password
           </h2>
           <button
             onClick={onClose}
-            className="text-yellow-500 hover:text-yellow-700"
+            className="text-yellow-600 hover:text-yellow-800"
           >
             <svg
-              className="w-5 h-5 sm:w-6 sm:h-6"
+              className="w-4 h-4 sm:w-5 sm:h-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -73,12 +73,12 @@ export default function ChangePassword({ onClose }) {
         </div>
 
         {/* Modal body */}
-        <div className="p-4 sm:p-6">
-          <form onSubmit={handleChangePassword} className="space-y-4">
-            <div className="mb-4">
+        <div className="p-3 sm:p-4">
+          <form onSubmit={handleChangePassword} className="space-y-3">
+            <div>
               <label
                 htmlFor="currentPassword"
-                className="block text-sm font-medium text-yellow-700"
+                className="block text-xs sm:text-sm font-medium text-yellow-600"
               >
                 Current Password
               </label>
@@ -88,13 +88,13 @@ export default function ChangePassword({ onClose }) {
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 required
-                className="mt-1 block w-full border-yellow-300 rounded-lg shadow-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600 focus:ring-opacity-50 px-3 py-2 transition-all duration-300 ease-in-out"
+                className="mt-1 block w-full border border-yellow-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm px-2 py-1.5"
               />
             </div>
-            <div className="mb-4">
+            <div>
               <label
                 htmlFor="newPassword"
-                className="block text-sm font-medium text-yellow-700"
+                className="block text-xs sm:text-sm font-medium text-yellow-600"
               >
                 New Password
               </label>
@@ -104,13 +104,13 @@ export default function ChangePassword({ onClose }) {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
-                className="mt-1 block w-full border-yellow-300 rounded-lg shadow-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600 focus:ring-opacity-50 px-3 py-2 transition-all duration-300 ease-in-out"
+                className="mt-1 block w-full border border-yellow-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm px-2 py-1.5"
               />
             </div>
-            <div className="mb-4">
+            <div>
               <label
                 htmlFor="confirmPassword"
-                className="block text-sm font-medium text-yellow-700"
+                className="block text-xs sm:text-sm font-medium text-yellow-600"
               >
                 Confirm Password
               </label>
@@ -120,20 +120,20 @@ export default function ChangePassword({ onClose }) {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className="mt-1 block w-full border-yellow-300 rounded-lg shadow-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600 focus:ring-opacity-50 px-3 py-2 transition-all duration-300 ease-in-out"
+                className="mt-1 block w-full border border-yellow-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500 sm:text-sm px-2 py-1.5"
               />
             </div>
-            <div className="flex justify-end space-x-3">
+            <div className="flex justify-end space-x-2 pt-2">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
+                className="px-3 py-1.5 text-xs sm:text-sm bg-gray-200 text-gray-700 font-medium rounded-md hover:bg-gray-300 transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-yellow-600 transition-colors"
+                className="px-3 py-1.5 text-xs sm:text-sm bg-yellow-500 text-white font-medium rounded-md hover:bg-yellow-600 transition-colors"
               >
                 Change Password
               </button>

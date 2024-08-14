@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+/* eslint-disable react/prop-types */
+import React, { useState, useEffect, useContext } from "react";
 import { EyeIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
+import { useNotification } from "../../Context/NotificationContext";
+import { UserContext } from "../../Context/UserContext";
 
 // Sample data
 const initialMessages = [
@@ -96,17 +99,27 @@ export default function Messages_List() {
     setFilters({ date: "", sender: "", status: "" });
   };
 
+  const { notifications, fetchNotifications, markAsRead, deleteNotification } =
+    useNotification();
+  const { authToken } = useContext(UserContext);
+
+  useEffect(() => {
+    if (authToken) {
+      fetchNotifications();
+    }
+  }, [authToken, fetchNotifications]);
+
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this message?")) {
-      setMessages((prevMessages) =>
-        prevMessages.filter((message) => message.id !== id)
-      );
+      deleteNotification(id);
     }
   };
 
   const handleViewDetails = (id) => {
+    markAsRead(id);
     navigate(`/message/${id}`);
   };
+
 
   // Apply filters
   const filteredMessages = messages.filter((message) => {

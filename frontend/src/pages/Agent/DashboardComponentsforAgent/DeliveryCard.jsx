@@ -25,7 +25,7 @@ export default function DeliveryCard({
     }[status] || "bg-gray-500";
 
   return (
-    <div className="bg-gradient-to-bl from-blue-200 to-indigo-400 p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 flex flex-col space-y-4">
+    <div className="bg-gradient-to-bl from-yellow-200 to-yellow-400 p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 flex flex-col space-y-4">
       <div className="text-lg font-semibold">
         <span className="font-bold">ORDER ID:</span> {orderID}
       </div>

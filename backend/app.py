@@ -1,13 +1,14 @@
 import os
 import random
 import string
-from geopy.geocoders import Nominatim
+from dotenv import dotenv_values, load_dotenv
+# from geopy.geocoders import Nominatim
 import smtplib
 from flask import Flask, request, jsonify,url_for
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from flask_apscheduler import APScheduler
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from requests_oauthlib import OAuth1
@@ -21,15 +22,25 @@ from sqlalchemy.orm import joinedload
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
+logging.info("Application starting...")
 
-app = Flask(__name__)
+load_dotenv()
+
+# config = dotenv_values(".env")
+logging.basicConfig(level=logging.INFO)
+
+
+app = Flask(__name__, static_folder='static')
 CORS(app)
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db'
+# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
+print(f"Connecting to database: {app.config['SQLALCHEMY_DATABASE_URI']}")
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "super-secret-key")
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "another-secret-key")
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=1) # expires in 1 day
 
-CORS(app)
 
 migrate = Migrate(app, db)
 db.init_app(app)
@@ -44,6 +55,9 @@ s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 #     scheduler.init_app(app)
 #     scheduler.start()
 
+
+logging.info("Database initialized")
+    
 # JWT Configurations
 blacklist = set()
 @jwt.token_in_blocklist_loader
@@ -57,10 +71,10 @@ def register():
     if User.query.filter_by(email=data['email']).first():
         return jsonify({'message': 'Email already exists'}), 400
 
-    phone_number = data.get("phone_number")
-    phone_number_exists = User.query.filter_by(phone_number=phone_number).first()
-    if phone_number_exists:
-        return jsonify({"message": "Phone number already exists"}), 400
+    elif data.get("phone_number"): # check if phone_number = data.get("phone_number")
+        phone_number_exists = User.query.filter_by(phone_number=data.get("phone_number")).first()
+        if phone_number_exists:
+            return jsonify({"message": "Phone number already exists"}), 400
 
     
     required_fields = ['name', 'email', 'phone_number', 'user_role', 'password']
@@ -80,9 +94,12 @@ def register():
         email=data.get('email'),
         phone_number=data.get('phone_number'),
         user_role=data.get('user_role'),
+        # region=data.get('region'), 
         created_at=datetime.now(),
         updated_at=datetime.now(),
         password_hash=hashed_password,
+        primary_region=data.get('primary_region'),
+        operation_areas=','.join(data.get('operation_areas', [])),
     )
     db.session.add(new_user)
     db.session.commit()
@@ -107,8 +124,10 @@ def login():
                 "role": user.user_role
             }
         }), 200
-    else:
+    elif user and not bcrypt.check_password_hash(user.password_hash, data['password']):
         return jsonify({"message": "Invalid credentials"}), 401
+    else:
+        return jsonify({"message": "User not found"}), 401
 
 
 @app.route('/current_user', methods=['GET'])
@@ -154,7 +173,7 @@ def delete_user(user_id):
     return jsonify({"message": "User deleted successfully"})
 
 
-# user profile
+# TODO: whitney (profile picture update) GET request and PUT request.  there is another function down.  
 @app.route('/profile', methods=['GET'])
 @jwt_required()
 def profile():
@@ -173,6 +192,9 @@ def profile():
         'user_role': user.user_role,
         'profile_picture': profile_picture_url,
         'status': user.status if user.status else 'Available',
+        'primary_region': user.primary_region,
+        'operation_areas': user.operation_areas.split(',') if user.operation_areas else []
+
     })
 
 # update profile
@@ -188,6 +210,8 @@ def update_profile():
     user.name = data.get('name', user.name)
     user.email = data.get('email', user.email)
     user.phone_number = data.get('phone_number', user.phone_number)
+    user.primary_region = data.get('primary_region', user.primary_region)
+    user.operation_areas = ','.join(data.get('operation_areas', user.operation_areas.split(',')))
     
     profile_picture = data.get('profile_picture')
     if profile_picture and profile_picture.startswith('data:image'):
@@ -198,7 +222,20 @@ def update_profile():
     user.updated_at = datetime.now()
     db.session.commit()
     
-    return jsonify({"message": "Profile updated successfully"})
+    profile_picture_url = url_for('static', filename=user.profile_picture, _external=True) if user.profile_picture else None
+
+    
+    return jsonify({
+        "message": "Profile updated successfully",
+        "profile": {
+            "name": user.name,
+            "email": user.email,
+            "phone_number": user.phone_number,
+            "profile_picture": profile_picture_url,
+            "primary_region": user.primary_region,
+            "operation_areas": user.operation_areas
+        }
+    })
 
 @app.route('/update-status', methods=['PUT'])
 @jwt_required()
@@ -417,6 +454,7 @@ def update_parcel_status(parcel_id):
     
     # Find the parcel based on the parcel_id
     parcel = Parcel.query.get(parcel_id)
+    logging.debug(f"Queried parcel: {parcel}")
     if not parcel:
         return jsonify({"message": "Parcel not found"}), 404
     
@@ -442,7 +480,7 @@ def update_parcel_status(parcel_id):
     # Send notifications
     if old_status != parcel.status:
         send_notification(parcel.sender.email, 'Parcel Status Update', f'Your parcel with tracking number {parcel.tracking_number} is now {parcel.status}.')
-        send_notification(parcel.recipient_email, 'Parcel Status Update', f'The parcel with tracking number {parcel.tracking_number} is now {parcel.status}.')
+        send_notification(parcel.recipient_email, 'Parcel Status Update', f'The parcel with tracking number {parcel.tracking_number} is now {parcel.status}. \n visit http://localhost:5173/track/{parcel.tracking_number} to track your parcel.')
 
     return jsonify({"message": "Parcel status updated successfully"}), 200
 
@@ -547,8 +585,8 @@ def mark_as_delivered(parcel_id):
 
 
 
-#TODO: TRACKING ROUTES
-@app.route('/track/<string:tracking_number>', methods=['GET'])
+# TRACKING ROUTES
+@app.route('/track/<string:tracking_number>', methods=['GET', 'POST'])
 def track_parcel(tracking_number):
     parcel = Parcel.query.filter_by(tracking_number=tracking_number).first()
     if parcel is None:
@@ -557,26 +595,7 @@ def track_parcel(tracking_number):
     tracking_info = Tracking.query.filter_by(parcel_id=parcel.parcel_id).order_by(Tracking.timestamp.desc()).all()
     print(f"tracking_info: {tracking_info}")
 
-    # Simulate GPS location if not available
-    if not hasattr(parcel, 'latitude') or not hasattr(parcel, 'longitude') or parcel.latitude is None or parcel.longitude is None:
-        parcel.latitude = random.uniform(-90, 90)
-        parcel.longitude = random.uniform(-180, 180)
-        db.session.commit()
-
-    # Get address from coordinates
-    geolocator = Nominatim(user_agent="parcel_tracker")
-    location = geolocator.reverse(f"{parcel.latitude}, {parcel.longitude}")
-    address = location.address if location else "Unknown location"
-
     tracking_data = [track.to_dict() for track in tracking_info]
-    for track in tracking_data:
-        track['gps_location'] = {
-            'latitude': parcel.latitude,
-            'longitude': parcel.longitude,
-            'address': address
-        }
-
-    parcel.current_location = address
 
     response_data = {
         "parcel": {
@@ -586,7 +605,9 @@ def track_parcel(tracking_number):
             "sender_name": parcel.sender.name if parcel.sender else "Unknown",
             "recipient_name": parcel.recipient_name,
             "description": parcel.description,
-            "category": parcel.category
+            "category": parcel.category,
+            "latitude": parcel.latitude,
+            "longitude": parcel.longitude
         },
         "tracking_history": tracking_data
     }
@@ -618,6 +639,9 @@ def schedule_pickup():
     
     data = request.get_json()
     
+    sender_location = data.get('current_location', user.primary_region)  # Use business's primary region if not provided
+    sender_region = get_region_from_address(sender_location)
+
     # Create a new parcel
     new_parcel = Parcel(
         sender_id=current_user_id,
@@ -629,7 +653,7 @@ def schedule_pickup():
         weight=data['weight'],
         category=data['category'],
         status='Scheduled for Pickup',
-        current_location='Nairobi (Store location)',
+        current_location=sender_location,
         sender_email=user.email,
         recipient_email=data['recipient_email']
     )
@@ -652,14 +676,47 @@ def schedule_pickup():
         pickup_time_str = pickup_time_str[:-1]  # Remove the 'Z'
     pickup_time = datetime.fromisoformat(pickup_time_str).replace(tzinfo=timezone.utc)
     
-    # Ensure selected_agent is provided
-    selected_agent = data.get('agent_id')
-    if not selected_agent:
+    # Format pickup time as "2024-08-12 Time: 12:20 PM"
+    formatted_pickup_time = pickup_time.strftime('%Y-%m-%d Time: %I:%M %p')
+
+    selected_agent_id = data.get('agent_id')
+    if not selected_agent_id:
         return jsonify({"message": "Agent ID must be provided"}), 400
-    
+
+    # Convert selected_agent_id to an integer
+    try:
+        selected_agent_id = int(selected_agent_id)
+    except ValueError:
+        return jsonify({"message": "Invalid agent ID format"}), 400
+
+    sender_region = get_region_from_address(new_parcel.current_location)
+
+    if sender_region == 'Other':
+        available_agents = User.query.filter_by(
+            user_role='Agent',
+            status='Available',
+            Request='Approved'
+        ).all()
+    else:
+        available_agents = User.query.filter(
+            User.user_role == 'Agent',
+            User.status == 'Available',
+            User.Request == 'Approved',
+            (User.primary_region == sender_region) | (User.operation_areas.like(f'%{sender_region}%'))
+        ).all()
+
+    if not available_agents:
+        return jsonify({"message": f"No available agents in the region: {sender_region}"}), 400
+
+    # Check if the provided agent_id is among the available agents
+    selected_agent = next((agent for agent in available_agents if agent.user_id == selected_agent_id), None)
+
+    if not selected_agent:
+        return jsonify({"message": "Provided agent ID is not available in the specified region"}), 400
+
     new_delivery = Delivery(
         parcel_id=new_parcel.parcel_id,
-        agent_id=selected_agent,
+        agent_id=selected_agent.user_id,
         pickup_time=pickup_time,
         status='Scheduled'
     )
@@ -672,33 +729,34 @@ def schedule_pickup():
     )
     db.session.add(new_tracking)
     
-    # Update the status of the selected agent to 'Unavailable'
-    agent = User.query.get(selected_agent)
-    if agent:
-        agent.status = 'Unavailable'
-    else:
-        return jsonify({"message": "Invalid agent ID provided"}), 400
+    # # Update the status of the selected agent to 'Unavailable'
+    # agent = User.query.get(selected_agent)
+    # if agent:
+    #     agent.status = 'Unavailable'
+    # else:
+    #     return jsonify({"message": "Invalid agent ID provided"}), 400
+    
+
     
     db.session.commit()
 
     recipient_email = data.get('recipient_email')
     if recipient_email:
-        subject = f"Your parcel {new_parcel.tracking_number} is scheduled for pickup on {pickup_time.isoformat()}"
-        body = f"Dear {data.get('recipient_name')},\n\nYour parcel {new_parcel.tracking_number} is scheduled for pickup on {pickup_time.isoformat()}."
+        subject = f"Your parcel {new_parcel.tracking_number} is scheduled for pickup on {formatted_pickup_time}"
+        body = f"Dear {data.get('recipient_name')},\n\nYour parcel {new_parcel.tracking_number} is scheduled for pickup on {formatted_pickup_time}."
         send_notification(recipient_email, subject, body)
     
     if selected_agent:
-        agent_user = User.query.get(selected_agent)
-        if agent_user:
-            agent_email = agent_user.email
-            subject = f"New parcel {new_parcel.tracking_number} scheduled for pickup"
-            body = f"A new parcel {new_parcel.tracking_number} is scheduled for you to pickup on {pickup_time.isoformat()}.\nPlease log in to your dashboard to accept the pickup.\nLocation: {new_parcel.current_location}"
-            send_notification(agent_email, subject, body)
+        agent_email = selected_agent.email
+        subject = f"New parcel {new_parcel.tracking_number} scheduled for pickup"
+        body = f"A new parcel {new_parcel.tracking_number} is scheduled for you to pickup on {formatted_pickup_time}.\nPlease log in to your dashboard to accept the pickup.\nLocation: {new_parcel.current_location}"
+        send_notification(agent_email, subject, body)
+
 
     return jsonify({
         "message": "Pickup scheduled successfully",
         "tracking_number": new_parcel.tracking_number,
-        "pickup_time": pickup_time.isoformat()
+        "pickup_time": formatted_pickup_time
     }), 201
 
 
@@ -725,7 +783,7 @@ def get_order_details(order_id):
     if user.user_role != 'Business':
         return jsonify({"message": "Access denied"}), 403
     
-    order = Order.query.filter_by(id=order_id, user_id=current_user_id).first()
+    order = Order.query.filter_by(order_id=order_id, user_id=current_user_id).first()
     if not order:
         return jsonify({"message": "Order not found"}), 404
     
@@ -741,7 +799,7 @@ def cancel_order(order_id):
     if user.user_role != 'Business':
         return jsonify({"message": "Access denied"}), 403
     
-    order = Order.query.filter_by(id=order_id, user_id=current_user_id).first()
+    order = Order.query.filter_by(order_id=order_id, user_id=current_user_id).first()
     if not order:
         return jsonify({"message": "Order not found"}), 404
     
@@ -772,13 +830,60 @@ def get_agents():
 @app.route('/get-available-agents', methods=['GET'])
 @jwt_required()
 def get_available_agents():
-    user = User.query.get(get_jwt_identity())
-    # if user.user_role == 'Agent':
-    #     return jsonify({"message": "Only admins and Businesses can get available agents"}), 403
+    primary_region = request.args.get('primary_region')
+    operational_area = request.args.get('operational_area')
     
-    agents = User.query.filter_by(user_role='Agent', status='Available', Request='Approved').all()
-    print('agents', agents)
+    if not primary_region:
+        return jsonify({"message": "Primary region parameter is required"}), 400
+
+    query = User.query.filter(
+        User.user_role == 'Agent',
+        User.status == 'Available',
+        User.Request == 'Approved'
+    )
+
+    if primary_region != 'Other':
+        query = query.filter(
+            (User.primary_region == primary_region) |
+            (User.operation_areas.like(f'%{primary_region}%'))
+        )
+
+    if operational_area and operational_area != 'Other':
+        query = query.filter(User.operation_areas.like(f'%{operational_area}%'))
+
+    agents = query.all()
+
     return jsonify([agent.to_dict() for agent in agents])
+
+
+
+@app.route('/update-agent-regions', methods=['PUT'])
+@jwt_required()
+def update_agent_regions():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    
+    if user.user_role != 'Agent':
+        return jsonify({"message": "Only agents can update their regions"}), 403
+    
+    data = request.get_json()
+    user.primary_region = data.get('primary_region', user.primary_region)
+    user.operation_areas = ','.join(data.get('operation_areas', []))
+    db.session.commit()
+    
+    return jsonify({"message": "Agent regions updated successfully"})
+
+# get-business-primary-region
+@app.route('/get-business-primary-region', methods=['GET'])
+@jwt_required()
+def get_business_primary_region():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    
+    if user.user_role != 'Business':
+        return jsonify({"message": "Only businesses can get their primary region"}), 403
+    
+    return jsonify({"primary_region": user.primary_region}) 
 
 
 # TODO: ORDER ROUTES
@@ -796,19 +901,118 @@ def get_orders():
 
 
 # TODO: NOTIFICATION
+# Get all notifications for the current user
+@app.route('/notifications', methods=['GET'])
+@jwt_required()
+def get_notifications():
+    current_user_id = get_jwt_identity()
+    notifications = Notification.query.filter_by(user_id=current_user_id).order_by(Notification.created_at.desc()).all()
+    return jsonify([notification.to_dict() for notification in notifications])
 
+# Create a new notification TODO:
+@app.route('/notifications', methods=['POST'])
+@jwt_required()
+def create_notification():
+    current_user_id = get_jwt_identity()
+    data = request.json
+    recipient_id = data.get('recipient_id')
+    if not recipient_id:
+        return jsonify({"message": "recipient_id is required"}), 400
+
+    recipient = User.query.get(recipient_id)
+    if not recipient:
+        return jsonify({"message": "Recipient not found"}), 404
+
+    notification = Notification(
+        user_id=recipient_id,
+        message=data['message'],
+        type=data['type'],
+        status='Sent'
+    )
+    db.session.add(notification)
+    db.session.commit()
+    
+    return jsonify(notification.to_dict()), 201
+
+# Get a specific notification
+@app.route('/notifications/<int:notification_id>', methods=['GET'])
+@jwt_required()
+def get_notification(notification_id):
+    current_user_id = get_jwt_identity()
+    notification = Notification.query.filter_by(notification_id=notification_id, user_id=current_user_id).first()
+    
+    if not notification:
+        return jsonify({"message": "Notification not found"}), 404
+
+    return jsonify(notification.to_dict())
+
+# Update a notification's status
+@app.route('/notifications/<int:notification_id>', methods=['PUT'])
+@jwt_required()
+def update_notification(notification_id):
+    current_user_id = get_jwt_identity()
+    notification = Notification.query.filter_by(notification_id=notification_id, user_id=current_user_id).first()
+    
+    if not notification:
+        return jsonify({"message": "Notification not found"}), 404
+
+    data = request.json
+    if 'status' in data:
+        notification.status = data['status']
+        db.session.commit()
+        return jsonify(notification.to_dict())
+    
+    return jsonify({"message": "No changes made"}), 400
+
+# Delete a notification
+@app.route('/notifications/<int:notification_id>', methods=['DELETE'])
+@jwt_required()
+def delete_notification(notification_id):
+    current_user_id = get_jwt_identity()
+    notification = Notification.query.filter_by(notification_id=notification_id, user_id=current_user_id).first()
+    
+    if not notification:
+        return jsonify({"message": "Notification not found"}), 404
+
+    db.session.delete(notification)
+    db.session.commit()
+    return jsonify({"message": "Notification deleted successfully"}), 200
+
+# Mark all notifications as read
+@app.route('/notifications/mark-all-read', methods=['PUT'])
+@jwt_required()
+def mark_all_notifications_read():
+    current_user_id = get_jwt_identity()
+    notifications = Notification.query.filter_by(user_id=current_user_id, status='Delivered').all()
+    
+    for notification in notifications:
+        notification.status = 'Read'
+    
+    db.session.commit()
+    return jsonify({"message": "All notifications marked as read"}), 200
+
+# Get unread notification count
+@app.route('/notifications/unread-count', methods=['GET'])
+@jwt_required()
+def get_unread_notification_count():
+    current_user_id = get_jwt_identity()
+    unread_count = Notification.query.filter_by(user_id=current_user_id, status='Delivered').count()
+    return jsonify({"unread_count": unread_count})
+
+
+# send email notifications to users/parties
 def send_notification(email, subject, body):
     if not is_valid_email(email):
-        print(f"Invalid email address: {email}. Notification not sent.")
+        logging.error(f"Invalid email address: {email}")
         return
 
     with app.app_context():
         try:
             msg = Message(subject, recipients=[email], body=body)
             mail.send(msg)
-            print(f"Notification sent to {email}")
+            logging.info(f"Notification sent to {email}.")
         except Exception as e:
-            print(f"Failed to send notification to {email}: {str(e)}")
+            logging.error(f"Failed to send notification to {email}: {str(e)}")
 
 # generate tracking numbers
 def generate_unique_tracking_number(existing_numbers):
@@ -826,13 +1030,54 @@ def generate_order_number():
         if existing_order is None:
             return order_number
 
+# def get_region_from_address(address):
+    geolocator = Nominatim(user_agent="my_user_agent")
+    location = geolocator.geocode(address)
+    if location:
+        return location.address
+    else:
+        return None
+
+def get_region_from_address(address):
+    if address is None:
+        return 'Other'  # or handle None as needed
+
+    nairobi_regions = [
+        'Embakasi', 'Kasarani', 'Pangani', 'Ngara', 
+        'Ruaraka', 'Muthaiga', 'Lavington', 'Parklands', 'Westlands'
+    ]
+    address_lower = address.lower()
+    
+    for region in nairobi_regions:
+        if region.lower() in address_lower:
+            return 'Nairobi'
+    if 'nairobi' in address_lower:
+        return 'Nairobi'
+    return 'Other'
+
+
+# @app.route('/get-regions', methods=['GET'])
+# def get_regions():
+#     regions = {
+#         'Primary': ['Nairobi', 'Other'],
+#         'Operational': ['Embakasi', 'Kasarani', 'Pangani', 'Ngara', 'Ruaraka', 'Muthaiga', 'Lavington', 'Parklands', 'Westlands']
+#     }
+#     return jsonify(regions)
+
+
+@app.route('/get-regions', methods=['GET'])
+def get_regions():
+    regions = {
+        'Nairobi': ['Embakasi', 'Kasarani', 'Pangani', 'Ngara', 'Ruaraka', 'Muthaiga', 'Lavington', 'Parklands', 'Westlands'],
+        'Other': []  # You can add other primary regions here if needed
+    }
+    return jsonify(regions)
+
+
 
 # RESET PASSWORD
 from flask_mail import Mail, Message
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
+# from itsdangerous import URLSafeTimedSerializer
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
@@ -840,7 +1085,7 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = os.environ.get('GMAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.environ.get('GMAIL_APP_PASSWORD')
-app.config['MAIL_DEFAULT_SENDER'] = 'parcelpoa@gmail.com'
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
 
 mail = Mail(app)
 
@@ -933,7 +1178,7 @@ def send_email(to_email, reset_url):
 
     return True
 
-#is valid email
+#is valid email # TODO: whitney
 import re
 
 def is_valid_email(email):
@@ -943,7 +1188,11 @@ def is_valid_email(email):
 # Handle image upload:
 import base64
 import os
-from flask import current_app
+from flask import current_app, send_from_directory
+
+@app.route('/static/<path:path>')
+def send_static(path):
+    return send_from_directory('static', path)
 
 def save_base64_image(base64_string, filename):
     if ',' in base64_string:
@@ -951,7 +1200,7 @@ def save_base64_image(base64_string, filename):
     
     image_data = base64.b64decode(base64_string)
     
-    upload_dir = os.path.join(current_app.root_path, 'static', 'uploads')
+    upload_dir = os.path.join(current_app.root_path, 'static', 'uploads') #TODO:: change this
     if not os.path.exists(upload_dir):
         os.makedirs(upload_dir)
     
@@ -978,6 +1227,8 @@ def save_base64_image(base64_string, filename):
 #     access_token_url='/oauth/access_token',
 #     authorize_url='https://www.facebook.com/dialog/oauth'
 # )
+# db_check()
+logging.info("Application setup completed")
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)

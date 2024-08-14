@@ -1,32 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-
-// Sample data for demonstration; replace with actual data source
-const messages = [
-  {
-    id: "1",
-    date: "2024-07-20",
-    sender: "John Doe",
-    content: "Hello, this is a test message.",
-    status: "Unread",
-  },
-  {
-    id: "2",
-    date: "2024-07-22",
-    sender: "Jane Smith",
-    content: "Important update regarding your account.",
-    status: "Read",
-  },
-  // Add more sample messages as needed
-];
+import { useNotification } from "../../Context/NotificationContext";
+import { UserContext } from "../../Context/UserContext";
+// import Navbar from "../Admin/Navbar";
 
 export default function Messages_Details() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isReplying, setIsReplying] = useState(false);
   const [replyContent, setReplyContent] = useState("");
+  const { notifications, markAsRead, fetchNotifications } = useNotification();
+  const { authToken } = useContext(UserContext);
 
-  const message = messages.find((msg) => msg.id === id);
+  useEffect(() => {
+    if (authToken) {
+      fetchNotifications();
+      markAsRead(id);
+    }
+  }, [authToken, id, fetchNotifications, markAsRead]);
+
+  const message = notifications.find((msg) => msg.id === id);
 
   if (!message) return <div className="p-6">Message not found</div>;
 

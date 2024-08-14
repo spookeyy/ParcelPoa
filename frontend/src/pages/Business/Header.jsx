@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import SellerSidebar from "../Seller/SellerSidebar";
+import ViewProfile from "../Seller/ViewProfile";
 import SellerProfile from "../Seller/SellerPofie";
 import Logo from "../../assets/Logo.png";
 import { Link } from "react-router-dom";
@@ -9,8 +9,7 @@ import { UserContext } from "../../Context/UserContext";
 function Header() {
   const { currentUser } = useContext(UserContext);
   const navigate = useNavigate();
-  const [showProfile, setShowProfile] = useState(false); 
-
+  const [showProfile, setShowProfile] = useState(false);
 
   // const handleProfileClick = () => {
   //   setShowProfile(true);
@@ -21,7 +20,7 @@ function Header() {
   };
 
   return (
-    <header className="bg-yellow-600 p-2 md:p-3 shadow-lg flex flex-col md:flex-row items-center justify-between rounded-lg border border-gray-300">
+    <header className="bg-yellow-600 p-2 md:p-3 shadow-lg flex flex-col md:flex-row items-center justify-between rounded-lg border border-gray-300 fixed top-0 left-0 right-0">
       <div className="flex items-center w-full md:w-auto justify-between md:justify-start mb-2 md:mb-0">
         <img
           src={Logo}
@@ -30,7 +29,7 @@ function Header() {
           onClick={() => navigate("/")}
         />
         <div className="md:hidden">
-          <SellerSidebar />
+          <ViewProfile />
         </div>
       </div>
 
@@ -54,7 +53,7 @@ function Header() {
           Agents List
         </Link>
         <div className="hidden md:block cursor-pointer">
-          <SellerSidebar />
+          <ViewProfile />
         </div>
       </div>
 

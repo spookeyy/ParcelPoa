@@ -19,16 +19,14 @@ export const UserProvider = ({ children }) => {
   );
 
   // REGISTER USER
-  const addUser = (name, email, phone_number, password, user_role) => {
+  const addUser = (
+    userData
+  ) => {
     return new Promise((resolve, reject) => {
       fetch(`${server}/register`, {
         method: "POST",
         body: JSON.stringify({
-          name: name,
-          email: email,
-          phone_number: phone_number,
-          password: password,
-          user_role: user_role,
+          ...userData,
         }),
         headers: {
           "Content-type": "application/json",
@@ -36,18 +34,21 @@ export const UserProvider = ({ children }) => {
       })
         .then((response) => {
           if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            return response.json().then((err) => {
+              throw new Error(
+                err.message ||
+                  err.error ||
+                  `HTTP error! status: ${response.status}`
+              );
+            });
           }
           return response.json();
         })
         .then((res) => {
-          console.log("Server response:", res);
+          // console.log("Server response:", res);
           if (res.message && res.message.includes("successfully")) {
             toast.success(res.message);
             resolve(res);
-          } else if (res.error) {
-            toast.error(res.error);
-            reject(new Error(res.error));
           } else {
             console.error("Unexpected response structure:", res);
             toast.error("An unexpected error occurred");
@@ -76,15 +77,22 @@ export const UserProvider = ({ children }) => {
     })
       .then((response) => response.json())
       .then((res) => {
-        console.log("Login response", res);
+        // console.log("Login response", res);
         if (res.access_token && res.user) {
           setAuthToken(res.access_token);
           localStorage.setItem("access_token", res.access_token);
           setCurrentUser(res.user);
 
+        }
+
+          if (res.user.role === "Agent" || res.user.role === "Business") {
+            // toast.success(`Logged in Successfully as ${res.user.role}!`);
+            // nav(res.user.role === "Agent" ? "/agent" : "/seller");
+
+
           const { role } = res.user;
           const routes = {
-            Agent: "/agent",
+            Agent: "/agent/dashboard",
             Business: "/business/dashboard",
             Admin: "/admin/requests",
           };
@@ -92,6 +100,7 @@ export const UserProvider = ({ children }) => {
           if (role in routes) {
             toast.success(`Logged in Successfully as ${role}!`);
             nav(routes[role]);
+
           } else {
             console.error("Unexpected role:", role);
             throw new Error(`Unexpected role: ${role}`);
@@ -196,6 +205,12 @@ export const UserProvider = ({ children }) => {
     }
   }, [authToken, onChange, fetchUserProfile]);
 
+
+
+  // REQUEST PASSWORD RESET
+
+
+
   // current user
   const getCurrentUser = () => {
     return fetch(`${server}/current_user`, {
@@ -221,6 +236,9 @@ export const UserProvider = ({ children }) => {
   };
 
   // Request Password Reset
+
+
+
   const requestPasswordReset = (email, frontendUrl) => {
     return fetch(`${server}/request-reset-password`, {
       method: "POST",

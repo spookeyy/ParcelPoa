@@ -2,9 +2,13 @@ import React from "react";
 import Navbar from "./Navbar";
 import { Link } from "react-router-dom";
 import { FloatingWhatsApp } from "react-floating-whatsapp";
+import FacebookMessengerChat from "./FacebookMessengerChat";
+// import DeliveryGuy from "../assets/DeliveryGuy.png";
 
 export default function Landing() {
+
   return (
+<<<<<<< HEAD
     <div className="bg-white min-h-screen flex flex-col pt-16">
       <Navbar />
 
@@ -14,6 +18,17 @@ export default function Landing() {
           style={{ height: "auto" }}
         >
           <main className="py-16 px-4 flex items-center justify-center">
+=======
+    <div className="bg-white min-h-screen flex flex-col">
+    <Navbar />
+
+    <div className="container mx-auto p-8 flex-grow flex justify-center items-center">
+      <div
+        className="bg-white p-8 rounded-lg shadow-lg"
+        style={{ height: "auto" }}
+      >
+         <main className="py-16 px-4 flex items-center justify-center">
+>>>>>>> 22d62bdf71481da724c6308b43d6e6c9dc9db8de
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
               <div className="flex flex-col justify-center items-start">
                 <h3 className="text-4xl md:text-5xl font-bold mb-8 text-center md:text-left">
@@ -30,7 +45,11 @@ export default function Landing() {
                 <div className="flex flex-row space-x-4 justify-center">
                   <Link
                     to="/signup"
+<<<<<<< HEAD
                     className="bg-transparent hover:bg-yellow-500 text-yellow-700 font-semibold hover:text-white py-2 px-4 rounded-full border border-yellow-500 hover:border-transparent"
+=======
+                    className="bg-yellow-500 hover:bg-yellow-700 text-white font-semibold hover:text-white py-2 px-4 rounded-full border border-yellow-500 hover:border-transparent"
+>>>>>>> 22d62bdf71481da724c6308b43d6e6c9dc9db8de
                   >
                     Get Started
                   </Link>
@@ -68,6 +87,9 @@ export default function Landing() {
             notificationTitle="Chat with us"
             notificationMessage="Hello! How can we assist you?"
           />
+          <div className="fixed bottom-16 right-4 z-50">
+            <FacebookMessengerChat />
+          </div>
         </div>
       </div>
     </div>

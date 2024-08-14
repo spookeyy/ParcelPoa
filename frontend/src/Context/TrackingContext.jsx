@@ -1,5 +1,11 @@
-
-import React, { createContext, useState, useContext, useEffect } from "react";
+/* eslint-disable react/prop-types */
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  useCallback,
+} from "react";
 import { toast } from "react-toastify";
 import { server } from "../../config.json";
 
@@ -10,20 +16,28 @@ export const useTracking = () => {
 };
 
 export const TrackingProvider = ({ children }) => {
-  const [trackingData, setTrackingData] = useState([]);
+  const [parcelData, setParcelData] = useState(null);
+  const [trackingHistory, setTrackingHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchTrackingData = (trackingNumber) => {
+  const fetchTrackingData = useCallback((trackingNumber, frontendUrl) => {
     setLoading(true);
-    fetch(`${server}/track/${trackingNumber}`)
+    fetch(`${server}/track/${trackingNumber}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ frontend_url: frontendUrl }),
+    })
       .then((response) => response.json())
       .then((data) => {
         if (data.message) {
           toast.error(data.message);
           setError(data.message);
         } else {
-          setTrackingData(data.tracking_history);
+          setParcelData(data.parcel);
+          setTrackingHistory(data.tracking_history);
         }
         setLoading(false);
       })
@@ -32,24 +46,24 @@ export const TrackingProvider = ({ children }) => {
         setError(err.message);
         setLoading(false);
       });
-  };
-
-  // useEffect(() => {
-  //   fetchTrackingData();
-  // }, []);
+  }, []);
 
   useEffect(() => {
-    if (trackingData.length > 0) {
+    if (parcelData) {
       setError(null);
     }
-  }, [trackingData]);
-  
-  const contextdata = { trackingData, loading, error, fetchTrackingData };
+  }, [parcelData]);
+
+  const contextData = {
+    parcelData,
+    trackingHistory,
+    loading,
+    error,
+    fetchTrackingData,
+  };
 
   return (
-    <TrackingContext.Provider
-      value={contextdata}
-    >
+    <TrackingContext.Provider value={contextData}>
       {children}
     </TrackingContext.Provider>
   );

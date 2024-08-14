@@ -71,7 +71,7 @@ export default function SellerProfile({ onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-yellow-900 bg-opacity-50 z-50 p-4">
+    <div className="fixed inset-0 flex items-center justify-center bg-yellow-900 bg-opacity-50 z-100 p-4">
       <div className="bg-white rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg mx-auto relative z-10">
         {/* Modal header */}
         <div className="flex items-center justify-between p-4 border-b border-yellow-200 rounded-t">
