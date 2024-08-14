@@ -82,14 +82,13 @@ export const UserProvider = ({ children }) => {
           localStorage.setItem("access_token", res.access_token);
           setCurrentUser(res.user);
 
-<<<<<<< HEAD
+        }
 
           if (res.user.role === "Agent" || res.user.role === "Business") {
             toast.success(`Logged in Successfully as ${res.user.role}!`);
             nav(res.user.role === "Agent" ? "/agent" : "/seller");
 
-=======
->>>>>>> be4f0d90fab629a52b9f7c4ce3d07a30b21f8c99
+
           const { role } = res.user;
           const routes = {
             Agent: "/agent/dashboard",
@@ -100,10 +99,7 @@ export const UserProvider = ({ children }) => {
           if (role in routes) {
             toast.success(`Logged in Successfully as ${role}!`);
             nav(routes[role]);
-<<<<<<< HEAD
 
-=======
->>>>>>> be4f0d90fab629a52b9f7c4ce3d07a30b21f8c99
           } else {
             console.error("Unexpected role:", role);
             throw new Error(`Unexpected role: ${role}`);
@@ -208,13 +204,12 @@ export const UserProvider = ({ children }) => {
     }
   }, [authToken, onChange, fetchUserProfile]);
 
-<<<<<<< HEAD
+
 
   // REQUEST PASSWORD RESET
 
 
-=======
->>>>>>> be4f0d90fab629a52b9f7c4ce3d07a30b21f8c99
+
   // current user
   const getCurrentUser = () => {
     return fetch(`${server}/current_user`, {
@@ -240,10 +235,9 @@ export const UserProvider = ({ children }) => {
   };
 
   // Request Password Reset
-<<<<<<< HEAD
 
-=======
->>>>>>> be4f0d90fab629a52b9f7c4ce3d07a30b21f8c99
+
+
   const requestPasswordReset = (email, frontendUrl) => {
     return fetch(`${server}/request-reset-password`, {
       method: "POST",
