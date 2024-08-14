@@ -71,16 +71,16 @@ export default function SellerProfile({ onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-yellow-900 bg-opacity-50 z-100 p-4">
+    <div className="fixed inset-0 flex items-center justify-center bg-yellow-700 bg-opacity-50 z-100 p-4">
       <div className="bg-white rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg mx-auto relative z-10">
         {/* Modal header */}
         <div className="flex items-center justify-between p-4 border-b border-yellow-200 rounded-t">
-          <h2 className="text-lg sm:text-xl font-semibold text-yellow-500">
-            Business Profile
+          <h2 className="text-lg sm:text-xl font-semibold text-black">
+            {userRole} Profile
           </h2>
           <button
             onClick={onClose}
-            className="text-yellow-500 hover:text-yellow-700"
+            className="text-black hover:text-yellow-700"
           >
             <svg
               className="w-5 h-5 sm:w-6 sm:h-6"
@@ -99,12 +99,12 @@ export default function SellerProfile({ onClose }) {
         </div>
 
         {/* Modal body */}
-        <div className="p-4 sm:p-6">
+        <div className="mt-[-10px] p-4 sm:p-6 sm:mt-[-10px]">
           <form onSubmit={handleUpdateProfile} className="space-y-4">
             <div className="mb-4">
               <label
                 htmlFor="name"
-                className="block text-sm font-medium text-yellow-700"
+                className="block text-sm font-bold text-yellow-700"
               >
                 Name
               </label>
@@ -120,7 +120,7 @@ export default function SellerProfile({ onClose }) {
             <div className="mb-4">
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-yellow-700"
+                className="block text-sm font-bold text-yellow-700"
               >
                 Email
               </label>
@@ -136,7 +136,7 @@ export default function SellerProfile({ onClose }) {
             <div className="mb-4">
               <label
                 htmlFor="phone"
-                className="block text-sm font-medium text-yellow-700"
+                className="block text-sm font-bold text-yellow-700"
               >
                 Phone Number
               </label>
@@ -152,7 +152,7 @@ export default function SellerProfile({ onClose }) {
             <div className="mb-4">
               <label
                 htmlFor="userRole"
-                className="block text-sm font-medium text-yellow-700"
+                className="block text-sm font-bold text-yellow-700"
               >
                 User Role
               </label>
@@ -166,7 +166,7 @@ export default function SellerProfile({ onClose }) {
             </div>
             <button
               type="submit"
-              className="w-full bg-yellow-500 text-white py-2 rounded-md shadow hover:bg-white hover:text-yellow-500 transition-all duration-300 ease-in-out"
+              className="w-full bg-black text-white py-2 rounded-md shadow hover:bg-yellow-800 hover:text-white transition-all duration-300 ease-in-out"
             >
               Update Profile
             </button>
@@ -180,13 +180,13 @@ export default function SellerProfile({ onClose }) {
         <div className="flex flex-col sm:flex-row justify-between p-4 border-t border-yellow-200">
           <button
             onClick={onClose}
-            className="mb-2 sm:mb-0 sm:mr-2 px-4 py-2 text-yellow-600 border border-yellow-300 rounded-md hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition duration-300 ease-in-out"
+            className="mb-2 sm:mb-0 sm:mr-2 px-4 py-2 bg-gray-600 text-white border border-yellow-300 rounded-md hover:bg-yellow-800 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition duration-300 ease-in-out"
           >
             Cancel
           </button>
           <button
             onClick={() => setShowChangePassword(!showChangePassword)}
-            className="px-4 py-2 text-yellow-600 border border-yellow-300 rounded-md hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition duration-300 ease-in-out"
+            className="px-4 py-2 text-white bg-yellow-600 border border-yellow-300 rounded-md hover:bg-yellow-800 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition duration-300 ease-in-out"
           >
             Change Password
           </button>

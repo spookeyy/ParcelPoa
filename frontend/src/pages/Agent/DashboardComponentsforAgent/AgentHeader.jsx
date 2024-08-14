@@ -104,7 +104,7 @@ export default function AgentHeader() {
         className="flex items-center text-gray-800 hover:bg-gray-100 p-3 rounded transition duration-200 text-sm sm:text-base absolute top-4 left-4"
       >
         <FaHome className="mr-2 text-lg sm:text-xl" />
-        <span className="hidden sm:inline">Home</span>
+        <span className="font-semibold sm:font bolder hidden sm:inline">Home</span>
       </button>
 
       <div className="absolute right-4 top-4 md:right-6 md:top-6 flex items-center">

@@ -30,8 +30,8 @@ export default function ResetPassword() {
   return (
     <>
       <Navbar />
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-yellow-200 to-yellow-400">
-        <div className="flex flex-col p-8 bg-gradient-to-bl from-yellow-200 to-yellow-400 bg-opacity-20 backdrop-blur-md shadow-lg rounded-lg max-w-md w-full m-4">
+      <div className="flex items-center justify-center min-h-screen bg-gray-200">
+        <div className="flex flex-col p-8 bg-white bg-opacity-20 backdrop-blur-md shadow-lg rounded-lg max-w-md w-full m-4 md:m-0 ">
           <h1 className="text-3xl italic font-semibold text-gray-800 mb-4 text-center">
             Reset Password
           </h1>
@@ -76,7 +76,7 @@ export default function ResetPassword() {
             </div>
             <button
               type="submit"
-              className="w-full bg-yellow-600 text-white p-3 rounded-md hover:bg-yellow-800 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition duration-200"
+              className="w-full bg-black text-white p-3 rounded-md hover:bg-yellow-800 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition duration-200"
             >
               Reset Password
             </button>
@@ -86,3 +86,5 @@ export default function ResetPassword() {
     </>
   );
 }
+
+// bg-gradient-to-br from-yellow-200 to-yellow-400

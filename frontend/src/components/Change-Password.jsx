@@ -49,7 +49,7 @@ export default function ChangePassword({ onClose }) {
       <div className="bg-white rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm mx-auto">
         {/* Modal header */}
         <div className="flex items-center justify-between p-3 border-b border-yellow-200 rounded-t">
-          <h2 className="text-base sm:text-lg font-semibold text-yellow-600">
+          <h2 className="text-base sm:text-lg font-semibold text-black">
             Change Password
           </h2>
           <button
@@ -78,7 +78,7 @@ export default function ChangePassword({ onClose }) {
             <div>
               <label
                 htmlFor="currentPassword"
-                className="block text-xs sm:text-sm font-medium text-yellow-600"
+                className="block text-xs sm:text-sm font-medium text-black"
               >
                 Current Password
               </label>
@@ -94,7 +94,7 @@ export default function ChangePassword({ onClose }) {
             <div>
               <label
                 htmlFor="newPassword"
-                className="block text-xs sm:text-sm font-medium text-yellow-600"
+                className="block text-xs sm:text-sm font-medium text-black"
               >
                 New Password
               </label>
@@ -110,7 +110,7 @@ export default function ChangePassword({ onClose }) {
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="block text-xs sm:text-sm font-medium text-yellow-600"
+                className="block text-xs sm:text-sm font-medium text-black"
               >
                 Confirm Password
               </label>
@@ -133,7 +133,7 @@ export default function ChangePassword({ onClose }) {
               </button>
               <button
                 type="submit"
-                className="px-3 py-1.5 text-xs sm:text-sm bg-yellow-500 text-white font-medium rounded-md hover:bg-yellow-600 transition-colors"
+                className="px-3 py-1.5 text-xs sm:text-sm bg-black text-white font-medium rounded-md hover:bg-yellow-800 transition-colors"
               >
                 Change Password
               </button>

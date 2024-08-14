@@ -19,9 +19,7 @@ export const UserProvider = ({ children }) => {
   );
 
   // REGISTER USER
-  const addUser = (
-    userData
-  ) => {
+  const addUser = (userData) => {
     return new Promise((resolve, reject) => {
       fetch(`${server}/register`, {
         method: "POST",
@@ -77,18 +75,20 @@ export const UserProvider = ({ children }) => {
     })
       .then((response) => response.json())
       .then((res) => {
-        // console.log("Login response", res);
+        console.log("Login response", res);
         if (res.access_token && res.user) {
           setAuthToken(res.access_token);
           localStorage.setItem("access_token", res.access_token);
           setCurrentUser(res.user);
-
         }
 
-          if (res.user.role === "Agent" || res.user.role === "Business") {
-            // toast.success(`Logged in Successfully as ${res.user.role}!`);
-            // nav(res.user.role === "Agent" ? "/agent" : "/seller");
-
+        if (
+          res.user.role === "Agent" ||
+          res.user.role === "Business" ||
+          res.user.role === "Admin"
+        ) {
+          // toast.success(`Logged in Successfully as ${res.user.role}!`);
+          // nav(res.user.role === "Agent" ? "/agent" : "/seller");
 
           const { role } = res.user;
           const routes = {
@@ -100,7 +100,6 @@ export const UserProvider = ({ children }) => {
           if (role in routes) {
             toast.success(`Logged in Successfully as ${role}!`);
             nav(routes[role]);
-
           } else {
             console.error("Unexpected role:", role);
             throw new Error(`Unexpected role: ${role}`);
@@ -177,6 +176,7 @@ export const UserProvider = ({ children }) => {
 
   // fetch user profile
   const fetchUserProfile = useCallback(() => {
+    console.log("fetchUserProfile called");
     fetch(`${server}/profile`, {
       method: "GET",
       headers: {
@@ -197,7 +197,7 @@ export const UserProvider = ({ children }) => {
         setAuthToken(null);
         localStorage.removeItem("access_token");
       });
-  }, [authToken]);
+  }, [authToken, setCurrentUser, setAuthToken]);
 
   useEffect(() => {
     if (authToken) {
@@ -205,11 +205,7 @@ export const UserProvider = ({ children }) => {
     }
   }, [authToken, onChange, fetchUserProfile]);
 
-
-
   // REQUEST PASSWORD RESET
-
-
 
   // current user
   const getCurrentUser = () => {
@@ -236,8 +232,6 @@ export const UserProvider = ({ children }) => {
   };
 
   // Request Password Reset
-
-
 
   const requestPasswordReset = (email, frontendUrl) => {
     return fetch(`${server}/request-reset-password`, {
@@ -357,7 +351,7 @@ export const UserProvider = ({ children }) => {
 
   // FETCH ALL AGENTS
   const fetchAllAgents = () => {
-    return fetch(`${server}/agents`, { 
+    return fetch(`${server}/agents`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -399,7 +393,7 @@ export const UserProvider = ({ children }) => {
         toast.error("An error occurred while fetching orders");
         throw error;
       });
-  }
+  };
 
   const contextData = {
     currentUser,
@@ -419,7 +413,7 @@ export const UserProvider = ({ children }) => {
     fetchAgentDetails,
     fetchAllAgents,
     setAuthToken,
-    fetchOrders
+    fetchOrders,
   };
 
   return (

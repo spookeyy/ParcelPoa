@@ -156,7 +156,7 @@ function OrderManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-white p-6 mt-10">
+    <div className="min-h-screen bg-white flex flex-col">
       <Header />
       <div className="container mx-auto px-4 py-8">
         {/* Filter Bar */}
