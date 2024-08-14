@@ -30,7 +30,8 @@ library.add(
 const OrderTracking = () => {
   const { trackingNumber } = useParams();
   const location = useLocation();
-  const { trackingData, fetchTrackingData, loading, error } = useTracking();
+  const { parcelData, trackingHistory, fetchTrackingData, loading, error } =
+    useTracking();
   const [localTrackingNumber, setLocalTrackingNumber] = useState(
     trackingNumber || ""
   );
@@ -61,6 +62,7 @@ const OrderTracking = () => {
     const frontendUrl = window.location.origin;
     fetchTrackingData(localTrackingNumber, frontendUrl);
   };
+
   const statusIcon = (status) => {
     switch (status) {
       case "Delivered":
@@ -135,15 +137,15 @@ const OrderTracking = () => {
             <span>{error}</span>
           </p>
         )}
-        {trackingData && trackingData.length > 0 && (
+        {parcelData && trackingHistory && trackingHistory.length > 0 && (
           <div className="mt-6 p-4 max-w-3xl mx-auto bg-white shadow-md rounded-lg">
             <h3 className="text-xl font-semibold text-yellow-800 mb-3 text-center">
               Tracking History
             </h3>
             <ul role="list" className="divide-y divide-gray-200 mb-6">
-              {trackingData.map((track, index) => (
+              {trackingHistory.map((track, index) => (
                 <li key={index} className="relative py-4">
-                  {index !== trackingData.length - 1 && (
+                  {index !== trackingHistory.length - 1 && (
                     <span
                       className="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200"
                       aria-hidden="true"
@@ -179,26 +181,18 @@ const OrderTracking = () => {
                 </li>
               ))}
             </ul>
-            {trackingData[0].gps_location && (
+            {parcelData.latitude && parcelData.longitude && (
               <div>
                 <h4 className="text-md font-semibold mb-2">Current Location</h4>
-                <p className="mb-3 text-sm">
-                  {trackingData[0].gps_location.address}
-                </p>
+                <p className="mb-3 text-sm">{parcelData.current_location}</p>
                 <MapContainer
-                  center={[
-                    trackingData[0].gps_location.latitude,
-                    trackingData[0].gps_location.longitude,
-                  ]}
+                  center={[parcelData.latitude, parcelData.longitude]}
                   zoom={13}
                   style={{ height: "300px", width: "100%" }}
                 >
                   <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                   <Marker
-                    position={[
-                      trackingData[0].gps_location.latitude,
-                      trackingData[0].gps_location.longitude,
-                    ]}
+                    position={[parcelData.latitude, parcelData.longitude]}
                   >
                     <Popup>Current parcel location</Popup>
                   </Marker>

@@ -10,43 +10,69 @@ function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 py-1 px-2 bg-yellow-500 shadow z-50">
-      <div className="container mx-auto flex justify-between items-center">
-        <div className="flex items-center">
+    <nav className="bg-yellow-500 shadow shadow z-50fixed w-full z-20 top-0 left-0 border-b border-gray-200 py-[0px] ">
+      <div className="max-w-screen-xl mx-auto flex items-center justify-between p-2">
+        <Link to="/" className="flex items-center space-x-2">
           <img
             src={logo}
             alt="ParcelPoa Logo"
             className="h-14 w-auto md:h-16 md:w-auto mr-4 sm:mr-0"
           />
-          <h1 className="font-bold text-3xl">ParcelPoa</h1>
-        </div>
-        <div className="sm:hidden">
+          <h1 className="font-bold text-3xl ml-2">ParcelPoa</h1>
+        </Link>
+        <div className="flex md:hidden">
           <button
             onClick={toggleMenu}
-            className="text-black-700 focus:outline-none"
+            type="button"
+            className="inline-flex items-center justify-center p-2 rounded-md text-yellow-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+            aria-controls="mobile-menu"
+            aria-expanded={isOpen}
           >
+            <span className="sr-only">Open main menu</span>
             <svg
+              className="block h-6 w-6"
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={2}
-                d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16m-7 6h7"}
+                strokeWidth="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+            <svg
+              className="hidden h-6 w-6"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18L18 6M6 6l12 12"
               />
             </svg>
           </button>
         </div>
-        <nav className="hidden sm:flex sm:items-center space-x-4">
+        <div className="hidden md:flex md:items-center md:justify-end md:space-x-6">
           <Link
             to="/"
-            className="text-black-700 font-medium hover:text-white hover:underline"
+            className="text-black-700 font-medium hover:text-white hover:underline "
           >
             Home
+          </Link>
+          <Link
+            to="/about"
+            className="text-black-700 font-medium hover:text-white hover:underline "
+          >
+            About
           </Link>
           <Link
             to="/tracking"
@@ -56,15 +82,9 @@ function Navbar() {
           </Link>
           <Link
             to="/contact-us"
-            className="text-black-700 font-medium hover:text-white hover:underline"
+            className="text-black-700 font-medium hover:text-white hover:underline "
           >
             Contact Us
-          </Link>
-          <Link
-            to="/about"
-            className="text-black-700 font-medium hover:text-white hover:underline"
-          >
-            About Us
           </Link>
           <Link
             to="/signup"
@@ -78,88 +98,51 @@ function Navbar() {
           >
             Log In
           </Link>
-        </nav>
+        </div>
       </div>
 
       {/* Mobile Menu */}
-      <div
-        className={`fixed top-0 right-0 w-2/3 max-w-sm bg-yellow-500 z-50 h-full transform transition-transform duration-300 ease-in-out ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        <div className="flex flex-col p-4">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center">
-              <img
-                src={logo}
-                alt="ParcelPoa Logo"
-                className="h-14 w-auto md:h-16 md:w-auto mr-2"
-              />
-              <h1 className="font-bold text-3xl">ParcelPoa</h1>
-            </div>
-            <button className="text-black" onClick={toggleMenu}>
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-          <nav className="flex flex-col space-y-4">
-            <Link
-              to="/"
-              className="text-black-700 font-medium hover:text-white"
-              onClick={toggleMenu}
-            >
-              Home
-            </Link>
-            <Link
-              to="/tracking"
-              className="text-black-700 font-medium hover:text-white"
-              onClick={toggleMenu}
-            >
-              Track Order
-            </Link>
-            <Link
-              to="/contact-us"
-              className="text-black-700 font-medium hover:text-white"
-              onClick={toggleMenu}
-            >
-              Contact Us
-            </Link>
-            <Link
-              to="/about"
-              className="text-black-700 font-medium hover:text-white"
-              onClick={toggleMenu}
-            >
-              About Us
-            </Link>
-            <Link
-              to="/signup"
-              className="text-black-700 font-medium hover:text-white"
-              onClick={toggleMenu}
-            >
-              Sign Up
-            </Link>
-            <Link
-              to="/login"
-              className="text-black-700 font-medium hover:text-white"
-              onClick={toggleMenu}
-            >
-              Log In
-            </Link>
-          </nav>
+      <div className={`${isOpen ? "block" : "hidden"} md:hidden bg-yellow-500`}>
+        <div className="space-y-1 px-2 pt-2 pb-3">
+          <Link
+            to="/"
+            className="block px-3 py-2 rounded-md text-base font-medium text-gray-700  hover:bg-gray-500 hover:text-white"
+          >
+            Home
+          </Link>
+          <Link
+            to="/about"
+            className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-500 hover:text-white "
+          >
+            About
+          </Link>
+          <Link
+            to="/tracking"
+            className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-500 hover:text-white "
+          >
+            Track Order
+          </Link>
+          <Link
+            to="/contact-us"
+            className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-500 hover:text-white "
+          >
+            Contact Us
+          </Link>
+          <Link
+            to="/signup"
+            className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-500 hover:text-white "
+          >
+            Sign Up
+          </Link>
+          <Link
+            to="/login"
+            className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-500 hover:text-white "
+          >
+            Log In
+          </Link>
         </div>
       </div>
-    </header>
+    </nav>
   );
 }
 

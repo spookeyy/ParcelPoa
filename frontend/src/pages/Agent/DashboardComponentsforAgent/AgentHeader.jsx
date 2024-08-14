@@ -1,4 +1,6 @@
-import React, { useState, useEffect ,useContext} from "react";
+/* eslint-disable react/no-unknown-property */
+import React, { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { server } from "../../../../config";
 import {
   FaUser,
@@ -9,16 +11,16 @@ import {
 import Modal from "../Modal";
 import AgentProfile from "../AgentProfile";
 import Sidebar from "./Sidebar";
-import {UserContext} from "../../../Context/UserContext";
+import { UserContext } from "../../../Context/UserContext";
 
 export default function AgentHeader() {
+  const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [status, setStatus] = useState("Available");
   const [userName, setUserName] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { currentUser, logout } = useContext(UserContext);
-
 
   useEffect(() => {
     fetch(`${server}/profile`, {
@@ -44,7 +46,7 @@ export default function AgentHeader() {
         .map((name) => name[0])
         .join("")
     : "";
-    console.log("userInitial:", userInitial);
+  // console.log("userInitial:", userInitial);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -88,19 +90,33 @@ export default function AgentHeader() {
       <h1 className="text-2xl md:text-3xl font-bold text-gray-900 text-center">
         Agent Dashboard
       </h1>
-      <Sidebar isOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="bg-yellow-700 text-white p-2 rounded-lg shadow-md absolute top-4 left-4 z-50 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-300"
-          aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
-          aria-expanded={sidebarOpen}
-        >
-          <i className={`fas ${sidebarOpen ? "fa-times" : "fa-bars"} text-xl`}></i>
-        </button>
+      <Sidebar
+        isOpen={sidebarOpen}
+        toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+      />
+      {/* <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className="bg-yellow-700 text-white p-2 rounded-lg shadow-md absolute top-4 left-4 z-50 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-300"
+        aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+        aria-expanded={sidebarOpen}
+      >
+        <i className={`fas ${sidebarOpen ? "fa-times" : "fa-bars"} text-xl`}></i>
+      </button> */}
+      <button
+        onClick={() => {
+          navigate("/");
+          setSidebarOpen(false); // Close sidebar when navigating
+        }}
+        className="flex items-center text-gray-800 hover:bg-gray-100 p-3 rounded transition duration-200 text-sm sm:text-base absolute top-4 left-16"
+      >
+        <i className="fas fa-home mr-3 text-lg sm:text-xl"></i>
+        Home
+      </button>
+
       <div className="absolute right-4 top-4 md:right-6 md:top-6 flex items-center">
         <div className="relative ml-16">
           <div
-            className="bg-yellow-800  w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-lg md:text-xl font-semibold cursor-pointer hover:bg-yellow-600  transition-colors duration-300"
+            className="bg-yellow-500 border border-gray-800  w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-lg md:text-xl font-semibold cursor-pointer hover:bg-gray-100  transition-colors duration-300"
             onClick={toggleDropdown}
           >
             {userInitial}
@@ -118,20 +134,36 @@ export default function AgentHeader() {
               <div className="flex flex-col">
                 <div
                   className={`flex items-center px-4 py-2 text-sm cursor-pointer transition-colors duration-300 ${
-                    status === "Available" ? "bg-green-100 text-green-700" : "hover:bg-gray-100 text-gray-700"
+                    status === "Available"
+                      ? "bg-green-100 text-green-700"
+                      : "hover:bg-gray-100 text-gray-700"
                   }`}
                   onClick={() => handleStatusChange("Available")}
                 >
-                  <FaCheckCircle className={`mr-3 ${status === "Available" ? "text-green-500" : "text-gray-500"}`} />
+                  <FaCheckCircle
+                    className={`mr-3 ${
+                      status === "Available"
+                        ? "text-green-500"
+                        : "text-gray-500"
+                    }`}
+                  />
                   Available
                 </div>
                 <div
                   className={`flex items-center px-4 py-2 text-sm cursor-pointer transition-colors duration-300 ${
-                    status === "Unavailable" ? "bg-red-100 text-red-700" : "hover:bg-gray-100 text-gray-700"
+                    status === "Unavailable"
+                      ? "bg-red-100 text-red-700"
+                      : "hover:bg-gray-100 text-gray-700"
                   }`}
                   onClick={() => handleStatusChange("Unavailable")}
                 >
-                  <FaTimesCircle className={`mr-3 ${status === "Unavailable" ? "text-red-500" : "text-gray-500"}`} />
+                  <FaTimesCircle
+                    className={`mr-3 ${
+                      status === "Unavailable"
+                        ? "text-red-500"
+                        : "text-gray-500"
+                    }`}
+                  />
                   Unavailable
                 </div>
               </div>
@@ -144,7 +176,7 @@ export default function AgentHeader() {
                   Profile
                 </div>
                 <div
-                 currentUser={currentUser}
+                  currentUser={currentUser}
                   onClick={handleLogout}
                   className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer transition-colors duration-300"
                 >

@@ -14,6 +14,54 @@ LOGIN USER
 }
 
 
+@app.route('/track/<string:tracking_number>', methods=['GET', 'POST'])
+def track_parcel(tracking_number):
+    parcel = Parcel.query.filter_by(tracking_number=tracking_number).first()
+    if parcel is None:
+        return jsonify({"message": "Parcel not found"}), 404
+    
+    tracking_info = Tracking.query.filter_by(parcel_id=parcel.parcel_id).order_by(Tracking.timestamp.desc()).all()
+    print(f"tracking_info: {tracking_info}")
+
+    # Simulate GPS location if not available
+    if not hasattr(parcel, 'latitude') or not hasattr(parcel, 'longitude') or parcel.latitude is None or parcel.longitude is None:
+        parcel.latitude = random.uniform(-90, 90)
+        parcel.longitude = random.uniform(-180, 180)
+        db.session.commit()
+
+    # Get address from coordinates
+    geolocator = Nominatim(user_agent="parcel_tracker")
+    location = geolocator.reverse(f"{parcel.latitude}, {parcel.longitude}")
+    address = location.address if location else "Unknown location"
+
+    tracking_data = [track.to_dict() for track in tracking_info]
+    for track in tracking_data:
+        track['gps_location'] = {
+            'latitude': parcel.latitude,
+            'longitude': parcel.longitude,
+            'address': address
+        }
+
+    parcel.current_location = address
+
+    response_data = {
+        "parcel": {
+            "tracking_number": parcel.tracking_number,
+            "status": parcel.status,
+            "current_location": parcel.current_location,
+            "sender_name": parcel.sender.name if parcel.sender else "Unknown",
+            "recipient_name": parcel.recipient_name,
+            "description": parcel.description,
+            "category": parcel.category
+        },
+        "tracking_history": tracking_data
+    }
+
+    print(f"response_data: {response_data}")
+    return jsonify(response_data)
+
+    
+
  python app.py
  
  run both frontend and backend
@@ -276,3 +324,65 @@ def schedule_pickup():
                       </option>
                     ))}
                   </select>
+
+
+
+theme:
+                  bg-gradient-to-br from-yellow-200 to-yellow-400
+
+/* eslint-disable react/prop-types */
+import React, { createContext, useState, useContext, useEffect } from "react";
+import { toast } from "react-toastify";
+import { server } from "../../config.json";
+
+const TrackingContext = createContext();
+
+export const useTracking = () => {
+  return useContext(TrackingContext);
+};
+
+export const TrackingProvider = ({ children }) => {
+  const [trackingData, setTrackingData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchTrackingData = (trackingNumber, frontendUrl) => {
+    setLoading(true);
+    fetch(`${server}/track/${trackingNumber}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ frontend_url: frontendUrl }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.message) {
+          toast.error(data.message);
+          setError(data.message);
+        } else {
+          setTrackingData(data.tracking_history);
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        toast.error("Failed to fetch tracking data");
+        setError(err.message);
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    if (trackingData.length > 0) {
+      setError(null);
+    }
+  }, [trackingData]);
+
+  const contextdata = { trackingData, loading, error, fetchTrackingData };
+
+  return (
+    <TrackingContext.Provider value={contextdata}>
+      {children}
+    </TrackingContext.Provider>
+  );
+};
