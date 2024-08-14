@@ -454,6 +454,7 @@ def update_parcel_status(parcel_id):
     
     # Find the parcel based on the parcel_id
     parcel = Parcel.query.get(parcel_id)
+    logging.debug(f"Queried parcel: {parcel}")
     if not parcel:
         return jsonify({"message": "Parcel not found"}), 404
     
@@ -1019,16 +1020,16 @@ def get_unread_notification_count():
 # send email notifications to users/parties
 def send_notification(email, subject, body):
     if not is_valid_email(email):
-        print(f"Invalid email address: {email}. Notification not sent.")
+        logging.error(f"Invalid email address: {email}")
         return
 
     with app.app_context():
         try:
             msg = Message(subject, recipients=[email], body=body)
             mail.send(msg)
-            print(f"Notification sent to {email}")
+            logging.info(f"Notification sent to {email}.")
         except Exception as e:
-            print(f"Failed to send notification to {email}: {str(e)}")
+            logging.error(f"Failed to send notification to {email}: {str(e)}")
 
 # generate tracking numbers
 def generate_unique_tracking_number(existing_numbers):
