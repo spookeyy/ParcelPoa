@@ -2,7 +2,7 @@ import os
 import random
 import string
 from dotenv import dotenv_values, load_dotenv
-from geopy.geocoders import Nominatim
+# from geopy.geocoders import Nominatim
 import smtplib
 from flask import Flask, request, jsonify,url_for
 from flask_migrate import Migrate
@@ -32,8 +32,8 @@ logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__, static_folder='static')
 CORS(app)
-# app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db'
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
+app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db'
+# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
 print(f"Connecting to database: {app.config['SQLALCHEMY_DATABASE_URI']}")
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -480,7 +480,7 @@ def update_parcel_status(parcel_id):
     # Send notifications
     if old_status != parcel.status:
         send_notification(parcel.sender.email, 'Parcel Status Update', f'Your parcel with tracking number {parcel.tracking_number} is now {parcel.status}.')
-        send_notification(parcel.recipient_email, 'Parcel Status Update', f'The parcel with tracking number {parcel.tracking_number} is now {parcel.status}. \n visit https://parcelpoa.netlify.app/track/{parcel.tracking_number} to track your parcel.')
+        send_notification(parcel.recipient_email, 'Parcel Status Update', f'The parcel with tracking number {parcel.tracking_number} is now {parcel.status}. \n visit http://localhost:5173/track/{parcel.tracking_number} to track your parcel.')
 
     return jsonify({"message": "Parcel status updated successfully"}), 200
 
@@ -595,26 +595,7 @@ def track_parcel(tracking_number):
     tracking_info = Tracking.query.filter_by(parcel_id=parcel.parcel_id).order_by(Tracking.timestamp.desc()).all()
     print(f"tracking_info: {tracking_info}")
 
-    # Simulate GPS location if not available
-    if not hasattr(parcel, 'latitude') or not hasattr(parcel, 'longitude') or parcel.latitude is None or parcel.longitude is None:
-        parcel.latitude = random.uniform(-90, 90)
-        parcel.longitude = random.uniform(-180, 180)
-        db.session.commit()
-
-    # Get address from coordinates
-    geolocator = Nominatim(user_agent="parcel_tracker")
-    location = geolocator.reverse(f"{parcel.latitude}, {parcel.longitude}")
-    address = location.address if location else "Unknown location"
-
     tracking_data = [track.to_dict() for track in tracking_info]
-    for track in tracking_data:
-        track['gps_location'] = {
-            'latitude': parcel.latitude,
-            'longitude': parcel.longitude,
-            'address': address
-        }
-
-    parcel.current_location = address
 
     response_data = {
         "parcel": {
@@ -624,7 +605,9 @@ def track_parcel(tracking_number):
             "sender_name": parcel.sender.name if parcel.sender else "Unknown",
             "recipient_name": parcel.recipient_name,
             "description": parcel.description,
-            "category": parcel.category
+            "category": parcel.category,
+            "latitude": parcel.latitude,
+            "longitude": parcel.longitude
         },
         "tracking_history": tracking_data
     }

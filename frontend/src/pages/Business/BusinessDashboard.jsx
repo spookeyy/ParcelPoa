@@ -12,7 +12,7 @@ function BusinessDashboard() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pt-8">
       <Header />
       {currentUser && (
         <p className="text-center text-gray-800 mt-4 text-xl lg:text-2xl">

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Routes, Route } from "react-router-dom";
 import AgentHeader from "./DashboardComponentsforAgent/AgentHeader";
 import StatsCard from "./DashboardComponentsforAgent/StatsCard";
-import Deliveries from "./DashboardComponentsforAgent/Deliveries";
+// import Deliveries from "./DashboardComponentsforAgent/Deliveries";
 import Parcels from "./Parcels";
 import ManageDeliveries from "./ManageDeliveries";
 import { server } from "../../../config.json";

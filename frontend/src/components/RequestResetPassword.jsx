@@ -24,8 +24,8 @@ export default function RequestResetPassword() {
   return (
     <>
       <Navbar />
-      <div className="flex items-center justify-center bg-gray-100 p-6 dark:bg-gray-900 dark:text-gray-100 min-h-screen">
-        <form onSubmit={handleSubmit} className="max-w-sm mx-auto p-4">
+      <div className="flex items-center justify-center border border-gray-600 bg-gray-100 p-6 dark:bg-gray-100 dark:text-gray-100 min-h-screen">
+        <form onSubmit={handleSubmit} className="max-w-sm mx-auto p-4 border border-gray-600 border-2">
           <div className="mb-5">
             <label
               htmlFor="email"
@@ -45,7 +45,7 @@ export default function RequestResetPassword() {
           </div>
           <button
             type="submit"
-            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            className="text-white bg-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-800"
           >
             Request Password Reset
           </button>
