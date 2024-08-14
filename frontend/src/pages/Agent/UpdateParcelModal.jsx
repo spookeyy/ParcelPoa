@@ -28,10 +28,10 @@ function UpdateParcelModal({ parcel_id, onClose }) {
       if (response.ok) {
         // Check the status of the parcel
         if (status === "Delivered") {
-          toast.error("Cannot update the status of a delivered parcel.");
+          toast.success("Parcel delivered. No need to update status.");
+          onClose();
           return;
         }
-
         toast.success("Parcel status updated successfully!");
         onClose();
       } else {
@@ -54,7 +54,7 @@ function UpdateParcelModal({ parcel_id, onClose }) {
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded mt-1"
+              className="w-full p-2 border border-gray-300 rounded mt-1 appearance-none focus:outline-none focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
               required
             >
               <option value="">Select status</option>
@@ -85,7 +85,7 @@ function UpdateParcelModal({ parcel_id, onClose }) {
             </button>
             <button
               type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
+              className="bg-yellow-500 hover:bg-yellow-700 text-white py-2 px-4 rounded"
             >
               Update
             </button>

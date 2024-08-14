@@ -32,8 +32,8 @@ logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__, static_folder='static')
 CORS(app)
-app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db'
-# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
+# app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db?mode=rw'
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
 print(f"Connecting to database: {app.config['SQLALCHEMY_DATABASE_URI']}")
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -425,9 +425,9 @@ def get_parcel_status(parcel_id):
 #     return jsonify({"message": "Parcels updated successfully"}), 200
 # scheduler.add_job(func=update_locations, trigger='interval', seconds=300, id='update_locations')
 
-def simulate_new_location(parcel):
-    locations = ['In transit', 'Local distribution center', 'Out for delivery']
-    return random.choice(locations)
+# def simulate_new_location(parcel):
+#     locations = ['In transit', 'Local distribution center', 'Out for delivery']
+#     return random.choice(locations)
 
 @app.route('/parcels/<int:parcel_id>', methods=['DELETE'])
 @jwt_required()
@@ -480,7 +480,7 @@ def update_parcel_status(parcel_id):
     # Send notifications
     if old_status != parcel.status:
         send_notification(parcel.sender.email, 'Parcel Status Update', f'Your parcel with tracking number {parcel.tracking_number} is now {parcel.status}.')
-        send_notification(parcel.recipient_email, 'Parcel Status Update', f'The parcel with tracking number {parcel.tracking_number} is now {parcel.status}. \n visit http://localhost:5173/track/{parcel.tracking_number} to track your parcel.')
+        send_notification(parcel.recipient_email, 'Parcel Status Update', f'The parcel with tracking number {parcel.tracking_number} is now {parcel.status}. \n visit https://parcelpoa.netlify.app/track/{parcel.tracking_number} to track your parcel.')
 
     return jsonify({"message": "Parcel status updated successfully"}), 200
 
@@ -1044,7 +1044,8 @@ def get_region_from_address(address):
 
     nairobi_regions = [
         'Embakasi', 'Kasarani', 'Pangani', 'Ngara', 
-        'Ruaraka', 'Muthaiga', 'Lavington', 'Parklands', 'Westlands'
+        'Ruaraka', 'Muthaiga', 'Lavington', 'Parklands', 'Westlands',
+        'Ngong', 'Kibra', 'South B'
     ]
     address_lower = address.lower()
     
@@ -1068,7 +1069,7 @@ def get_region_from_address(address):
 @app.route('/get-regions', methods=['GET'])
 def get_regions():
     regions = {
-        'Nairobi': ['Embakasi', 'Kasarani', 'Pangani', 'Ngara', 'Ruaraka', 'Muthaiga', 'Lavington', 'Parklands', 'Westlands'],
+        'Nairobi': ['Embakasi', 'Kasarani', 'Pangani', 'Ngara', 'Ruaraka', 'Muthaiga', 'Lavington', 'Parklands', 'Westlands', 'Ngong', 'Kibra', 'South B'],
         'Other': []  # You can add other primary regions here if needed
     }
     return jsonify(regions)

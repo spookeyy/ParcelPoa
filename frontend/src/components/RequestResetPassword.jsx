@@ -24,33 +24,46 @@ export default function RequestResetPassword() {
   return (
     <>
       <Navbar />
-      <div className="flex items-center justify-center border border-gray-600 bg-gray-100 p-6 dark:bg-gray-100 dark:text-gray-100 min-h-screen">
-        <form onSubmit={handleSubmit} className="max-w-sm mx-auto p-4 border border-gray-600 border-2">
-          <div className="mb-5">
-            <label
-              htmlFor="email"
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Your email
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="name@example.com"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="text-white bg-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-800"
-          >
+      <div className="flex items-center justify-center min-h-screen bg-gray-200">
+        <div className="flex flex-col p-8 bg-opacity-20 backdrop-blur-md shadow-lg rounded-lg max-w-md w-full m-4">
+          <h1 className="text-3xl italic font-semibold text-gray-800 mb-4 text-center">
             Request Password Reset
-          </button>
-        </form>
+          </h1>
+          <p className="text-gray-700 mb-4 text-center">
+            Enter your email address to receive a password reset link.
+          </p>
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6 bg-gradient-to-br from-yellow-100 to-yellow-400 bg-opacity-150 backdrop-blur-md shadow-lg rounded-lg p-6"
+          >
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-bold text-gray-700 mb-1"
+              >
+                Your email
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-gray-100 p-2 border focus:outline-none border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition"
+                placeholder="name@example.com"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-black text-white p-3 rounded-md hover:bg-yellow-800 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition duration-200"
+            >
+              Request Password Reset
+            </button>
+          </form>
+        </div>
       </div>
     </>
   );
 }
+
+// bg-gradient-to-bl from-yellow-200 to-yellow-400

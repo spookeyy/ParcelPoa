@@ -12,7 +12,7 @@ function BusinessDashboard() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-white pt-8">
+    <div className="min-h-screen bg-white flex flex-col">
       <Header />
       {currentUser && (
         <p className="text-center text-gray-800 mt-4 text-xl lg:text-2xl">
@@ -20,7 +20,7 @@ function BusinessDashboard() {
         </p>
       )}
       <div className="pt-16 mt-0 flex-grow flex flex-col items-center py-8 px-4 lg:px-8">
-        <div className="w-full mt-8max-w-4xl bg-gray-100 rounded-xl shadow-md p-6 lg:p-10">
+        <div className="w-full mt-8max-w-4xl mt-[-50px] bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-xl shadow-md p-6 lg:p-10">
           <div className="text-center">
             <h1 className="text-xl font-medium text-gray-800 mb-4 sm:text-4xl md:text-5xl">
               Welcome to ParcelPoa
@@ -36,7 +36,7 @@ function BusinessDashboard() {
             {/* Pickup Scheduling */}
             <button
               onClick={() => navigate("/business/schedule-pickup")}
-              className="flex flex-col items-center bg-white p-6 rounded-lg shadow-md hover:shadow-lg hover:bg-yellow-200 transition-shadow duration-200 transform hover:scale-105 z-10"
+              className="flex flex-col items-center bg-white p-6 rounded-lg shadow-md hover:shadow-lg hover:bg-yellow-400 transition-shadow duration-200 transform hover:scale-105 "
             >
               <div className="bg-yellow-100 p-4 rounded-full mb-4">
                 <i className="fas fa-calendar-alt text-yellow-600 text-3xl"></i>
@@ -52,7 +52,7 @@ function BusinessDashboard() {
             {/* Manage Orders */}
             <button
               onClick={() => navigate("/business/orders")}
-              className="flex flex-col items-center bg-white p-6 rounded-lg shadow-md hover:shadow-lg hover:bg-yellow-200 transition-shadow duration-200 transform hover:scale-105 z-10"
+              className="flex flex-col items-center bg-white p-6 rounded-lg shadow-md hover:shadow-lg hover:bg-yellow-400 transition-shadow duration-200 transform hover:scale-105 "
             >
               <div className="bg-yellow-100 p-4 rounded-full mb-4">
                 <i className="fas fa-box text-yellow-600 text-3xl"></i>
@@ -69,7 +69,7 @@ function BusinessDashboard() {
             {/* Parcel Tracking */}
             <button
               onClick={() => navigate("/business/parcel-tracking")}
-              className="flex flex-col items-center bg-white p-6 rounded-lg shadow-md hover:shadow-lg hover:bg-yellow-200 transition-shadow duration-200 transform hover:scale-105 z-10"
+              className="flex flex-col items-center bg-white p-6 rounded-lg shadow-md hover:shadow-lg hover:bg-yellow-400 transition-shadow duration-200 transform hover:scale-105 "
             >
               <div className="bg-yellow-100 p-4 rounded-full mb-4">
                 <i className="fas fa-map-marker-alt text-yellow-600 text-3xl"></i>
@@ -85,7 +85,7 @@ function BusinessDashboard() {
             {/* Agents */}
             <button
               onClick={() => navigate("/seller/agents")}
-              className="flex flex-col items-center bg-white p-6 rounded-lg shadow-md hover:shadow-lg hover:bg-yellow-200 transition-shadow duration-200 transform hover:scale-105 z-10"
+              className="flex flex-col items-center bg-white p-6 rounded-lg shadow-md hover:shadow-lg hover:bg-yellow-400 transition-shadow duration-200 transform hover:scale-105 "
             >
               <div className="bg-yellow-100 p-4 rounded-full mb-4">
                 <i className="fas fa-users text-yellow-600 text-3xl"></i>

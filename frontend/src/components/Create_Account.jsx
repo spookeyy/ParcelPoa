@@ -123,7 +123,7 @@ function Create_Account() {
   return (
     <>
       <Navbar />
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-yellow-200 to-yellow-400 p-4 sm:p-6">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-yellow-50 to-yellow-100 p-4 sm:p-6">
         <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg overflow-hidden sm:rounded-2xl sm:overflow-visible mt-2 mb-8">
           <div className="md:flex">
             <div className="md:w-1/2 bg-gradient-to-l from-yellow-500 to-yellow-600 p-8 text-white flex flex-col justify-center">
@@ -137,7 +137,7 @@ function Create_Account() {
                 Already have an account?{" "}
                 <Link
                   to="/login"
-                  className="text-gray-800 hover:underline font-medium"
+                  className="text-gray-800 hover:underline font-bold transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
                 >
                   Login here
                 </Link>
@@ -376,7 +376,7 @@ function Create_Account() {
 
                 <button
                   type="submit"
-                  className="w-full py-2 px-4 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition duration-150 ease-in-out"
+                  className="w-full py-2 px-4 bg-black hover:bg-yellow-800 text-white font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition duration-150 ease-in-out"
                 >
                   Create Account
                 </button>

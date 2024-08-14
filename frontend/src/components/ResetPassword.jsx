@@ -30,48 +30,61 @@ export default function ResetPassword() {
   return (
     <>
       <Navbar />
-    <div className="flex items-center justify-center bg-gray-100 p-6  dark:bg-gray-900 dark:text-gray-100">
-      <form onSubmit={handleSubmit} className="max-w-sm mx-auto mb-12">
-        <div className="mb-5">
-          <label
-            htmlFor="newPassword"
-            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+      <div className="flex items-center justify-center min-h-screen bg-gray-200">
+        <div className="flex flex-col p-8 bg-white bg-opacity-20 backdrop-blur-md shadow-lg rounded-lg max-w-md w-full m-4 md:m-0 ">
+          <h1 className="text-3xl italic font-semibold text-gray-800 mb-4 text-center">
+            Reset Password
+          </h1>
+          <p className="text-gray-700 mb-4 text-center">
+            Please enter your new password.
+          </p>
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6 bg-gradient-to-br from-yellow-200 to-yellow-400 bg-opacity-150 backdrop-blur-md shadow-lg rounded-lg p-6"
           >
-            New Password
-          </label>
-          <input
-            type="password"
-            id="newPassword"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            required
-          />
+            <div>
+              <label
+                htmlFor="newPassword"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                New Password
+              </label>
+              <input
+                type="password"
+                id="newPassword"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full bg-gray-100 p-2 border focus:outline-none border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition"
+                required
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                id="confirmPassword"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full bg-gray-100 p-2 border focus:outline-none border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-black text-white p-3 rounded-md hover:bg-yellow-800 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition duration-200"
+            >
+              Reset Password
+            </button>
+          </form>
         </div>
-        <div className="mb-5">
-          <label
-            htmlFor="confirmPassword"
-            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-          >
-            Confirm Password
-          </label>
-          <input
-            type="password"
-            id="confirmPassword"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            required
-          />
-        </div>
-        <button
-          type="submit"
-          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-        >
-          Reset Password
-        </button>
-      </form>
-    </div>
+      </div>
     </>
   );
 }
+
+// bg-gradient-to-br from-yellow-200 to-yellow-400

@@ -141,8 +141,8 @@ function PickupScheduling() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-white p-6 mt-20">
-        <div className="container mx-auto px-4 py-8">
+      <div className="min-h-screen bg-white p-6 mt-[-2px]">
+        <div className="container mx-auto px-4 py-8 mt-[-30px]">
           <div className="bg-gray-100 rounded-xl shadow-md p-6 lg:p-10">
             <h2 className="text-xl underline font-bold mb-8 text-center text-gray-800">
               Create Order to Schedule Pickup
@@ -263,7 +263,7 @@ function PickupScheduling() {
                   <div className="text-center">
                     <button
                       type="submit"
-                      className="px-6 py-3 bg-gray-800 text-white rounded-lg shadow-md hover:bg-gray-900 transition duration-300"
+                      className="px-24 py-3 bg-black text-white rounded-lg shadow-md hover:bg-yellow-900 transition duration-300"
                     >
                       Schedule Pickup
                     </button>

@@ -127,7 +127,7 @@ const handleView = (user_id) => {
     <div>
       <Navbar />
       <div className="p-6">
-        <h1 className="text-2xl font-semibold mb-4">Agent Requests</h1>
+        <h1 className="text-2xl text-center font-semibold mb-4">Agent Requests</h1>
 
         <FilterBar
           filters={filters}

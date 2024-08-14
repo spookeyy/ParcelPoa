@@ -105,7 +105,7 @@ export default function Agents() {
   return (
     <div className="p-4 md:p-6 bg-gray-50 mt-4 min-h-screen">
       {/* Title */}
-      <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-gray-800">
+      <h1 className="text-xl text-center md:text-2xl font-bold mb-4 md:mb-6 text-gray-800">
         Agents List
       </h1>
 
@@ -133,6 +133,9 @@ export default function Agents() {
               </th>
               <th className="px-2 md:px-4 py-2 text-left font-medium border border-yellow-300">
                 Phone
+              </th>
+              <th className="px-2 md:px-4 py-2 text-left font-medium border border-yellow-300">
+                Primary Region
               </th>
               <th className="px-2 md:px-4 py-2 text-left font-medium border border-yellow-300">
                 Status
@@ -163,6 +166,9 @@ export default function Agents() {
                 </td>
                 <td className="px-2 md:px-4 py-2 border border-yellow-200">
                   {agent.phone_number}
+                </td>
+                <td className="px-2 md:px-4 py-2 border border-yellow-200">
+                  {agent.primary_region}
                 </td>
                 <td className="px-2 md:px-4 py-2 border border-yellow-200">
                   <span

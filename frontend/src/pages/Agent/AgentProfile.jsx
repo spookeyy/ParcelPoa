@@ -109,7 +109,7 @@ export default function AgentProfile({ onClose }) {
   return (
     <div className="fixed inset-0 bg-yellow-900 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center p-4">
       <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-6 text-center text-yellow-700">
+        <h2 className="text-2xl font-bold mb-6 text-center ">
           {profile.userRole} Profile
         </h2>
         <div className="flex flex-col items-center mb-6">
@@ -158,7 +158,7 @@ export default function AgentProfile({ onClose }) {
             <div key={field} className="mb-4">
               <label
                 htmlFor={field}
-                className="block text-sm font-medium text-yellow-700 mb-1"
+                className="block text-sm font-medium text-black font-bold mb-1"
               >
                 {field.charAt(0).toUpperCase() + field.slice(1)}
               </label>
@@ -174,7 +174,7 @@ export default function AgentProfile({ onClose }) {
             </div>
           ))}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-yellow-700 mb-1">
+            <label className="block text-sm font-medium text-black font-bold mb-1">
               User Role
             </label>
             <input
@@ -204,7 +204,7 @@ export default function AgentProfile({ onClose }) {
 
               <button
                 type="submit"
-                className="bg-yellow-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-yellow-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50"
+                className="bg-black text-white py-2 px-4 rounded-md shadow-md hover:bg-yellow-800 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50"
               >
                 Update Profile
               </button>

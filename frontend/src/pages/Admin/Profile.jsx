@@ -9,15 +9,22 @@ import {
 } from "react-icons/fa";
 
 function Profile() {
+  console.log("Component rendered");
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [userName, setUserName] = useState("");
   const { currentUser, logout, fetchUserProfile } = useContext(UserContext);
+  // useEffect(() => {
+  //   currentUser && setUserName(currentUser.name);
+  //   fetchUserProfile();
+  // }, [currentUser, fetchUserProfile]);
+
   useEffect(() => {
-    currentUser && setUserName(currentUser.name);
-    fetchUserProfile();
-  }, [currentUser, fetchUserProfile]);
+    if (currentUser && currentUser.name) {
+      setUserName(currentUser.name);
+    }
+  }, [currentUser]);
 
  const userInitial =
    currentUser && typeof currentUser.name === "string"
