@@ -33,8 +33,8 @@ function Header() {
         </div>
       </div>
 
-      <div className="w-full md:flex-1 text-center mb-2 md:mb-0 sm:ml-4 md:ml-0 sm:text-left">
-        <h1 className="text-xl ml-2 mt-[-40px] md:text-2xl sm:text-xl sm:ml-0 md:text-xl lg:text-3xl font-bold text-black py-1 px-2 ">
+      <div className="w-full md:flex-1 text-center mb-2 md:mb-0 sm:ml-4 md:ml-0 sm:text-left md:text-left lg:text-center">
+        <h1 className="text-xl lg:mt-[0px] lg:ml-28 sm:ml-2 mt-[-40px] md:text-2xl sm:text-xl sm:ml-0 md:text-xl lg:text-3xl font-bold text-black py-1 px-2 ">
           Business Dashboard
         </h1>
       </div>

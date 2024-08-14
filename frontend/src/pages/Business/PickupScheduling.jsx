@@ -263,7 +263,7 @@ function PickupScheduling() {
                   <div className="text-center">
                     <button
                       type="submit"
-                      className="px-24 py-3 bg-black text-white rounded-lg shadow-md hover:bg-yellow-900 transition duration-300"
+                      className="px-24 py-3 bg-black text-white rounded-lg shadow-md hover:bg-yellow-900 transition duration-300 md:ml-2 mt-4 md:mt-0 sm:ml-0 sm:mt-0 sm:px-12 sm:py-2" 
                     >
                       Schedule Pickup
                     </button>
