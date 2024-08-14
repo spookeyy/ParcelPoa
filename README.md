@@ -70,24 +70,24 @@ License
  To set up the ParcelPoa system locally, follow these steps:
  Clone the repository:
 
- bash
+ ```bash
  git clone https://github.com/Spookey/ParcelPoa.git
-
+```
 Navigate to the project directory:
 
- bash
+ ```bash
  cd ParcelPoa
-
+```
 Install the required dependencies:
 
- bash
+ ```bash
  npm install
-
+```
 Start the server:
 
- bash
+ ```bash
  npm start
-
+```
 ### Usage
 
  Once the server is running, users can interact with the system through the provided commands based on their roles. Ensure that you have the necessary permissions to execute specific commands.
