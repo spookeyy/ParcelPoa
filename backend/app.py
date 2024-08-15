@@ -32,8 +32,8 @@ logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__, static_folder='static')
 CORS(app)
-# app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db?mode=rw'
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
+app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db?mode=rw'
+# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
 print(f"Connecting to database: {app.config['SQLALCHEMY_DATABASE_URI']}")
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -182,7 +182,7 @@ def profile():
     if user is None:
         return jsonify({"message": "User not found"}), 404
     
-    profile_picture_url = url_for('static', filename=f'uploads/{user.profile_picture}', _external=True) if user.profile_picture else None
+    profile_picture_url = url_for('static', filename=f'/uploads/{user.profile_picture}', _external=True) if user.profile_picture else None
     
     return jsonify({
         'user_id': user.user_id,
