@@ -14,7 +14,7 @@ export default function About() {
         <div className="p-8">
           <h2 className="text-2xl font-bold mb-4">Who We Are</h2>
           <p className="mb-6 text-gray-700">
-            ParcelPoa is a leading delivery service provider dedicated to connecting businesses and individuals through reliable and efficient delivery solutions. Founded in 2023, our mission is to make package delivery as easy and convenient as possible.
+            ParcelPoa is a leading delivery service provider dedicated to connecting businesses and individuals through reliable and efficient delivery solutions. Founded in 2024, our mission is to make package delivery as easy and convenient as possible.
           </p>
 
           <h2 className="text-2xl font-bold mb-4">Our Mission</h2>
@@ -26,7 +26,7 @@ export default function About() {
           <ul className="list-disc list-inside mb-6 text-gray-700">
             <li>Same-day delivery</li>
             <li>Express delivery services</li>
-            <li>International shipping</li>
+            {/* <li>International shipping</li> */}
             <li>Real-time tracking</li>
             <li>Secure packaging</li>
           </ul>
