@@ -10,8 +10,7 @@ export default function AgentProfile({ onClose }) {
     name: "",
     phoneNumber: "",
     userRole: "",
-    profilePicture:
-      "https://img.freepik.com/free-photo/young-black-woman-straw-hat-looking-away_23-2148183285.jpg?t=st=1722852363~exp=1722855963~hmac=9bf43b902f33f6a6b76a8d1e0cbb23fca6ff23ed323fcd8b76ae6c5ef8b97eab&w=740",
+    profilePicture: "",
   });
   const [message, setMessage] = useState("");
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
