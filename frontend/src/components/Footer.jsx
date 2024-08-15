@@ -7,7 +7,7 @@ export default function Footer() {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center text-center md:text-left mb-4">
           <nav className="mb-4 md:mb-0">
-            <ul className="flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0">
+            <ul className="flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0 sm:flex sm:space-x-2 sm:space-y-0 sm:items-center sm:justify-center">
               <li><Link to="/about" className="hover:text-gray-400 transition duration-300 text-sm">About Us</Link></li>
               <li><Link to="/contact-us" className="hover:text-gray-400 transition duration-300 text-sm">Contact Us</Link></li>
               <li><Link to="/privacy-policy" className="hover:text-gray-400 transition duration-300 text-sm">Privacy Policy</Link></li>
