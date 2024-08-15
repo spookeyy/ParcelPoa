@@ -182,7 +182,7 @@ def profile():
     if user is None:
         return jsonify({"message": "User not found"}), 404
     
-    profile_picture_url = url_for('static', filename=f'uploads/{user.profile_picture}', _external=True) if user.profile_picture else None
+    profile_picture_url = url_for('static', filename=f'/uploads/{user.profile_picture}', _external=True) if user.profile_picture else None
     
     return jsonify({
         'user_id': user.user_id,
