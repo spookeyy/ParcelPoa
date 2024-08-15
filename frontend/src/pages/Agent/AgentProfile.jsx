@@ -42,7 +42,10 @@ export default function AgentProfile({ onClose }) {
           phoneNumber: data.phone_number,
           userRole: data.user_role,
           profilePicture: data.profile_picture
-            ? `${data.profile_picture}?t=${new Date().getTime()}`
+            ? `${data.profile_picture.replace(
+                "/static/uploads/",
+                "/"
+              )}?t=${new Date().getTime()}`
             : profile.profilePicture,
         });
       } else {

@@ -173,7 +173,7 @@ def delete_user(user_id):
     return jsonify({"message": "User deleted successfully"})
 
 
-# TODO: whitney (profile picture update) GET request and PUT request.  there is another function down.  
+# get profile 
 @app.route('/profile', methods=['GET'])
 @jwt_required()
 def profile():
@@ -1179,7 +1179,7 @@ def send_email(to_email, reset_url):
 
     return True
 
-#is valid email # TODO: whitney
+
 import re
 
 def is_valid_email(email):
@@ -1201,7 +1201,7 @@ def save_base64_image(base64_string, filename):
     
     image_data = base64.b64decode(base64_string)
     
-    upload_dir = os.path.join(current_app.root_path, 'static', 'uploads') #TODO:: change this
+    upload_dir = os.path.join(current_app.root_path, 'static', 'uploads')
     if not os.path.exists(upload_dir):
         os.makedirs(upload_dir)
     
