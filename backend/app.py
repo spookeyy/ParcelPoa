@@ -4,7 +4,7 @@ import string
 from dotenv import dotenv_values, load_dotenv
 # from geopy.geocoders import Nominatim
 import smtplib
-from flask import Flask, request, jsonify,url_for
+from flask import Flask, redirect, request, jsonify,url_for
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
@@ -1031,12 +1031,12 @@ def generate_order_number():
             return order_number
 
 # def get_region_from_address(address):
-    geolocator = Nominatim(user_agent="my_user_agent")
-    location = geolocator.geocode(address)
-    if location:
-        return location.address
-    else:
-        return None
+#     geolocator = Nominatim(user_agent="my_user_agent")
+#     location = geolocator.geocode(address)
+#     if location:
+#         return location.address
+#     else:
+#         return None
 
 def get_region_from_address(address):
     if address is None:
@@ -1211,6 +1211,73 @@ def save_base64_image(base64_string, filename):
         f.write(image_data)
     
     return os.path.join('uploads', filename)
+
+
+# Africastalking SMS
+import africastalking
+from flask import request
+
+username = os.environ.get('AT_USERNAME')
+api_key = os.environ.get('AT_API_KEY')
+
+africastalking.initialize(username, api_key)
+
+sms = africastalking.SMS
+
+def send_sms(phone_number, message):
+    try:
+        # response = sms.send(message, to=[phone_number])
+        response = sms.send(message, [phone_number])
+        logging.info(f"SMS sent to {phone_number}: {response}")
+        return True
+    except Exception as e:
+        logging.error(f"Failed to send SMS to {phone_number}: {str(e)}")
+        return False
+
+send_sms("+254111803597", "Hello from parcelpoa!")
+
+
+# sendchamp SMS
+# from flask import request
+# import sendchamp
+
+# api_key = os.environ.get('SENDCHAMP_API_KEY')
+# sendchamp.api_key = api_key
+
+# def send_sms(phone_number, message, sender_name="YourSenderID"):
+#     try:
+#         response = sendchamp.SMS.send(
+#             to=[phone_number],
+#             message=message,
+#             sender_name=sender_name,
+#             route="dnd"
+#         )
+#         logging.info(f"SMS sent to {phone_number}: {response}")
+#         return True
+#     except Exception as e:
+#         logging.error(f"Failed to send SMS to {phone_number}: {str(e)}")
+#         return False
+
+# send_sms("+254111803597", "Hello from parcelpoa!", "YourSenderID")
+
+# Google oauth
+# from flask_dance.contrib.google import make_google_blueprint, google
+
+# blueprint = make_google_blueprint(
+#     client_id=os.environ.get("GOOGLE_CLIENT_ID"),
+#     client_secret=os.environ.get("GOOGLE_CLIENT_SECRET"),
+#     redirect_to="google-login"
+# )
+# app.register_blueprint(blueprint)
+
+# @app.route("/google-login")
+# def google_login():
+#     if not google.authorized:
+#         return redirect(url_for("google.login"))
+#     resp = google.get("/oauth2/v2/userinfo")
+#     assert resp.ok, resp.text
+#     return resp.text
+
 
 # FACEBOOK webhook
 # oauth = OAuth1(app)
