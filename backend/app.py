@@ -599,6 +599,7 @@ def track_parcel(tracking_number):
 
     response_data = {
         "parcel": {
+            "parcel_id": parcel.parcel_id,
             "tracking_number": parcel.tracking_number,
             "status": parcel.status,
             "current_location": parcel.current_location,
@@ -617,11 +618,11 @@ def track_parcel(tracking_number):
 
 
 # current parcel location
-@app.route('/parcels/<int:parcel_id>/locations', methods=['GET'])
-@jwt_required()
-def get_current_location(parcel_id):
-    parcel = Parcel.query.get_or_404(parcel_id)
-    return jsonify({"location": parcel.current_location})
+# @app.route('/parcels/<int:parcel_id>/locations', methods=['GET'])
+# @jwt_required()
+# def get_current_location(parcel_id):
+#     parcel = Parcel.query.get_or_404(parcel_id)
+#     return jsonify({"location": parcel.current_location})
 
 @app.route('/parcels/<int:parcel_id>/location', methods=['GET'])
 @jwt_required()
@@ -639,16 +640,22 @@ def receive_location():
     latitude = data.get('latitude')
     longitude = data.get('longitude')
 
-    parcel = Parcel.query.get_or_404(parcel_id)
+    if not parcel_id:
+        return jsonify({'error': 'Parcel ID is required'}), 400
+
+    parcel = Parcel.query.get(parcel_id)
+    if not parcel:
+        return jsonify({'error': 'Parcel not found'}), 404
+
     parcel.latitude = latitude
     parcel.longitude = longitude
     parcel.current_location = f"{latitude}, {longitude}"
 
     tracking_entry = Tracking(
         parcel_id=parcel_id,
-        timestamp=datetime.utcnow(),
-        latitude=latitude,
-        longitude=longitude
+        timestamp=datetime.now(),
+        location=parcel.current_location,
+        status=parcel.status
     )
     db.session.add(tracking_entry)
     db.session.commit()
@@ -657,7 +664,6 @@ def receive_location():
 
 @app.route('/location', methods=['GET'])
 def get_location():
-    # If you need to return the latest location for a specific parcel, you need to specify it in the request
     parcel_id = request.args.get('parcel_id')
     if not parcel_id:
         return jsonify({'error': 'Parcel ID is required'}), 400
@@ -670,6 +676,8 @@ def get_location():
         'latitude': parcel.latitude,
         'longitude': parcel.longitude
     })
+
+
 # BUSINESS ROUTES
 # Route to schedule a pickup
 from datetime import datetime, timezone

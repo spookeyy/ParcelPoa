@@ -30,20 +30,29 @@ export const TrackingProvider = ({ children }) => {
       },
       body: JSON.stringify({ frontend_url: frontendUrl }),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
       .then((data) => {
         if (data.message) {
           toast.error(data.message);
           setError(data.message);
+        } else if (data.parcel && data.parcel.parcel_id) {
+          setParcelData({ ...data.parcel, parcel_id: data.parcel.parcel_id });
+          setTrackingHistory(data.tracking_history || []);
         } else {
-          setParcelData(data.parcel);
-          setTrackingHistory(data.tracking_history);
+          throw new Error("Invalid data structure received from server");
         }
-        setLoading(false);
       })
       .catch((err) => {
-        toast.error("Failed to fetch tracking data");
+        console.error("Tracking error:", err);
+        toast.error("Failed to fetch tracking data: " + err.message);
         setError(err.message);
+      })
+      .finally(() => {
         setLoading(false);
       });
   }, []);
