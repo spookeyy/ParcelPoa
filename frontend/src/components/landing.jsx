@@ -3,7 +3,7 @@ import Navbar from "./Navbar";
 import { Link } from "react-router-dom";
 import { FloatingWhatsApp } from "react-floating-whatsapp";
 import FacebookMessengerChat from "./FacebookMessengerChat";
-import DeliveryGuy from "../assets/DeliveryGuy.png";
+import DeliverPersonel from "../assets/DeliverPersonel.png";
 
 export default function Landing() {
   return (
@@ -46,9 +46,9 @@ export default function Landing() {
               </div>
               <div className="mt-16 md:mt-0 w-full flex justify-center">
                 <img
-                  src={DeliveryGuy}
+                  src={DeliverPersonel}
                   alt="Delivery Person"
-                  className="h- w-auto max-w-full object-contain md:h-auto"
+                  className="h- w-auto max-w-full object-contain md:h-auto border border-gray-50 rounded-lg shadow-xl"
                 />
               </div>
             </div>

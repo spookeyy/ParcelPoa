@@ -251,7 +251,7 @@ function App() {
             style: {
               background: "rgb(51 65 85)",
               color: "#000",
-              borderRadius: "4px",
+              borderRadius: "8px",
               boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
               padding: "10px 20px",
             },

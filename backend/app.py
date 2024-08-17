@@ -4,7 +4,7 @@ import string
 from dotenv import dotenv_values, load_dotenv
 # from geopy.geocoders import Nominatim
 import smtplib
-from flask import Flask, request, jsonify,url_for
+from flask import Flask, redirect, request, jsonify,url_for
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
@@ -599,6 +599,7 @@ def track_parcel(tracking_number):
 
     response_data = {
         "parcel": {
+            "parcel_id": parcel.parcel_id,
             "tracking_number": parcel.tracking_number,
             "status": parcel.status,
             "current_location": parcel.current_location,
@@ -617,11 +618,11 @@ def track_parcel(tracking_number):
 
 
 # current parcel location
-@app.route('/parcels/<int:parcel_id>/locations', methods=['GET'])
-@jwt_required()
-def get_current_location(parcel_id):
-    parcel = Parcel.query.get_or_404(parcel_id)
-    return jsonify({"location": parcel.current_location})
+# @app.route('/parcels/<int:parcel_id>/locations', methods=['GET'])
+# @jwt_required()
+# def get_current_location(parcel_id):
+#     parcel = Parcel.query.get_or_404(parcel_id)
+#     return jsonify({"location": parcel.current_location})
 
 @app.route('/parcels/<int:parcel_id>/location', methods=['GET'])
 @jwt_required()
@@ -639,16 +640,22 @@ def receive_location():
     latitude = data.get('latitude')
     longitude = data.get('longitude')
 
-    parcel = Parcel.query.get_or_404(parcel_id)
+    if not parcel_id:
+        return jsonify({'error': 'Parcel ID is required'}), 400
+
+    parcel = Parcel.query.get(parcel_id)
+    if not parcel:
+        return jsonify({'error': 'Parcel not found'}), 404
+
     parcel.latitude = latitude
     parcel.longitude = longitude
     parcel.current_location = f"{latitude}, {longitude}"
 
     tracking_entry = Tracking(
         parcel_id=parcel_id,
-        timestamp=datetime.utcnow(),
-        latitude=latitude,
-        longitude=longitude
+        timestamp=datetime.now(),
+        location=parcel.current_location,
+        status=parcel.status
     )
     db.session.add(tracking_entry)
     db.session.commit()
@@ -657,7 +664,6 @@ def receive_location():
 
 @app.route('/location', methods=['GET'])
 def get_location():
-    # If you need to return the latest location for a specific parcel, you need to specify it in the request
     parcel_id = request.args.get('parcel_id')
     if not parcel_id:
         return jsonify({'error': 'Parcel ID is required'}), 400
@@ -670,6 +676,8 @@ def get_location():
         'latitude': parcel.latitude,
         'longitude': parcel.longitude
     })
+
+
 # BUSINESS ROUTES
 # Route to schedule a pickup
 from datetime import datetime, timezone
@@ -1077,12 +1085,12 @@ def generate_order_number():
             return order_number
 
 # def get_region_from_address(address):
-    geolocator = Nominatim(user_agent="my_user_agent")
-    location = geolocator.geocode(address)
-    if location:
-        return location.address
-    else:
-        return None
+#     geolocator = Nominatim(user_agent="my_user_agent")
+#     location = geolocator.geocode(address)
+#     if location:
+#         return location.address
+#     else:
+#         return None
 
 def get_region_from_address(address):
     if address is None:
@@ -1257,6 +1265,73 @@ def save_base64_image(base64_string, filename):
         f.write(image_data)
     
     return os.path.join('uploads', filename)
+
+
+# Africastalking SMS
+import africastalking
+from flask import request
+
+username = os.environ.get('AT_USERNAME')
+api_key = os.environ.get('AT_API_KEY')
+
+africastalking.initialize(username, api_key)
+
+sms = africastalking.SMS
+
+def send_sms(phone_number, message):
+    try:
+        # response = sms.send(message, to=[phone_number])
+        response = sms.send(message, [phone_number])
+        logging.info(f"SMS sent to {phone_number}: {response}")
+        return True
+    except Exception as e:
+        logging.error(f"Failed to send SMS to {phone_number}: {str(e)}")
+        return False
+
+send_sms("+254111803597", "Hello from parcelpoa!")
+
+
+# sendchamp SMS
+# from flask import request
+# import sendchamp
+
+# api_key = os.environ.get('SENDCHAMP_API_KEY')
+# sendchamp.api_key = api_key
+
+# def send_sms(phone_number, message, sender_name="YourSenderID"):
+#     try:
+#         response = sendchamp.SMS.send(
+#             to=[phone_number],
+#             message=message,
+#             sender_name=sender_name,
+#             route="dnd"
+#         )
+#         logging.info(f"SMS sent to {phone_number}: {response}")
+#         return True
+#     except Exception as e:
+#         logging.error(f"Failed to send SMS to {phone_number}: {str(e)}")
+#         return False
+
+# send_sms("+254111803597", "Hello from parcelpoa!", "YourSenderID")
+
+# Google oauth
+# from flask_dance.contrib.google import make_google_blueprint, google
+
+# blueprint = make_google_blueprint(
+#     client_id=os.environ.get("GOOGLE_CLIENT_ID"),
+#     client_secret=os.environ.get("GOOGLE_CLIENT_SECRET"),
+#     redirect_to="google-login"
+# )
+# app.register_blueprint(blueprint)
+
+# @app.route("/google-login")
+# def google_login():
+#     if not google.authorized:
+#         return redirect(url_for("google.login"))
+#     resp = google.get("/oauth2/v2/userinfo")
+#     assert resp.ok, resp.text
+#     return resp.text
+
 
 # FACEBOOK webhook
 # oauth = OAuth1(app)
