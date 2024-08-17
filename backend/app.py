@@ -32,8 +32,8 @@ logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__, static_folder='static')
 CORS(app)
-# app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db?mode=rw'
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
+app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db?mode=rw'
+# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
 print(f"Connecting to database: {app.config['SQLALCHEMY_DATABASE_URI']}")
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -617,13 +617,59 @@ def track_parcel(tracking_number):
 
 
 # current parcel location
-@app.route('/parcels/<int:parcel_id>/location', methods=['GET'])
+@app.route('/parcels/<int:parcel_id>/locations', methods=['GET'])
 @jwt_required()
 def get_current_location(parcel_id):
     parcel = Parcel.query.get_or_404(parcel_id)
     return jsonify({"location": parcel.current_location})
 
+@app.route('/parcels/<int:parcel_id>/location', methods=['GET'])
+@jwt_required()
+def get_current_location(parcel_id):
+    parcel = Parcel.query.get_or_404(parcel_id)
+    return jsonify({"location": {
+        "latitude": parcel.latitude,
+        "longitude": parcel.longitude
+    }})
 
+@app.route('/location', methods=['POST'])
+def receive_location():
+    data = request.get_json()
+    parcel_id = data.get('parcel_id')
+    latitude = data.get('latitude')
+    longitude = data.get('longitude')
+
+    parcel = Parcel.query.get_or_404(parcel_id)
+    parcel.latitude = latitude
+    parcel.longitude = longitude
+    parcel.current_location = f"{latitude}, {longitude}"
+
+    tracking_entry = Tracking(
+        parcel_id=parcel_id,
+        timestamp=datetime.utcnow(),
+        latitude=latitude,
+        longitude=longitude
+    )
+    db.session.add(tracking_entry)
+    db.session.commit()
+
+    return jsonify({'status': 'success'}), 200
+
+@app.route('/location', methods=['GET'])
+def get_location():
+    # If you need to return the latest location for a specific parcel, you need to specify it in the request
+    parcel_id = request.args.get('parcel_id')
+    if not parcel_id:
+        return jsonify({'error': 'Parcel ID is required'}), 400
+
+    parcel = Parcel.query.get(parcel_id)
+    if not parcel:
+        return jsonify({'error': 'Parcel not found'}), 404
+
+    return jsonify({
+        'latitude': parcel.latitude,
+        'longitude': parcel.longitude
+    })
 # BUSINESS ROUTES
 # Route to schedule a pickup
 from datetime import datetime, timezone
