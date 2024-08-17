@@ -83,6 +83,8 @@ function ProtectedRoute({ element }) {
 }
 
 function App() {
+
+  
   return (
     <Router>
       <UserProvider>
