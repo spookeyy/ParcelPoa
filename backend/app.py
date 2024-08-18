@@ -1340,7 +1340,7 @@ def send_sms(phone_number, message, sender_name="YourSenderID"):
         logging.error(f"Failed to send SMS to {phone_number}: {str(e)}")
         return False
 
-send_sms("+254755854832", "Hello from parcelpoa!", "YourSenderID")
+# send_sms("+254755854832", "Hello from parcelpoa!", "YourSenderID")
 
 # Google oauth
 # from flask_dance.contrib.google import make_google_blueprint, google
