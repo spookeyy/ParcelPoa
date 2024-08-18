@@ -386,3 +386,27 @@ export const TrackingProvider = ({ children }) => {
     </TrackingContext.Provider>
   );
 };
+
+
+
+
+Map Marker
+{/* {parcelData.latitude && parcelData.longitude && (
+              <div>
+                <h4 className="text-md font-semibold mb-2">Current Location</h4>
+                <p className="mb-3 text-sm">{parcelData.current_location}</p>
+                <MapContainer
+                  center={[parcelData.latitude, parcelData.longitude]}
+                  zoom={13}
+                  style={{ height: "300px", width: "100%" }}
+                >
+                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                  <Marker
+                    position={[parcelData.latitude, parcelData.longitude]}
+                  >
+                    <Popup>Current parcel location</Popup>
+                  </Marker>
+                  
+                </MapContainer>
+              </div>
+            )} */}
