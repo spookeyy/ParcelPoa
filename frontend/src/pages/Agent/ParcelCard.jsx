@@ -51,7 +51,7 @@ export default function ParcelCard({ parcel }) {
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-2 sm:mt-4 space-y-2 sm:space-y-0 sm:space-x-2">
         <div
-          className={`${statusColor} text-white px-2 sm:px-4 py-1 sm:py-2 rounded-lg font-semibold text-xs sm:text-sm`}
+          className={`${statusColor} text-white px-2 sm:px-4 py-1 sm:py-2 rounded-3xl font-semibold text-xs sm:text-sm`}
         >
           {parcel.status}
         </div>
