@@ -593,9 +593,14 @@ def track_parcel(tracking_number):
         return jsonify({"message": "Parcel not found"}), 404
     
     tracking_info = Tracking.query.filter_by(parcel_id=parcel.parcel_id).order_by(Tracking.timestamp.desc()).all()
-    print(f"tracking_info: {tracking_info}")
+    
+    # Group tracking entries by status
+    grouped_tracking = {}
+    for track in tracking_info:
+        if track.status not in grouped_tracking:
+            grouped_tracking[track.status] = track.to_dict()
 
-    tracking_data = [track.to_dict() for track in tracking_info]
+    tracking_data = list(grouped_tracking.values())
 
     response_data = {
         "parcel": {
@@ -613,7 +618,6 @@ def track_parcel(tracking_number):
         "tracking_history": tracking_data
     }
 
-    print(f"response_data: {response_data}")
     return jsonify(response_data)
 
 
@@ -624,14 +628,14 @@ def track_parcel(tracking_number):
 #     parcel = Parcel.query.get_or_404(parcel_id)
 #     return jsonify({"location": parcel.current_location})
 
-@app.route('/parcels/<int:parcel_id>/location', methods=['GET'])
-@jwt_required()
-def get_current_location(parcel_id):
-    parcel = Parcel.query.get_or_404(parcel_id)
-    return jsonify({"location": {
-        "latitude": parcel.latitude,
-        "longitude": parcel.longitude
-    }})
+# @app.route('/parcels/<int:parcel_id>/location', methods=['GET'])
+# @jwt_required()
+# def get_current_location(parcel_id):
+#     parcel = Parcel.query.get_or_404(parcel_id)
+#     return jsonify({"location": {
+#         "latitude": parcel.latitude,
+#         "longitude": parcel.longitude
+#     }})
 
 @app.route('/location', methods=['POST'])
 def receive_location():
@@ -639,6 +643,7 @@ def receive_location():
     parcel_id = data.get('parcel_id')
     latitude = data.get('latitude')
     longitude = data.get('longitude')
+    current_location = data.get('locationName')
 
     if not parcel_id:
         return jsonify({'error': 'Parcel ID is required'}), 400
@@ -649,18 +654,24 @@ def receive_location():
 
     parcel.latitude = latitude
     parcel.longitude = longitude
-    parcel.current_location = f"{latitude}, {longitude}"
-
-    tracking_entry = Tracking(
-        parcel_id=parcel_id,
-        timestamp=datetime.now(),
-        location=parcel.current_location,
-        status=parcel.status
-    )
-    db.session.add(tracking_entry)
+    parcel.current_location = current_location
+    parcel.updated_at = datetime.now()
     db.session.commit()
 
+    # Check if the status has changed before creating a new tracking entry
+    last_tracking = Tracking.query.filter_by(parcel_id=parcel_id).order_by(Tracking.timestamp.desc()).first()
+    if not last_tracking or last_tracking.status != parcel.status:
+        tracking_entry = Tracking(
+            parcel_id=parcel_id,
+            timestamp=datetime.now(),
+            location=parcel.current_location,
+            status=parcel.status
+        )
+        db.session.add(tracking_entry)
+
+    db.session.commit()
     return jsonify({'status': 'success'}), 200
+
 
 @app.route('/location', methods=['GET'])
 def get_location():
@@ -677,6 +688,23 @@ def get_location():
         'longitude': parcel.longitude
     })
 
+
+# delete tracking entries in range using parcel id
+@app.route('/delete_tracking_entries', methods=['POST'])
+def delete_tracking_entries():
+    data = request.get_json()
+    parcel_id = data.get('parcel_id')
+    if not parcel_id:
+        return jsonify({'error': 'Parcel ID is required'}), 400
+
+    parcel = Parcel.query.get(parcel_id)
+    if not parcel:
+        return jsonify({'error': 'Parcel not found'}), 404
+
+    Tracking.query.filter_by(parcel_id=parcel_id).delete()
+    db.session.commit()
+
+    return jsonify({'message': 'Tracking entries deleted successfully'}), 200  
 
 # BUSINESS ROUTES
 # Route to schedule a pickup
@@ -1288,7 +1316,7 @@ def send_sms(phone_number, message):
         logging.error(f"Failed to send SMS to {phone_number}: {str(e)}")
         return False
 
-send_sms("+254111803597", "Hello from parcelpoa!")
+send_sms("+254788054500", "Hello from parcelpoa!")
 
 
 # sendchamp SMS
