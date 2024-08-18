@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import GPS from "../../components/GPS";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   faSearch,
@@ -14,7 +15,7 @@ import {
   faMapMarkerAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { useTracking } from "../../Context/TrackingContext";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+// import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 
 library.add(
   faSearch,
@@ -85,6 +86,7 @@ const OrderTracking = () => {
   return (
     <>
       <Navbar />
+      {/* <GPS /> */}
       <div className="order-tracking p-4 sm:p-6 bg-gradient-to-r from-yellow-50 to-yellow-200 shadow-lg rounded-lg max-w-3xl mx-auto mt-8 min-h-screen">
         <h2 className="text-3xl font-bold text-center mb-4 text-yellow-900 flex items-center justify-center">
           <FontAwesomeIcon
@@ -181,7 +183,7 @@ const OrderTracking = () => {
                 </li>
               ))}
             </ul>
-            {parcelData.latitude && parcelData.longitude && (
+            {/* {parcelData.latitude && parcelData.longitude && (
               <div>
                 <h4 className="text-md font-semibold mb-2">Current Location</h4>
                 <p className="mb-3 text-sm">{parcelData.current_location}</p>
@@ -196,7 +198,15 @@ const OrderTracking = () => {
                   >
                     <Popup>Current parcel location</Popup>
                   </Marker>
+                  
                 </MapContainer>
+              </div>
+            )} */}
+            {parcelData && (
+              <div>
+                <h4 className="text-md font-semibold mb-2">Current Location</h4>
+                <p className="mb-3 text-sm">{parcelData.current_location}</p>
+                <GPS parcel_id={parcelData.parcel_id} />
               </div>
             )}
           </div>
@@ -205,5 +215,4 @@ const OrderTracking = () => {
     </>
   );
 };
-
 export default OrderTracking;

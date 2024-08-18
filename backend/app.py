@@ -4,7 +4,7 @@ import string
 from dotenv import dotenv_values, load_dotenv
 # from geopy.geocoders import Nominatim
 import smtplib
-from flask import Flask, request, jsonify,url_for
+from flask import Flask, redirect, request, jsonify,url_for
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
@@ -32,8 +32,8 @@ logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__, static_folder='static')
 CORS(app)
-# app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db?mode=rw'
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
+app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db?mode=rw'
+# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
 print(f"Connecting to database: {app.config['SQLALCHEMY_DATABASE_URI']}")
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -593,12 +593,18 @@ def track_parcel(tracking_number):
         return jsonify({"message": "Parcel not found"}), 404
     
     tracking_info = Tracking.query.filter_by(parcel_id=parcel.parcel_id).order_by(Tracking.timestamp.desc()).all()
-    print(f"tracking_info: {tracking_info}")
+    
+    # Group tracking entries by status
+    grouped_tracking = {}
+    for track in tracking_info:
+        if track.status not in grouped_tracking:
+            grouped_tracking[track.status] = track.to_dict()
 
-    tracking_data = [track.to_dict() for track in tracking_info]
+    tracking_data = list(grouped_tracking.values())
 
     response_data = {
         "parcel": {
+            "parcel_id": parcel.parcel_id,
             "tracking_number": parcel.tracking_number,
             "status": parcel.status,
             "current_location": parcel.current_location,
@@ -612,17 +618,93 @@ def track_parcel(tracking_number):
         "tracking_history": tracking_data
     }
 
-    print(f"response_data: {response_data}")
     return jsonify(response_data)
 
 
 # current parcel location
-@app.route('/parcels/<int:parcel_id>/location', methods=['GET'])
-@jwt_required()
-def get_current_location(parcel_id):
-    parcel = Parcel.query.get_or_404(parcel_id)
-    return jsonify({"location": parcel.current_location})
+# @app.route('/parcels/<int:parcel_id>/locations', methods=['GET'])
+# @jwt_required()
+# def get_current_location(parcel_id):
+#     parcel = Parcel.query.get_or_404(parcel_id)
+#     return jsonify({"location": parcel.current_location})
 
+# @app.route('/parcels/<int:parcel_id>/location', methods=['GET'])
+# @jwt_required()
+# def get_current_location(parcel_id):
+#     parcel = Parcel.query.get_or_404(parcel_id)
+#     return jsonify({"location": {
+#         "latitude": parcel.latitude,
+#         "longitude": parcel.longitude
+#     }})
+
+@app.route('/location', methods=['POST'])
+def receive_location():
+    data = request.get_json()
+    parcel_id = data.get('parcel_id')
+    latitude = data.get('latitude')
+    longitude = data.get('longitude')
+    current_location = data.get('locationName')
+
+    if not parcel_id:
+        return jsonify({'error': 'Parcel ID is required'}), 400
+
+    parcel = Parcel.query.get(parcel_id)
+    if not parcel:
+        return jsonify({'error': 'Parcel not found'}), 404
+
+    parcel.latitude = latitude
+    parcel.longitude = longitude
+    parcel.current_location = current_location
+    parcel.updated_at = datetime.now()
+    db.session.commit()
+
+    # Check if the status has changed before creating a new tracking entry
+    last_tracking = Tracking.query.filter_by(parcel_id=parcel_id).order_by(Tracking.timestamp.desc()).first()
+    if not last_tracking or last_tracking.status != parcel.status:
+        tracking_entry = Tracking(
+            parcel_id=parcel_id,
+            timestamp=datetime.now(),
+            location=parcel.current_location,
+            status=parcel.status
+        )
+        db.session.add(tracking_entry)
+
+    db.session.commit()
+    return jsonify({'status': 'success'}), 200
+
+
+@app.route('/location', methods=['GET'])
+def get_location():
+    parcel_id = request.args.get('parcel_id')
+    if not parcel_id:
+        return jsonify({'error': 'Parcel ID is required'}), 400
+
+    parcel = Parcel.query.get(parcel_id)
+    if not parcel:
+        return jsonify({'error': 'Parcel not found'}), 404
+
+    return jsonify({
+        'latitude': parcel.latitude,
+        'longitude': parcel.longitude
+    })
+
+
+# delete tracking entries in range using parcel id
+@app.route('/delete_tracking_entries', methods=['POST'])
+def delete_tracking_entries():
+    data = request.get_json()
+    parcel_id = data.get('parcel_id')
+    if not parcel_id:
+        return jsonify({'error': 'Parcel ID is required'}), 400
+
+    parcel = Parcel.query.get(parcel_id)
+    if not parcel:
+        return jsonify({'error': 'Parcel not found'}), 404
+
+    Tracking.query.filter_by(parcel_id=parcel_id).delete()
+    db.session.commit()
+
+    return jsonify({'message': 'Tracking entries deleted successfully'}), 200  
 
 # BUSINESS ROUTES
 # Route to schedule a pickup
@@ -1031,12 +1113,12 @@ def generate_order_number():
             return order_number
 
 # def get_region_from_address(address):
-    geolocator = Nominatim(user_agent="my_user_agent")
-    location = geolocator.geocode(address)
-    if location:
-        return location.address
-    else:
-        return None
+#     geolocator = Nominatim(user_agent="my_user_agent")
+#     location = geolocator.geocode(address)
+#     if location:
+#         return location.address
+#     else:
+#         return None
 
 def get_region_from_address(address):
     if address is None:
@@ -1211,6 +1293,73 @@ def save_base64_image(base64_string, filename):
         f.write(image_data)
     
     return os.path.join('uploads', filename)
+
+
+# Africastalking SMS
+import africastalking
+from flask import request
+
+username = os.environ.get('AT_USERNAME')
+api_key = os.environ.get('AT_API_KEY')
+
+africastalking.initialize(username, api_key)
+
+sms = africastalking.SMS
+
+def send_sms(phone_number, message):
+    try:
+        # response = sms.send(message, to=[phone_number])
+        response = sms.send(message, [phone_number])
+        logging.info(f"SMS sent to {phone_number}: {response}")
+        return True
+    except Exception as e:
+        logging.error(f"Failed to send SMS to {phone_number}: {str(e)}")
+        return False
+
+send_sms("+254788054500", "Hello from parcelpoa!")
+
+
+# sendchamp SMS
+# from flask import request
+# import sendchamp
+
+# api_key = os.environ.get('SENDCHAMP_API_KEY')
+# sendchamp.api_key = api_key
+
+# def send_sms(phone_number, message, sender_name="YourSenderID"):
+#     try:
+#         response = sendchamp.SMS.send(
+#             to=[phone_number],
+#             message=message,
+#             sender_name=sender_name,
+#             route="dnd"
+#         )
+#         logging.info(f"SMS sent to {phone_number}: {response}")
+#         return True
+#     except Exception as e:
+#         logging.error(f"Failed to send SMS to {phone_number}: {str(e)}")
+#         return False
+
+# send_sms("+254111803597", "Hello from parcelpoa!", "YourSenderID")
+
+# Google oauth
+# from flask_dance.contrib.google import make_google_blueprint, google
+
+# blueprint = make_google_blueprint(
+#     client_id=os.environ.get("GOOGLE_CLIENT_ID"),
+#     client_secret=os.environ.get("GOOGLE_CLIENT_SECRET"),
+#     redirect_to="google-login"
+# )
+# app.register_blueprint(blueprint)
+
+# @app.route("/google-login")
+# def google_login():
+#     if not google.authorized:
+#         return redirect(url_for("google.login"))
+#     resp = google.get("/oauth2/v2/userinfo")
+#     assert resp.ok, resp.text
+#     return resp.text
+
 
 # FACEBOOK webhook
 # oauth = OAuth1(app)
