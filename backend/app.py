@@ -1316,31 +1316,31 @@ def send_sms(phone_number, message):
         logging.error(f"Failed to send SMS to {phone_number}: {str(e)}")
         return False
 
-send_sms("+254755854832", "Hello from parcelpoa!")
+# send_sms("+254755854832", "Hello from parcelpoa!")
 
 
 # sendchamp SMS
-from flask import request
-import sendchamp
+# from flask import request
+# import sendchamp
 
-api_key = os.environ.get('SENDCHAMP_API_KEY')
-sendchamp.api_key = api_key
+# api_key = os.environ.get('SENDCHAMP_API_KEY')
+# sendchamp.api_key = api_key
 
-def send_sms(phone_number, message, sender_name="YourSenderID"):
-    try:
-        response = sendchamp.SMS.send(
-            to=[phone_number],
-            message=message,
-            sender_name=sender_name,
-            route="dnd"
-        )
-        logging.info(f"SMS sent to {phone_number}: {response}")
-        return True
-    except Exception as e:
-        logging.error(f"Failed to send SMS to {phone_number}: {str(e)}")
-        return False
+# def send_sms(phone_number, message, sender_name="YourSenderID"):
+#     try:
+#         response = sendchamp.SMS.send(
+#             to=[phone_number],
+#             message=message,
+#             sender_name=sender_name,
+#             route="dnd"
+#         )
+#         logging.info(f"SMS sent to {phone_number}: {response}")
+#         return True
+#     except Exception as e:
+#         logging.error(f"Failed to send SMS to {phone_number}: {str(e)}")
+#         return False
 
-# send_sms("+254755854832", "Hello from parcelpoa!", "YourSenderID")
+# # send_sms("+254755854832", "Hello from parcelpoa!", "YourSenderID")
 
 # Google oauth
 # from flask_dance.contrib.google import make_google_blueprint, google
