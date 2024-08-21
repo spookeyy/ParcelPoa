@@ -31,7 +31,8 @@ library.add(
 const OrderTracking = () => {
   const { trackingNumber } = useParams();
   const location = useLocation();
-  const { parcelData, trackingHistory, fetchTrackingData, loading, error } = useTracking();
+  const { parcelData, trackingHistory, fetchTrackingData, loading, error } =
+    useTracking();
   const [localTrackingNumber, setLocalTrackingNumber] = useState(
     trackingNumber || ""
   );
@@ -201,12 +202,17 @@ const OrderTracking = () => {
                 </MapContainer>
               </div>
             )} */}
-            {parcelData && <GPS parcel_id={parcelData.parcel_id} />}
+            {parcelData && (
+              <div>
+                <h4 className="text-md font-semibold mb-2">Current Location</h4>
+                <p className="mb-3 text-sm">{parcelData.current_location}</p>
+                <GPS parcel_id={parcelData.parcel_id} />
+              </div>
+            )}
           </div>
         )}
       </div>
     </>
   );
 };
-
 export default OrderTracking;
