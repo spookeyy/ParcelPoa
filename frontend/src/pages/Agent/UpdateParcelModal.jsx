@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
 import { server } from "../../../config.json";
@@ -7,10 +7,58 @@ import { UserContext } from "../../Context/UserContext";
 function UpdateParcelModal({ parcel_id, onClose }) {
   const [status, setStatus] = useState("");
   const [location, setLocation] = useState("");
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
+  const [locationName, setLocationName] = useState("");
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const { authToken } = useContext(UserContext);
+
+  const getLocationName = async (lat, lon) => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+      );
+      const data = await response.json();
+      return data.display_name;
+    } catch (error) {
+      console.error("Error fetching location name:", error);
+      return "Unable to fetch location name";
+    }
+  };
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      setIsLoadingLocation(true);
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          setLatitude(latitude);
+          setLongitude(longitude);
+          const name = await getLocationName(latitude, longitude);
+          setLocationName(name);
+          setLocation(name); // Automatically set the input field
+          setIsLoadingLocation(false);
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          toast.error("Failed to get current location. Please enter manually.");
+          setIsLoadingLocation(false);
+        }
+      );
+    } else {
+      toast.warn("Geolocation is not supported by this browser.");
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!latitude || !longitude) {
+      toast.error(
+        "Location data is missing. Please try again or enter location manually."
+      );
+      return;
+    }
 
     try {
       const response = await fetch(`${server}/update_status/${parcel_id}`, {
@@ -22,17 +70,18 @@ function UpdateParcelModal({ parcel_id, onClose }) {
         body: JSON.stringify({
           status,
           location,
+          latitude,
+          longitude,
         }),
       });
 
       if (response.ok) {
-        // Check the status of the parcel
         if (status === "Delivered") {
           toast.success("Parcel delivered. No need to update status.");
           onClose();
           return;
         }
-        toast.success("Parcel status updated successfully!");
+        toast.success("Parcel status and location updated successfully!");
         onClose();
       } else {
         const data = await response.json();
@@ -71,10 +120,24 @@ function UpdateParcelModal({ parcel_id, onClose }) {
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded mt-1"
-              placeholder="Enter current location"
+              placeholder={
+                isLoadingLocation
+                  ? "Getting current location..."
+                  : "Enter current location"
+              }
               required
             />
           </div>
+          {isLoadingLocation && (
+            <p className="text-sm text-gray-600 mb-4">
+              Getting current location...
+            </p>
+          )}
+          {locationName && (
+            <p className="text-sm text-gray-600 mb-4">
+              Current location: {locationName}
+            </p>
+          )}
           <div className="flex justify-end">
             <button
               type="button"
@@ -86,6 +149,7 @@ function UpdateParcelModal({ parcel_id, onClose }) {
             <button
               type="submit"
               className="bg-yellow-500 hover:bg-yellow-700 text-white py-2 px-4 rounded"
+              disabled={isLoadingLocation}
             >
               Update
             </button>
