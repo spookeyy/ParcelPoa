@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, Float, Integer, String, Enum, ForeignKey, Text, DECIMAL, TIMESTAMP
+from sqlalchemy import Boolean, Column, Float, Integer, String, Enum, ForeignKey, Text, DECIMAL, TIMESTAMP
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash,check_password_hash
 from flask_bcrypt import generate_password_hash, check_password_hash
@@ -14,7 +14,7 @@ class User(db.Model):
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     phone_number = Column(String, unique=True, nullable=False)
-    user_role = Column(Enum('Business','Agent','Admin', name='user_roles'), nullable=False)
+    user_role = Column(Enum('Business','Agent','Admin','PickupStation', name='user_roles'), nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     password_hash = Column(String(128), nullable=False)
@@ -23,6 +23,7 @@ class User(db.Model):
     Request = Column(Enum('Approved', 'Pending', 'Rejected', name='approval_statuses'), default='Pending', nullable=True)
     primary_region = Column(String(100), nullable=True)
     operation_areas = Column(String(500), nullable=True)
+    is_open = Column(Boolean, default=True, nullable=False)
     # region = Column(String(100), nullable=True)
 
     parcels = relationship('Parcel', back_populates='sender', foreign_keys='Parcel.sender_id')
@@ -49,7 +50,8 @@ class User(db.Model):
             'status': self.status,
             'Request': self.Request,
             'primary_region': self.primary_region,
-            'operation_areas': self.operation_areas.split(',') if self.operation_areas else []
+            'operation_areas': self.operation_areas.split(',') if self.operation_areas else [],
+            'is_open': self.is_open if self.user_role == 'PickupStation' else None,
             # 'region': self.region
         }
     
