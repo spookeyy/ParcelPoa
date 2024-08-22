@@ -385,17 +385,17 @@ function OrderManagement() {
                     <h3 className="text-lg font-semibold text-gray-800 mb-2">
                       Location Information
                     </h3>
-                    {/* <p>
+                    <p>
                       <strong>Current Location:</strong>{" "}
                       {selectedOrder.parcel.current_location}
-                    </p> */}
-                    <p>
+                    </p>
+                    {/* <p>
                       <strong>Latitude:</strong> {selectedOrder.parcel.latitude}
                     </p>
                     <p>
                       <strong>Longitude:</strong>{" "}
                       {selectedOrder.parcel.longitude}
-                    </p>
+                    </p> */}
                   </div>
                 </div>
               </div>

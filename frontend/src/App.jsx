@@ -42,6 +42,7 @@ import OrderManagement from "./pages/Business/OrderManagement";
 import ParcelForm from "./pages/Business/ParcelForm";
 import ParcelTracking from "./pages/Business/ParcelTracking";
 import PickupScheduling from "./pages/Business/PickupScheduling";
+import PickupStationDashboard from "./pages/Business/PickupStationDashboard";
 
 // Buyer Pages
 import OrderTracking from "./pages/Buyer/OrderTracking";
@@ -218,6 +219,10 @@ function App() {
                   path="/business/schedule-pickup"
                   element={<ProtectedRoute element={<PickupScheduling />} />}
                 />
+                <Route 
+                path="/pickup-station/dashboard"
+                element={<ProtectedRoute element={<PickupStationDashboard />} />}
+              />
 
                 {/* Admin Routes */}
                 <Route
