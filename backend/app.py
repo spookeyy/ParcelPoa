@@ -1,9 +1,7 @@
 import os
 import random
 import string
-from dotenv import dotenv_values, load_dotenv
-# from geopy.geocoders import Nominatim
-import smtplib
+from dotenv import load_dotenv
 from flask import Flask, redirect, request, jsonify,url_for
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
@@ -94,12 +92,12 @@ def register():
         email=data.get('email'),
         phone_number=data.get('phone_number'),
         user_role=data.get('user_role'),
-        # region=data.get('region'), 
         created_at=datetime.now(),
         updated_at=datetime.now(),
         password_hash=hashed_password,
         primary_region=data.get('primary_region'),
         operation_areas=','.join(data.get('operation_areas', [])),
+        is_open=True if data.get('user_role') == 'PickupStation' else None,
     )
     db.session.add(new_user)
     db.session.commit()
@@ -107,6 +105,8 @@ def register():
         return jsonify({"message": "Business registered successfully"}), 201
     elif data['user_role'] == 'Agent':
         return jsonify({"message": "Agent registered successfully"}), 201
+    elif data['user_role'] == 'PickupStation':
+        return jsonify({"message": "PickupStation registered successfully"}), 201
     
     return jsonify({"message": "User registered successfully"}), 201
 
@@ -259,6 +259,27 @@ def update_status():
     
     db.session.commit()
     return jsonify({"message": "Status updated successfully", "status": new_status})
+
+@app.route('/update-pickup-station-status', methods=['PUT'])
+@jwt_required()
+def update_pickup_station_status():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    
+    if user.user_role != 'PickupStation':
+        return jsonify({"message": "Only Pickup Stations can update their status"}), 403
+    
+    data = request.get_json()
+    new_status = data.get('is_open')
+    
+    if new_status is None:
+        return jsonify({"message": "Status is required"}), 400
+    
+    user.is_open = new_status
+    user.updated_at = datetime.now()
+    
+    db.session.commit()
+    return jsonify({"message": "Status updated successfully", "is_open": new_status})
 
 # change password
 @app.route('/change_password', methods=['PUT'])
