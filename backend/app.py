@@ -32,8 +32,8 @@ logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__, static_folder='static')
 CORS(app)
-# app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db?mode=rw'
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
+app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db?mode=rw'
+# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
 print(f"Connecting to database: {app.config['SQLALCHEMY_DATABASE_URI']}")
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -124,8 +124,9 @@ def login():
                 "role": user.user_role
             }
         }), 200
+    # check password
     elif user and not bcrypt.check_password_hash(user.password_hash, data['password']):
-        return jsonify({"message": "Invalid credentials"}), 401
+        return jsonify({"message": "Invalid email or password"}), 401
     else:
         return jsonify({"message": "User not found"}), 401
 
@@ -446,15 +447,11 @@ def delete_parcel(parcel_id):
 @app.route('/update_status/<int:parcel_id>', methods=['PUT'])
 @jwt_required()
 def update_parcel_status(parcel_id):
-    logging.debug(f"Updating status for parcel ID: {parcel_id}")
-    logging.debug(f"Received data: {request.get_json()}")
     current_user = User.query.get(get_jwt_identity())
     if current_user.user_role != 'Agent':
         return jsonify({"message": "Only agents can update parcel status"}), 403
     
-    # Find the parcel based on the parcel_id
     parcel = Parcel.query.get(parcel_id)
-    logging.debug(f"Queried parcel: {parcel}")
     if not parcel:
         return jsonify({"message": "Parcel not found"}), 404
     
@@ -468,9 +465,14 @@ def update_parcel_status(parcel_id):
     parcel.status = data['status']
     parcel.updated_at = datetime.now()
     
+    # Update location
+    parcel.latitude = data.get('latitude')
+    parcel.longitude = data.get('longitude')
+    parcel.current_location = data.get('location')
+
     new_tracking = Tracking(
         parcel_id=parcel.parcel_id,
-        location=data['location'],
+        location=parcel.current_location,
         status=parcel.status,
         timestamp=datetime.now()
     )
@@ -482,7 +484,7 @@ def update_parcel_status(parcel_id):
         send_notification(parcel.sender.email, 'Parcel Status Update', f'Your parcel with tracking number {parcel.tracking_number} is now {parcel.status}.')
         send_notification(parcel.recipient_email, 'Parcel Status Update', f'The parcel with tracking number {parcel.tracking_number} is now {parcel.status}. \n visit https://parcelpoa.netlify.app/track/{parcel.tracking_number} to track your parcel.')
 
-    return jsonify({"message": "Parcel status updated successfully"}), 200
+    return jsonify({"message": "Parcel status and location updated successfully"}), 200
 
 # agent associated parcels:
 @app.route('/agent_parcels', methods=['GET'])
