@@ -246,7 +246,7 @@ function Create_Account() {
                       } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm ${
                         passwordError ? "text-red-500" : ""
                       }`}
-                      placeholder="password"
+                      placeholder="at least 8 characters with"
                       required
                     />
                     <button
