@@ -77,9 +77,13 @@ function Create_Account() {
       password,
       user_role,
       primary_region: primaryRegion,
-      operation_areas: user_role === "Agent" ? operationAreas : [],
+      operation_areas:
+        user_role === "Agent"
+          ? operationAreas
+          : user_role === "PickupStation"
+          ? [operationAreas[0]]
+          : [],
     };
-
     addUser(userData)
       .then(() => {
         // Clear form fields
@@ -316,71 +320,108 @@ function Create_Account() {
                     )}
                   </div>
 
-                <div>
-                  <label htmlFor="user_role" className="block text-sm font-medium text-gray-700 mb-1">
-                    Account Type
-                  </label>
-                  <select
-                    id="user_role"
-                    value={user_role}
-                    onChange={(e) => setUserRole(e.target.value)}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm"
+                  <div>
+                    <label
+                      htmlFor="user_role"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Account Type
+                    </label>
+                    <select
+                      id="user_role"
+                      value={user_role}
+                      onChange={(e) => setUserRole(e.target.value)}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm"
+                    >
+                      <option value="" disabled>
+                        Select an option
+                      </option>
+                      <option value="Agent">Agent</option>
+                      <option value="Business">Business</option>
+                      <option value="PickupStation">Pickup Station</option>
+                    </select>
+                  </div>
+
+                  {user_role && (
+                    <div>
+                      <label
+                        htmlFor="primary_region"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Primary Region
+                      </label>
+                      <select
+                        id="primary_region"
+                        value={primaryRegion}
+                        onChange={(e) => setPrimaryRegion(e.target.value)}
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm"
+                      >
+                        <option value="" disabled>
+                          Select a region
+                        </option>
+                        {Object.keys(availableRegions).map((region, index) => (
+                          <option key={index} value={region}>
+                            {region}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {(user_role === "Agent" || user_role === "PickupStation") &&
+                    primaryRegion && (
+                      <div>
+                        <label
+                          htmlFor="operation_areas"
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                          {user_role === "Agent"
+                            ? "Operational Areas"
+                            : "Choose Your Location"}
+                        </label>
+                        <select
+                          id="operation_areas"
+                          multiple={user_role === "Agent"}
+                          value={operationAreas}
+                          onChange={(e) =>
+                            setOperationAreas(
+                              user_role === "Agent"
+                                ? Array.from(
+                                    e.target.selectedOptions,
+                                    (option) => option.value
+                                  )
+                                : [e.target.value]
+                            )
+                          }
+                          required
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm"
+                        >
+                          {availableRegions[primaryRegion] &&
+                            availableRegions[primaryRegion].map(
+                              (area, index) => (
+                                <option key={index} value={area}>
+                                  {area}
+                                </option>
+                              )
+                            )}
+                        </select>
+                        {user_role === "Agent" && (
+                          <p className="mt-1 text-xs text-gray-500">
+                            Hold Ctrl (Cmd on Mac) to select multiple areas
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                  <button
+                    type="submit"
+                    className="w-full py-2 px-4 bg-black hover:bg-yellow-800 text-white font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition duration-150 ease-in-out"
                   >
-                    <option value="" disabled>Select an option</option>
-                    <option value="Agent">Agent</option>
-                    <option value="Business">Business</option>
-                  </select>
+                    Create Account
+                  </button>
                 </div>
-
-                {user_role && (
-                  <div>
-                    <label htmlFor="primary_region" className="block text-sm font-medium text-gray-700 mb-1">
-                      Primary Region
-                    </label>
-                    <select
-                      id="primary_region"
-                      value={primaryRegion}
-                      onChange={(e) => setPrimaryRegion(e.target.value)}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm"
-                    >
-                      <option value="" disabled>Select a region</option>
-                      {Object.keys(availableRegions).map((region, index) => (
-                        <option key={index} value={region}>{region}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
-                {user_role === 'Agent' && primaryRegion && (
-                  <div>
-                    <label htmlFor="operation_areas" className="block text-sm font-medium text-gray-700 mb-1">
-                      Operational Areas
-                    </label>
-                    <select
-                      id="operation_areas"
-                      multiple
-                      value={operationAreas}
-                      onChange={(e) => setOperationAreas(Array.from(e.target.selectedOptions, option => option.value))}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm"
-                    >
-                      {availableRegions[primaryRegion] && availableRegions[primaryRegion].map((area, index) => (
-                        <option key={index} value={area}>{area}</option>
-                      ))}
-                    </select>
-                    <p className="mt-1 text-xs text-gray-500">Hold Ctrl (Cmd on Mac) to select multiple areas</p>
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  className="w-full py-2 px-4 bg-black hover:bg-yellow-800 text-white font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition duration-150 ease-in-out"
-                >
-                  Create Account
-                </button>
-              </div>
               </form>
             </div>
           </div>

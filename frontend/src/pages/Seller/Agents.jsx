@@ -103,7 +103,7 @@ export default function Agents() {
   );
 
   return (
-    <div className="p-4 md:p-6 bg-gray-50 mt-4 min-h-screen">
+    <div className="h-full flex flex-col p-4 md:p-6 bg-gray-50 mt-4">
       {/* Title */}
       <h1 className="text-xl text-center md:text-2xl font-bold mb-4 md:mb-6 text-gray-800">
         Agents List
@@ -115,7 +115,7 @@ export default function Agents() {
         onReset={resetFilters}
       />
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto flex-grow">
         <table className="min-w-full bg-white border border-yellow-600 rounded-lg shadow-lg">
           <thead>
             <tr className="bg-yellow-100 text-yellow-800 text-sm md:text-base">

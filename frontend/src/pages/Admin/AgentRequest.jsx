@@ -10,7 +10,6 @@ import {
 import { UserContext } from "../../Context/UserContext";
 import { server } from "../../../config";
 import { toast } from "react-toastify";
-import Navbar from "./Navbar";
 
 // Filter Component
 const FilterBar = ({ filters, onFilterChange, onReset }) => (
@@ -124,10 +123,11 @@ const handleView = (user_id) => {
   });
 
   return (
-    <div>
-      <Navbar />
+    <div className="bg-gray-100 min-h-screen h-full flex flex-col">
       <div className="p-6">
-        <h1 className="text-2xl text-center font-semibold mb-4">Agent Requests</h1>
+        <h1 className="text-2xl text-center font-semibold mb-4">
+          Agent Requests
+        </h1>
 
         <FilterBar
           filters={filters}
@@ -135,7 +135,7 @@ const handleView = (user_id) => {
           onReset={resetFilters}
         />
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto flex-grow">
           <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
             <thead>
               <tr className="bg-gray-100 text-gray-600">
@@ -178,7 +178,9 @@ const handleView = (user_id) => {
                   <td className="px-6 py-4 text-sm border">{agent.user_id}</td>
                   <td className="px-6 py-4 text-sm border">{agent.name}</td>
                   <td className="px-6 py-4 text-sm border">{agent.email}</td>
-                  <td className="px-6 py-4 text-sm border">{agent.phone_number}</td>
+                  <td className="px-6 py-4 text-sm border">
+                    {agent.phone_number}
+                  </td>
                   {/* <td className="px-6 py-4 text-sm border">{agent.address}</td> */}
                   <td className="px-6 py-4 text-sm border">
                     <span
@@ -219,16 +221,16 @@ const handleView = (user_id) => {
                       onClick={() => handleDelete(agent.user_id)}
                       className="text-gray-500 hover:text-gray-700"
                       aria-label={`Delete Agent ID: ${agent.user_id}`}
-                  >
-                    <TrashIcon className="w-5 h-5" />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                    >
+                      <TrashIcon className="w-5 h-5" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
     </div>
   );
 }

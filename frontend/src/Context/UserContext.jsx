@@ -92,7 +92,7 @@ export const UserProvider = ({ children }) => {
           const routes = {
             Agent: "/agent/dashboard",
             Business: "/business/dashboard",
-            Admin: "/admin/requests",
+            Admin: "/admin/dashboard",
             PickupStation: "/pickup-station/dashboard",
           };
 

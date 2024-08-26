@@ -212,7 +212,11 @@ def update_profile():
     user.email = data.get('email', user.email)
     user.phone_number = data.get('phone_number', user.phone_number)
     user.primary_region = data.get('primary_region', user.primary_region)
-    user.operation_areas = ','.join(data.get('operation_areas', user.operation_areas.split(',')))
+    
+    # Ensure operation_areas has a default value if None
+    existing_operation_areas = user.operation_areas.split(',') if user.operation_areas else []
+    new_operation_areas = data.get('operation_areas', existing_operation_areas)
+    user.operation_areas = ','.join(new_operation_areas)
     
     profile_picture = data.get('profile_picture')
     if profile_picture and profile_picture.startswith('data:image'):
@@ -225,7 +229,6 @@ def update_profile():
     
     profile_picture_url = url_for('static', filename=user.profile_picture, _external=True) if user.profile_picture else None
 
-    
     return jsonify({
         "message": "Profile updated successfully",
         "profile": {
@@ -395,6 +398,15 @@ def get_businesses():
     businesses = User.query.filter_by(user_role='Business').all()
     return jsonify([business.to_dict() for business in businesses])
 
+# get all pickup stations as an admin
+@app.route('/get-pickup-stations', methods=['GET'])
+@jwt_required()
+def get_pickup_stations():
+    current_user = User.query.get(get_jwt_identity())
+    if current_user.user_role != 'Admin':
+        return jsonify({"message": "Only admins can get pickup stations"}), 403
+    pickup_stations = User.query.filter_by(user_role='PickupStation').all()
+    return jsonify([pickup_station.to_dict() for pickup_station in pickup_stations])
 
 @app.route('/parcels', methods=['GET'])
 @jwt_required()
@@ -1316,6 +1328,51 @@ def save_base64_image(base64_string, filename):
         f.write(image_data)
     
     return os.path.join('uploads', filename)
+
+# twilio SMS
+from twilio.rest import Client
+import re
+from flask import request
+
+# Twilio credentials
+account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
+auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
+twilio_phone_number = os.environ.get('TWILIO_PHONE_NUMBER')
+
+client = Client(account_sid, auth_token)
+
+@app.route('/send-sms', methods=['POST'])
+def send_sms():
+    data = request.json
+    to_number = data.get('to')
+    message = data.get('message')
+
+    # Function to format Kenyan phone numbers
+    def format_kenyan_number(number):
+        # Remove any non-digit characters
+        number = re.sub(r'\D', '', number)
+        
+        if number.startswith('0'):
+            number = number[1:]  # Remove the leading '0'
+        
+        # Check if the number already has the country code
+        if not number.startswith('254'):
+            number = '254' + number
+        
+        return '+' + number
+
+    # Format the 'to' number
+    to_number = format_kenyan_number(to_number)
+
+    try:
+        message = client.messages.create(
+            body=message,
+            from_=twilio_phone_number,
+            to=to_number
+        )
+        return jsonify({'success': True, 'message_sid': message.sid}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
 
 
 # Africastalking SMS

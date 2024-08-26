@@ -1,66 +1,28 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 import { Link } from "react-router-dom";
-import  Profile from "./Profile";
-import Logo from "../../assets/Logo.png";
+import Profile from "./Profile";
+import { FaBars } from "react-icons/fa";
 
-function Navbar() {
-    return (
-        <nav className="bg-yellow-500 shadow-md sticky top-0">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between h-16">
-                    
-                    <div className="flex">
-                        <div className="flex-shrink-0 flex items-center">
-                            <img
-                                className="h-16 w-16"
-                                src={Logo}
-                                alt="Workflow"
-                            />
-                        </div>
-                        <div className="hidden md:block ">
-                            <div className="ml-10 flex space-x-4 mt-4">
-                            <Link
-                                    to="/"
-                                    className=" hover:underline hover:text-white  px-3 py-2 rounded-md  font-medium"
-                                >
-                                    Home
-                                </Link>
-                                {/* <Link
-                                    to="/admin"
-                                    className=" hover:underline hover:text-white  px-3 py-2 rounded-md  font-medium"
-                                >
-                                    Dashboard
-                                </Link> */}
-                                <Link
-                                    to="/admin/agents"
-                                    className=" hover:underline hover:text-white  px-3 py-2 rounded-md  font-medium"
-                                >
-                                    Agents
-                                </Link>
-                                <Link
-                                    to="/admin/requests"
-                                    className=" hover:underline hover:text-white  px-3 py-2 rounded-md  font-medium"
-                                >
-                                    Requests
-                                </Link>
-                                <Link
-                                    to="/admin/businesses"
-                                    className=" hover:underline hover:text-white  px-3 py-2 rounded-md  font-medium"
-                                >
-                                    Businesses
-                                </Link>
-                            </div>
-                            
-                        </div>
-                        
-                    </div>
-                    
-                    <Profile/>
-                </div>
-                
-            </div>
-        </nav>
-    );
+function Navbar({ toggleSidebar }) {
+  return (
+    <nav className="bg-yellow-500 shadow-md sticky top-0">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex-shrink-0 flex items-center">
+            <button
+              onClick={toggleSidebar}
+              className="text-2xl text-white focus:outline-none lg:hidden mr-4"
+            >
+              <FaBars />
+            </button>
+            <p className="text-xl font-bold text-white">Admin Panel</p>
+          </div>
+          <Profile />
+        </div>
+      </div>
+    </nav>
+  );
 }
 
 export default Navbar;

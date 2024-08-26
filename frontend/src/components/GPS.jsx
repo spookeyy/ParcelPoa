@@ -1,12 +1,20 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState, useRef, useCallback } from "react";
-import L from "leaflet";
+import React, { useEffect, useState, useCallback } from "react";
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import { server } from "../../config.json";
 
+const mapContainerStyle = {
+  height: "400px",
+  width: "100%",
+};
+
+const defaultCenter = {
+  lat: 0,
+  lng: 0,
+};
+
 export default function GPS({ parcel_id }) {
-  const mapRef = useRef(null);
-  const markerRef = useRef(null);
-  const [position, setPosition] = useState(null);
+  const [position, setPosition] = useState(defaultCenter);
 
   const fetchLatestLocation = useCallback(() => {
     console.log("Fetching latest location from server...");
@@ -18,26 +26,13 @@ export default function GPS({ parcel_id }) {
         } else {
           const { latitude, longitude } = data;
           console.log("Latest Location:", latitude, longitude);
-          setPosition({ latitude, longitude });
-          if (mapRef.current && markerRef.current) {
-            markerRef.current.setLatLng([latitude, longitude]);
-            mapRef.current.setView([latitude, longitude], 13);
-          }
+          setPosition({ lat: latitude, lng: longitude });
         }
       })
       .catch((error) => console.error("Error fetching location:", error));
   }, [parcel_id]);
 
   useEffect(() => {
-    if (!mapRef.current) {
-      mapRef.current = L.map("map").setView([0, 0], 13);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-      }).addTo(mapRef.current);
-
-      markerRef.current = L.marker([0, 0]).addTo(mapRef.current);
-    }
-
     fetchLatestLocation();
 
     // Fetch location every 5 minutes
@@ -45,18 +40,21 @@ export default function GPS({ parcel_id }) {
 
     return () => {
       clearInterval(intervalId);
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-        markerRef.current = null;
-      }
     };
   }, [parcel_id, fetchLatestLocation]);
 
   return (
     <div>
       <h6 className="text-md font-bold mb-4">GPS Tracker</h6>
-      <div id="map" style={{ height: "400px", width: "100%" }}></div>
+      <LoadScript googleMapsApiKey="YOUR_GOOGLE_MAPS_API_KEY">
+        <GoogleMap
+          mapContainerStyle={mapContainerStyle}
+          center={position}
+          zoom={13}
+        >
+          <Marker position={position} />
+        </GoogleMap>
+      </LoadScript>
     </div>
   );
 }

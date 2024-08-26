@@ -8,7 +8,7 @@ import {
   Routes,
   Navigate,
 } from "react-router-dom";
-import Footer from "./components/Footer";
+// import Footer from "./components/Footer";
 import RequestResetPassword from "./components/RequestResetPassword";
 import ResetPassword from "./components/ResetPassword";
 import ChangePassword from "./components/Change-Password";
@@ -17,10 +17,13 @@ import Create_Account from "./components/Create_Account";
 // import SendNotification from "./pages/SendNotification";
 
 // Admin
+import AdminLayout from "./pages/Admin/Layout";
+import AdminDashboard from "./pages/Admin/Dashboard";
 import Profile from "./pages/Admin/Profile";
 import AgentRequests from "./pages/Admin/AgentRequest";
 import AgentList from "./pages/Admin/AgentList";
 import BusinessList from "./pages/Admin/BusinessList";
+import PickUpStations from "./pages/Admin/PickUpStation";
 
 // Seller Pages
 import Home from "./pages/Seller/Home";
@@ -46,7 +49,6 @@ import PickupStationDashboard from "./pages/Business/PickupStationDashboard";
 
 // Buyer Pages
 import OrderTracking from "./pages/Buyer/OrderTracking";
-import TrackOrders from "./pages/Buyer/TrackOrders";
 
 // Agent Pages
 // import AgentHome from "./pages/Agent/AgentHome";
@@ -84,8 +86,6 @@ function ProtectedRoute({ element }) {
 }
 
 function App() {
-
-  
   return (
     <Router>
       <UserProvider>
@@ -156,7 +156,6 @@ function App() {
                   path="/track/:trackingNumber?"
                   element={<OrderTracking />}
                 />
-                <Route path="/track-orders" element={<TrackOrders />} />
 
                 {/* Agent Routes */}
                 {/* <Route
@@ -219,37 +218,31 @@ function App() {
                   path="/business/schedule-pickup"
                   element={<ProtectedRoute element={<PickupScheduling />} />}
                 />
-                <Route 
-                path="/pickup-station/dashboard"
-                element={<ProtectedRoute element={<PickupStationDashboard />} />}
-              />
+                <Route
+                  path="/pickup-station/dashboard"
+                  element={
+                    <ProtectedRoute element={<PickupStationDashboard />} />
+                  }
+                />
 
                 {/* Admin Routes */}
                 <Route
-                  path="/admin/requests"
-                  element={<ProtectedRoute element={<AgentRequests />} />}
-                />
-                <Route
-                  path="/admin/profile"
-                  element={<ProtectedRoute element={<Profile />} />}
-                />
-                <Route
-                  path="/admin/agents"
-                  element={<ProtectedRoute element={<AgentList />} />}
-                />
-                <Route
-                  path="/admin/businesses"
-                  element={<ProtectedRoute element={<BusinessList />} />}
-                />
-                <Route
-                  path="/admin/agent/:id"
-                  element={<ProtectedRoute element={<Agent_Details />} />}
-                />
+                  path="/admin/*"
+                  element={<ProtectedRoute element={<AdminLayout />} />}
+                >
+                  <Route path="dashboard" element={<AdminDashboard />} />
+                  <Route path="requests" element={<AgentRequests />} />
+                  <Route path="profile" element={<Profile />} />
+                  <Route path="agents" element={<AgentList />} />
+                  <Route path="businesses" element={<BusinessList />} />
+                  <Route path="agent/:id" element={<Agent_Details />} />
+                  <Route path="pickup-stations" element={<PickUpStations />} />
+                </Route>
               </Routes>
             </DeliveryProvider>
           </TrackingProvider>
         </NotificationProvider>
-        <Footer />
+        {/* <Footer /> */}
         <ToastContainer
           position="top-center"
           toastOptions={{
