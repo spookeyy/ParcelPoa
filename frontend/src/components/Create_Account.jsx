@@ -128,9 +128,9 @@ function Create_Account() {
     <>
       <Navbar />
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-yellow-50 to-yellow-100 p-4 sm:p-6">
-        <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg overflow-hidden sm:rounded-2xl sm:overflow-visible mt-2 mb-8">
+        <div className="w-full max-w-4xl bg-white rounded-xl shadow-2xl overflow-hidden sm:rounded-2xl sm:overflow-visible mt-2 mb-8">
           <div className="md:flex">
-            <div className="md:w-1/2 bg-gradient-to-l from-yellow-500 to-yellow-600 p-8 text-white flex flex-col justify-center">
+            <div className="md:w-1/2 bg-gradient-to-l from-yellow-500 to-yellow-600 p-8 text-white flex flex-col justify-center rounded-l-xl">
               <h2 className="text-3xl text-gray-600 italic font-bold mb-4">
                 Welcome to ParcelPoa
               </h2>
@@ -148,7 +148,7 @@ function Create_Account() {
               </p>
             </div>
 
-            <div className="md:w-1/2 p-8">
+            <div className="md:w-1/2 p-8 rounded-r-xl ">
               <h2 className="text-2xl font-bold mb-6 text-gray-800">
                 Create Account
               </h2>
