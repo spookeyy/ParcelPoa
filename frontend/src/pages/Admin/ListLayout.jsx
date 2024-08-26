@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 
 export default function ListLayout({ title, filterBar, children }) {
