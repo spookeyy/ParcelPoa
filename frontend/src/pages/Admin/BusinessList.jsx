@@ -61,7 +61,7 @@ export default function BusinessList() {
 
   return (
     <>
-      <div className="p-6 bg-gray-50 h-full flex flex-col">
+      <div className="p-6 bg-gray-50 h-full flex flex-col ">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">
         Businesses List
       </h1>

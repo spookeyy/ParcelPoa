@@ -38,7 +38,7 @@ export default function PickUpStations() {
     try {
       const response = await fetch(`${server}/users`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Assuming you store the JWT token in localStorage
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
       if (!response.ok) {

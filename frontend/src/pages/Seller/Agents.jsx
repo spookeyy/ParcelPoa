@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { server } from "../../../config.json";
 
-// Define the getStatus function
+
 const getStatus = (status) => (status === "Available" ? "Available" : "Unavailable");
 
 // FilterBar Component
