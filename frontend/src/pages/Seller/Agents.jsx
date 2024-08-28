@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { server } from "../../../config.json";
 
 // Define the getStatus function
@@ -30,7 +29,7 @@ const FilterBar = ({ filters, onFilterChange, onReset }) => (
     </select>
     <button
       onClick={onReset}
-      className="bg-yellow-300  py-1 px-3 rounded-md text-base hover:bg-yellow-500"
+      className="bg-yellow-300 py-1 px-3 rounded-md text-base hover:bg-yellow-500"
       aria-label="Reset filters"
     >
       Reset Filter
@@ -68,6 +67,7 @@ export default function Agents() {
   const handleView = (user_id) => {
     navigate(`/admin/agent/${user_id}`);
   };
+
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this client request?")) {
       try {
@@ -116,77 +116,78 @@ export default function Agents() {
       />
 
       <div className="overflow-x-auto flex-grow">
-        <table className="min-w-full bg-white border border-yellow-600 rounded-lg shadow-lg">
-          <thead>
-            <tr className="bg-yellow-100 text-yellow-800 text-sm md:text-base">
-              <th className="px-2 md:px-4 py-2 text-left font-medium border border-yellow-300">
-                Profile Image
-              </th>
-              <th className="px-2 md:px-4 py-2 text-left font-medium border border-yellow-300">
-                Agent ID
-              </th>
-              <th className="px-2 md:px-4 py-2 text-left font-medium border border-yellow-300">
-                Name
-              </th>
-              <th className="px-2 md:px-4 py-2 text-left font-medium border border-yellow-300">
-                Email
-              </th>
-              <th className="px-2 md:px-4 py-2 text-left font-medium border border-yellow-300">
-                Phone
-              </th>
-              <th className="px-2 md:px-4 py-2 text-left font-medium border border-yellow-300">
-                Primary Region
-              </th>
-              <th className="px-2 md:px-4 py-2 text-left font-medium border border-yellow-300">
-                Status
-              </th>
-            </tr>
-          </thead>
-          <tbody className="text-yellow-900 text-xs md:text-sm">
-            {filteredAgentRequests.map((agent) => (
-              <tr
-                key={agent.user_id}
-                className="hover:bg-yellow-50 transition-colors duration-300"
-              >
-                <td className="px-2 md:px-4 py-2 border border-yellow-200">
-                  <img
-                    src={agent.profile_picture}
-                    alt={`${agent.name}'s profile`}
-                    className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover"
-                  />
-                </td>
-                <td className="px-2 md:px-4 py-2 border border-yellow-200">
-                  {agent.user_id}
-                </td>
-                <td className="px-2 md:px-4 py-2 border border-yellow-200">
-                  {agent.name}
-                </td>
-                <td className="px-2 md:px-4 py-2 border border-yellow-200">
-                  {agent.email}
-                </td>
-                <td className="px-2 md:px-4 py-2 border border-yellow-200">
-                  {agent.phone_number}
-                </td>
-                <td className="px-2 md:px-4 py-2 border border-yellow-200">
-                  {agent.primary_region}
-                </td>
-                <td className="px-2 md:px-4 py-2 border border-yellow-200">
-                  <span
-                    className={`inline-flex items-center px-2 md:px-3 py-1 text-xs md:text-sm font-medium rounded-full ${
-                      agent.status === "Available"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {agent.status}
-                  </span>
-                </td>
+        <div className="overflow-y-auto h-[calc(100vh-200px)] pb-24"> {/* Increased padding-bottom */}
+          <table className="min-w-full bg-white border border-yellow-600 rounded-lg shadow-lg">
+            <thead>
+              <tr className="bg-yellow-100 text-yellow-800 text-sm md:text-base">
+                <th className="px-2 md:px-4 py-2 text-left font-medium border border-yellow-300">
+                  Profile Image
+                </th>
+                <th className="px-2 md:px-4 py-2 text-left font-medium border border-yellow-300">
+                  Agent ID
+                </th>
+                <th className="px-2 md:px-4 py-2 text-left font-medium border border-yellow-300">
+                  Name
+                </th>
+                <th className="px-2 md:px-4 py-2 text-left font-medium border border-yellow-300">
+                  Email
+                </th>
+                <th className="px-2 md:px-4 py-2 text-left font-medium border border-yellow-300">
+                  Phone
+                </th>
+                <th className="px-2 md:px-4 py-2 text-left font-medium border border-yellow-300">
+                  Primary Region
+                </th>
+                <th className="px-2 md:px-4 py-2 text-left font-medium border border-yellow-300">
+                  Status
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="text-yellow-900 text-xs md:text-sm">
+              {filteredAgentRequests.map((agent) => (
+                <tr
+                  key={agent.user_id}
+                  className="hover:bg-yellow-50 transition-colors duration-300"
+                >
+                  <td className="px-2 md:px-4 py-2 border border-yellow-200">
+                    <img
+                      src={agent.profile_picture}
+                      alt={`${agent.name}'s profile`}
+                      className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover"
+                    />
+                  </td>
+                  <td className="px-2 md:px-4 py-2 border border-yellow-200">
+                    {agent.user_id}
+                  </td>
+                  <td className="px-2 md:px-4 py-2 border border-yellow-200">
+                    {agent.name}
+                  </td>
+                  <td className="px-2 md:px-4 py-2 border border-yellow-200">
+                    {agent.email}
+                  </td>
+                  <td className="px-2 md:px-4 py-2 border border-yellow-200">
+                    {agent.phone_number}
+                  </td>
+                  <td className="px-2 md:px-4 py-2 border border-yellow-200">
+                    {agent.primary_region}
+                  </td>
+                  <td className="px-2 md:px-4 py-2 border border-yellow-200">
+                    <span
+                      className={`inline-flex items-center px-2 md:px-3 py-1 text-xs md:text-sm font-medium rounded-full ${
+                        agent.status === "Available"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {agent.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
-
 }

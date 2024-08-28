@@ -10,3 +10,6 @@ export const theme = {
 export const plugins = [];
 
 // tailwind.config.js
+
+
+
