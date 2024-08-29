@@ -1,8 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Boolean, Column, Float, Integer, String, Enum, ForeignKey, Text, DECIMAL, TIMESTAMP
 from sqlalchemy.orm import relationship
-from werkzeug.security import generate_password_hash,check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask_bcrypt import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
@@ -14,7 +14,7 @@ class User(db.Model):
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     phone_number = Column(String, unique=True, nullable=False)
-    user_role = Column(Enum('Business','Agent','Admin','PickupStation', name='user_roles'), nullable=False)
+    user_role = Column(Enum('Business', 'Agent', 'Admin', 'PickupStation', name='user_roles'), nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
     password_hash = Column(String(128), nullable=False)
@@ -23,13 +23,13 @@ class User(db.Model):
     Request = Column(Enum('Approved', 'Pending', 'Rejected', name='approval_statuses'), default='Pending', nullable=True)
     primary_region = Column(String(100), nullable=True)
     operation_areas = Column(String(500), nullable=True)
-    is_open = Column(Boolean, default=True, nullable=False)
-    # region = Column(String(100), nullable=True)
+    is_open = Column(Boolean, default=True, nullable=True)  # Changed to nullable
 
     parcels = relationship('Parcel', back_populates='sender', foreign_keys='Parcel.sender_id')
     deliveries = relationship('Delivery', back_populates='agent', foreign_keys='Delivery.agent_id')
     notifications = relationship('Notification', back_populates='user', foreign_keys='Notification.user_id')
     orders = relationship('Order', back_populates='user', foreign_keys='Order.user_id')
+    pickup_station_parcels = relationship('Parcel', back_populates='pickup_station', foreign_keys='Parcel.pickup_station_id')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password).decode('utf-8')
@@ -52,9 +52,8 @@ class User(db.Model):
             'primary_region': self.primary_region,
             'operation_areas': self.operation_areas.split(',') if self.operation_areas else [],
             'is_open': self.is_open if self.user_role == 'PickupStation' else None,
-            # 'region': self.region
         }
-    
+
 class Parcel(db.Model):
     __tablename__ = 'parcels'
 
@@ -75,8 +74,11 @@ class Parcel(db.Model):
     category = Column(String(50), nullable=False)
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
+    delivery_type = Column(Enum('PickupStation', 'DoorDelivery', name='delivery_types'), nullable=False)
+    pickup_station_id = Column(Integer, ForeignKey('users.user_id'), nullable=True)
 
     sender = relationship('User', back_populates='parcels', foreign_keys=[sender_id])
+    pickup_station = relationship('User', back_populates='pickup_station_parcels', foreign_keys=[pickup_station_id])
     delivery = relationship('Delivery', back_populates='parcel', uselist=False)
     tracking = relationship('Tracking', back_populates='parcel')
     orders = relationship('Order', back_populates='parcel', foreign_keys='Order.parcel_id')
@@ -99,22 +101,20 @@ class Parcel(db.Model):
             'recipient_email': self.recipient_email,
             'category': self.category,
             'latitude': float(self.latitude) if self.latitude else None,
-            'longitude': float(self.longitude) if self.longitude else None
+            'longitude': float(self.longitude) if self.longitude else None,
+            'delivery_type': self.delivery_type,
+            'pickup_station_id': self.pickup_station_id
         }
-
-
-
-from datetime import datetime, timezone
 
 class Delivery(db.Model):
     __tablename__ = 'deliveries'
 
     delivery_id = Column(Integer, primary_key=True)
     parcel_id = Column(Integer, ForeignKey('parcels.parcel_id'), nullable=False)
-    agent_id = Column(Integer, ForeignKey('users.user_id'), nullable=True)  # Changed to nullable
+    agent_id = Column(Integer, ForeignKey('users.user_id'), nullable=True)
     pickup_time = Column(TIMESTAMP, nullable=False)
     delivery_time = Column(TIMESTAMP)
-    status = Column(Enum('Scheduled', 'In Transit', 'Delivered', name='delivery_statuses'), nullable=False)
+    status = Column(Enum('At Pickup Station', 'Collected', name='delivery_statuses'), nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=lambda: datetime.now(timezone.utc))
     updated_at = Column(TIMESTAMP, nullable=False, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
@@ -155,7 +155,6 @@ class Notification(db.Model):
             'created_at': self.created_at.isoformat()
         }
 
-
 class Tracking(db.Model):
     __tablename__ = 'tracking'
 
@@ -176,7 +175,6 @@ class Tracking(db.Model):
             'timestamp': self.timestamp.isoformat()
         }
 
-
 class Order(db.Model):
     __tablename__ = 'orders'
 
@@ -186,7 +184,7 @@ class Order(db.Model):
     parcel_id = Column(Integer, ForeignKey('parcels.parcel_id'), nullable=False)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now)
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.now, onupdate=datetime.now)
-    status = Column(Enum('Active', 'Cancelled', name='order_statuses'), default='Active', nullable=False)  # New field
+    status = Column(Enum('Active', 'Cancelled', name='order_statuses'), default='Active', nullable=False)
 
     user = relationship('User', back_populates='orders', foreign_keys=[user_id])
     parcel = relationship('Parcel', back_populates='orders', foreign_keys=[parcel_id])
@@ -202,5 +200,3 @@ class Order(db.Model):
             'status': self.status,
             'parcel': self.parcel.to_dict() if self.parcel else None
         }
-
-
