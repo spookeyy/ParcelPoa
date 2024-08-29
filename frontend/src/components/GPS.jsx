@@ -46,7 +46,7 @@ export default function GPS({ parcel_id }) {
   return (
     <div>
       <h6 className="text-md font-bold mb-4">GPS Tracker</h6>
-      <LoadScript googleMapsApiKey="YOUR_GOOGLE_MAPS_API_KEY">
+      <LoadScript googleMapsApiKey="https://maps.googleapis.com/maps/api/js?key=AIzaSyAOVYRIgupAurZup5y1PRh8Ismb1A3lLao&libraries=places&callback=initMap">
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
           center={position}
