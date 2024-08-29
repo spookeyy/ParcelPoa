@@ -263,26 +263,6 @@ def update_status():
     db.session.commit()
     return jsonify({"message": "Status updated successfully", "status": new_status})
 
-@app.route('/update-pickup-station-status', methods=['PUT'])
-@jwt_required()
-def update_pickup_station_status():
-    current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
-    
-    if user.user_role != 'PickupStation':
-        return jsonify({"message": "Only Pickup Stations can update their status"}), 403
-    
-    data = request.get_json()
-    new_status = data.get('is_open')
-    
-    if new_status is None:
-        return jsonify({"message": "Status is required"}), 400
-    
-    user.is_open = new_status
-    user.updated_at = datetime.now()
-    
-    db.session.commit()
-    return jsonify({"message": "Status updated successfully", "is_open": new_status})
 
 # change password
 @app.route('/change_password', methods=['PUT'])
@@ -430,39 +410,6 @@ def get_parcel_status(parcel_id):
     return jsonify({"status": parcel.status})
 
 
-# # update parcel location
-# @app.route('/parcels/<int:parcel_id>/location', methods=['PUT'])
-# @jwt_required()
-# def update_parcel_location(parcel_id):
-#     user = User.query.get(get_jwt_identity())
-#     if user.user_role != 'Agent':
-#         return jsonify({"message": "Only agents can update parcel location"}), 403
-#     data = request.get_json()
-#     parcel = Parcel.query.get_or_404(parcel_id)
-#     parcel.current_location = data['location']
-#     parcel.updated_at = datetime.now()
-#     db.session.commit()
-#     return jsonify({"message": "Parcel location updated successfully"}), 200
-
-# scheduler implementation
-# @scheduler.task('interval', id='update_locations', seconds=300)  # Run every 5 minutes
-# def update_locations():
-#     parcels = Parcel.query.filter(Parcel.status != 'Delivered').all()
-#     for parcel in parcels:
-#         new_location = simulate_new_location(parcel)
-#         parcel.current_location = new_location
-#         parcel.updated_at = datetime.now()
-#     db.session.commit()
-
-#     print('Parcels updated successfully')
-
-#     return jsonify({"message": "Parcels updated successfully"}), 200
-# scheduler.add_job(func=update_locations, trigger='interval', seconds=300, id='update_locations')
-
-# def simulate_new_location(parcel):
-#     locations = ['In transit', 'Local distribution center', 'Out for delivery']
-#     return random.choice(locations)
-
 @app.route('/parcels/<int:parcel_id>', methods=['DELETE'])
 @jwt_required()
 def delete_parcel(parcel_id):
@@ -583,25 +530,6 @@ def get_assigned_deliveries():
     ]
     return jsonify(deliveries_data)
 
-@app.route('/update_delivery_status/<int:delivery_id>', methods=['PUT'])
-@jwt_required()
-def update_delivery_status(delivery_id):
-    current_user = User.query.get(get_jwt_identity())
-    if current_user.user_role not in ['Business', 'Agent']:
-        return jsonify({"message": "Only agents and businesses can update delivery status"}), 403
-
-    data = request.get_json()
-    delivery = Delivery.query.get_or_404(delivery_id)
-
-    if 'status' not in data:
-        return jsonify({"message": "Status is required"}), 400
-
-    delivery.status = data['status']
-    delivery.updated_at = datetime.now()
-    db.session.commit()
-    
-    return jsonify({"message": "Delivery status updated successfully"}), 200
-
 
 # mark parcel as delivered
 @app.route('/mark_as_delivered/<int:parcel_id>', methods=['PUT'])
@@ -655,22 +583,6 @@ def track_parcel(tracking_number):
 
     return jsonify(response_data)
 
-
-# current parcel location
-# @app.route('/parcels/<int:parcel_id>/locations', methods=['GET'])
-# @jwt_required()
-# def get_current_location(parcel_id):
-#     parcel = Parcel.query.get_or_404(parcel_id)
-#     return jsonify({"location": parcel.current_location})
-
-# @app.route('/parcels/<int:parcel_id>/location', methods=['GET'])
-# @jwt_required()
-# def get_current_location(parcel_id):
-#     parcel = Parcel.query.get_or_404(parcel_id)
-#     return jsonify({"location": {
-#         "latitude": parcel.latitude,
-#         "longitude": parcel.longitude
-#     }})
 
 @app.route('/location', methods=['POST'])
 def receive_location():
@@ -741,7 +653,7 @@ def delete_tracking_entries():
 
     return jsonify({'message': 'Tracking entries deleted successfully'}), 200  
 
-# BUSINESS ROUTES
+# BUSINESS ROUTES TODO: integration with frontend
 # Route to schedule a pickup
 from datetime import datetime, timezone
 
@@ -756,15 +668,31 @@ def schedule_pickup():
     
     data = request.get_json()
     
-    sender_location = data.get('current_location', user.primary_region)  # Use business's primary region if not provided
+    sender_location = data.get('current_location', user.primary_region)
     sender_region = get_region_from_address(sender_location)
 
-    # Create a new parcel
+    delivery_type = data.get('delivery_type')
+    if delivery_type not in ['pickup_station', 'door_delivery']:
+        return jsonify({"message": "Invalid delivery type"}), 400
+
+    if delivery_type == 'pickup_station':
+        pickup_station_id = data.get('pickup_station_id')
+        if not pickup_station_id:
+            return jsonify({"message": "Pickup station ID is required for pickup station delivery"}), 400
+        
+        pickup_station = User.query.filter_by(user_id=pickup_station_id, user_role='PickupStation').first()
+        if not pickup_station or not pickup_station.is_open:
+            return jsonify({"message": "Invalid or closed pickup station"}), 400
+        
+        recipient_address = pickup_station.primary_region
+    else:
+        recipient_address = data['recipient_address']
+
     new_parcel = Parcel(
         sender_id=current_user_id,
-        tracking_number=generate_unique_tracking_number(existing_numbers=Parcel.query.with_entities(Parcel.tracking_number).all()),
+        tracking_number=generate_unique_tracking_number(),
         recipient_name=data['recipient_name'],
-        recipient_address=data['recipient_address'],
+        recipient_address=recipient_address,
         recipient_phone=data['recipient_phone'],
         description=data['description'],
         weight=data['weight'],
@@ -775,22 +703,20 @@ def schedule_pickup():
         recipient_email=data['recipient_email']
     )
     db.session.add(new_parcel)
-    db.session.flush()  # This will assign an ID to the new_parcel
-    
-    # Create a new order
+    db.session.flush()
+
     new_order = Order(
         user_id=current_user_id,
         order_number=generate_order_number(),
         parcel_id=new_parcel.parcel_id,
-        created_at=datetime.now(),
-        updated_at=datetime.now()
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc)
     )
     db.session.add(new_order)
     
-    # Parse the pickup time
     pickup_time_str = data['pickup_time']
     if pickup_time_str.endswith('Z'):
-        pickup_time_str = pickup_time_str[:-1]  # Remove the 'Z'
+        pickup_time_str = pickup_time_str[:-1]
     pickup_time = datetime.fromisoformat(pickup_time_str).replace(tzinfo=timezone.utc)
     
     # Format pickup time as "2024-08-12 Time: 12:20 PM"
@@ -800,32 +726,21 @@ def schedule_pickup():
     if not selected_agent_id:
         return jsonify({"message": "Agent ID must be provided"}), 400
 
-    # Convert selected_agent_id to an integer
     try:
         selected_agent_id = int(selected_agent_id)
     except ValueError:
         return jsonify({"message": "Invalid agent ID format"}), 400
 
-    sender_region = get_region_from_address(new_parcel.current_location)
-
-    if sender_region == 'Other':
-        available_agents = User.query.filter_by(
-            user_role='Agent',
-            status='Available',
-            Request='Approved'
-        ).all()
-    else:
-        available_agents = User.query.filter(
-            User.user_role == 'Agent',
-            User.status == 'Available',
-            User.Request == 'Approved',
-            (User.primary_region == sender_region) | (User.operation_areas.like(f'%{sender_region}%'))
-        ).all()
+    available_agents = User.query.filter(
+        User.user_role == 'Agent',
+        User.status == 'Available',
+        User.Request == 'Approved',
+        (User.primary_region == sender_region) | (User.operation_areas.like(f'%{sender_region}%'))
+    ).all()
 
     if not available_agents:
         return jsonify({"message": f"No available agents in the region: {sender_region}"}), 400
 
-    # Check if the provided agent_id is among the available agents
     selected_agent = next((agent for agent in available_agents if agent.user_id == selected_agent_id), None)
 
     if not selected_agent:
@@ -835,7 +750,7 @@ def schedule_pickup():
         parcel_id=new_parcel.parcel_id,
         agent_id=selected_agent.user_id,
         pickup_time=pickup_time,
-        status='Scheduled'
+        status='Scheduled'  # Initial status
     )
     db.session.add(new_delivery)
 
@@ -845,15 +760,6 @@ def schedule_pickup():
         status=new_parcel.status
     )
     db.session.add(new_tracking)
-    
-    # # Update the status of the selected agent to 'Unavailable'
-    # agent = User.query.get(selected_agent)
-    # if agent:
-    #     agent.status = 'Unavailable'
-    # else:
-    #     return jsonify({"message": "Invalid agent ID provided"}), 400
-    
-
     
     db.session.commit()
 
@@ -1001,6 +907,166 @@ def get_business_primary_region():
         return jsonify({"message": "Only businesses can get their primary region"}), 403
     
     return jsonify({"primary_region": user.primary_region}) 
+
+
+# PICKUP STATION ROUTES 
+@app.route('/get-open-pickup-stations', methods=['GET'])
+def get_open_pickup_stations():
+    area = request.args.get('area')
+    open_stations = User.query.filter(
+        User.user_role == 'PickupStation',
+        User.is_open == True,
+        User.operation_areas.like(f'%{area}%')
+    ).all()
+    return jsonify([station.to_dict() for station in open_stations])
+
+@app.route('/update-pickup-station-status', methods=['PUT'])
+@jwt_required()
+def update_pickup_station_status():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    
+    if user.user_role != 'PickupStation':
+        return jsonify({"message": "Only Pickup Stations can update their status"}), 403
+    
+    data = request.get_json()
+    new_status = data.get('is_open')
+    
+    if new_status is None:
+        return jsonify({"message": "Status is required"}), 400
+    
+    user.is_open = new_status
+    user.updated_at = datetime.now()
+    
+    db.session.commit()
+    return jsonify({"message": "Status updated successfully", "is_open": new_status})
+
+@app.route('/get-pickup-station-parcels', methods=['GET'])
+@jwt_required()
+def get_pickup_station_parcels():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    
+    if user.user_role != 'PickupStation':
+        return jsonify({"message": "Access denied"}), 403
+    
+    parcels = Parcel.query.filter_by(pickup_station_id=current_user_id).all()
+    return jsonify([parcel.to_dict() for parcel in parcels])
+
+@app.route('/update-pickup-station-parcel/<int:parcel_id>', methods=['PUT'])
+@jwt_required()
+def update_parcel_status_at_pickup_station(parcel_id):
+    current_user = User.query.get(get_jwt_identity())
+    if current_user.user_role != 'PickupStation':
+        return jsonify({"message": "Only pickup stations can update this status"}), 403
+    
+    parcel = Parcel.query.get_or_404(parcel_id)
+    if parcel.pickup_station_id != current_user.user_id:
+        return jsonify({"message": "This parcel is not assigned to your pickup station"}), 403
+    
+    data = request.get_json()
+    new_status = data.get('status')
+    
+    if new_status not in ['At Pickup Station', 'Collected']:
+        return jsonify({"message": "Invalid status for pickup station"}), 400
+    
+    delivery = Delivery.query.filter_by(parcel_id=parcel.parcel_id).first()
+    if not delivery:
+        return jsonify({"message": "Delivery not found for this parcel"}), 404
+    
+    old_status = delivery.status
+    delivery.status = new_status
+    delivery.updated_at = datetime.now(timezone.utc)
+    
+    if new_status == 'Collected':
+        parcel.status = 'Delivered'
+        parcel.updated_at = datetime.now(timezone.utc)
+    
+    db.session.commit()
+    
+    # Send notifications
+    if old_status != new_status:
+        send_notification(parcel.sender.email, 'Parcel Status Update', f'Your parcel with tracking number {parcel.tracking_number} is now {new_status}.')
+        send_notification(parcel.recipient_email, 'Parcel Status Update', f'The parcel with tracking number {parcel.tracking_number} is now {new_status}. \n Visit https://parcelpoa.netlify.app/track/{parcel.tracking_number} to track your parcel.')
+
+    return jsonify({"message": "Pickup station status updated successfully"}), 200
+
+@app.route('/update_delivery_status/<int:delivery_id>', methods=['PUT'])
+@jwt_required()
+def update_delivery_status(delivery_id):
+    current_user = User.query.get(get_jwt_identity())
+    if current_user.user_role not in ['Business', 'Agent']:
+        return jsonify({"message": "Only agents and businesses can update delivery status"}), 403
+
+    data = request.get_json()
+    delivery = Delivery.query.get_or_404(delivery_id)
+
+    if 'status' not in data:
+        return jsonify({"message": "Status is required"}), 400
+
+    new_status = data['status']
+    if new_status not in ['Scheduled', 'Picked Up', 'In Transit', 'At Pickup Station', 'Collected']:
+        return jsonify({"message": "Invalid status"}), 400
+
+    delivery.status = new_status
+    delivery.updated_at = datetime.now(timezone.utc)
+
+    parcel = Parcel.query.get(delivery.parcel_id)
+    if new_status == 'Collected':
+        parcel.status = 'Delivered'
+        parcel.updated_at = datetime.now(timezone.utc)
+    elif new_status == 'At Pickup Station':
+        parcel.status = 'Out for Delivery'
+        parcel.updated_at = datetime.now(timezone.utc)
+    else:
+        parcel.status = new_status
+        parcel.updated_at = datetime.now(timezone.utc)
+
+    db.session.commit()
+    
+    # Send notifications
+    send_notification(parcel.sender.email, 'Parcel Status Update', f'Your parcel with tracking number {parcel.tracking_number} is now {new_status}.')
+    send_notification(parcel.recipient_email, 'Parcel Status Update', f'The parcel with tracking number {parcel.tracking_number} is now {new_status}. \n Visit https://parcelpoa.netlify.app/track/{parcel.tracking_number} to track your parcel.')
+
+    return jsonify({"message": "Delivery status updated successfully"}), 200
+
+@app.route('/pickup-station-dashboard', methods=['GET'])
+@jwt_required()
+def pickup_station_dashboard():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    
+    if user.user_role != 'PickupStation':
+        return jsonify({"message": "Access denied"}), 403
+
+    parcels = Parcel.query.filter_by(pickup_station_id=user.user_id).all()
+    
+    dashboard_data = {
+        "station_name": user.name,
+        "is_open": user.is_open,
+        "total_parcels": len(parcels),
+        "parcels_waiting": sum(1 for p in parcels if p.delivery.status == 'At Pickup Station'),
+        "parcels_collected": sum(1 for p in parcels if p.delivery.status == 'Collected'),
+    }
+
+    return jsonify(dashboard_data)
+
+@app.route('/get-available-pickup-stations', methods=['GET'])
+@jwt_required()
+def get_available_pickup_stations():
+    region = request.args.get('region')
+    
+    if not region:
+        return jsonify({"message": "Region parameter is required"}), 400
+
+    pickup_stations = User.query.filter(
+        User.user_role == 'PickupStation',
+        User.is_open == True,
+        User.primary_region == region
+    ).all()
+
+    return jsonify([station.to_dict() for station in pickup_stations])
+
 
 
 # TODO: ORDER ROUTES
@@ -1157,7 +1223,7 @@ def generate_order_number():
 
 def get_region_from_address(address):
     if address is None:
-        return 'Other'  # or handle None as needed
+        return 'Other' 
 
     nairobi_regions = [
         'Embakasi', 'Kasarani', 'Pangani', 'Ngara', 
@@ -1174,20 +1240,11 @@ def get_region_from_address(address):
     return 'Other'
 
 
-# @app.route('/get-regions', methods=['GET'])
-# def get_regions():
-#     regions = {
-#         'Primary': ['Nairobi', 'Other'],
-#         'Operational': ['Embakasi', 'Kasarani', 'Pangani', 'Ngara', 'Ruaraka', 'Muthaiga', 'Lavington', 'Parklands', 'Westlands']
-#     }
-#     return jsonify(regions)
-
-
 @app.route('/get-regions', methods=['GET'])
 def get_regions():
     regions = {
         'Nairobi': ['Embakasi', 'Kasarani', 'Pangani', 'Ngara', 'Ruaraka', 'Muthaiga', 'Lavington', 'Parklands', 'Westlands', 'Ngong', 'Kibra', 'South B'],
-        'Other': []  # You can add other primary regions here if needed
+        'Other': [] 
     }
     return jsonify(regions)
 
@@ -1457,7 +1514,7 @@ def send_sms(phone_number, message):
 #     access_token_url='/oauth/access_token',
 #     authorize_url='https://www.facebook.com/dialog/oauth'
 # )
-# db_check()
+
 logging.info("Application setup completed")
 
 if __name__ == "__main__":
