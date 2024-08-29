@@ -55,7 +55,7 @@ export const UserProvider = ({ children }) => {
         })
         .catch((error) => {
           console.error("Fetch error:", error);
-          toast.error(`An error occurred: ${error.message}`);
+          // toast.error(`An error occurred: ${error.message}`);
           reject(error);
         });
     });
@@ -75,7 +75,7 @@ export const UserProvider = ({ children }) => {
     })
       .then((response) => response.json())
       .then((res) => {
-        console.log("Login response", res);
+        // console.log("Login response", res);
         if (res.access_token && res.user) {
           setAuthToken(res.access_token);
           localStorage.setItem("access_token", res.access_token);
@@ -85,16 +85,15 @@ export const UserProvider = ({ children }) => {
         if (
           res.user.role === "Agent" ||
           res.user.role === "Business" ||
-          res.user.role === "Admin"
+          res.user.role === "Admin" ||
+          res.user.role === "PickupStation"
         ) {
-          // toast.success(`Logged in Successfully as ${res.user.role}!`);
-          // nav(res.user.role === "Agent" ? "/agent" : "/seller");
-
           const { role } = res.user;
           const routes = {
             Agent: "/agent/dashboard",
             Business: "/business/dashboard",
-            Admin: "/admin/requests",
+            Admin: "/admin/dashboard",
+            PickupStation: "/pickup-station/dashboard",
           };
 
           if (role in routes) {
@@ -110,10 +109,10 @@ export const UserProvider = ({ children }) => {
           throw new Error("An unexpected error occurred during login");
         }
       })
-      .catch((error) => {
-        toast.error(error.message || "An error occurred during login");
-        console.error("Login error:", error);
-        throw error;
+      .catch((res) => {
+        toast.error("Invalid email or password");
+        console.error("Login error:", res);
+        throw res;
       });
   }
 

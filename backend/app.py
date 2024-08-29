@@ -1,9 +1,7 @@
 import os
 import random
 import string
-from dotenv import dotenv_values, load_dotenv
-# from geopy.geocoders import Nominatim
-import smtplib
+from dotenv import load_dotenv
 from flask import Flask, redirect, request, jsonify,url_for
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
@@ -32,8 +30,8 @@ logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__, static_folder='static')
 CORS(app)
-# app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db?mode=rw'
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
+app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db?mode=rw'
+# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
 print(f"Connecting to database: {app.config['SQLALCHEMY_DATABASE_URI']}")
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -94,12 +92,12 @@ def register():
         email=data.get('email'),
         phone_number=data.get('phone_number'),
         user_role=data.get('user_role'),
-        # region=data.get('region'), 
         created_at=datetime.now(),
         updated_at=datetime.now(),
         password_hash=hashed_password,
         primary_region=data.get('primary_region'),
         operation_areas=','.join(data.get('operation_areas', [])),
+        is_open=True if data.get('user_role') == 'PickupStation' else None,
     )
     db.session.add(new_user)
     db.session.commit()
@@ -107,6 +105,8 @@ def register():
         return jsonify({"message": "Business registered successfully"}), 201
     elif data['user_role'] == 'Agent':
         return jsonify({"message": "Agent registered successfully"}), 201
+    elif data['user_role'] == 'PickupStation':
+        return jsonify({"message": "PickupStation registered successfully"}), 201
     
     return jsonify({"message": "User registered successfully"}), 201
 
@@ -124,8 +124,9 @@ def login():
                 "role": user.user_role
             }
         }), 200
+    # check password
     elif user and not bcrypt.check_password_hash(user.password_hash, data['password']):
-        return jsonify({"message": "Invalid credentials"}), 401
+        return jsonify({"message": "Invalid email or password"}), 401
     else:
         return jsonify({"message": "User not found"}), 401
 
@@ -211,7 +212,11 @@ def update_profile():
     user.email = data.get('email', user.email)
     user.phone_number = data.get('phone_number', user.phone_number)
     user.primary_region = data.get('primary_region', user.primary_region)
-    user.operation_areas = ','.join(data.get('operation_areas', user.operation_areas.split(',')))
+    
+    # Ensure operation_areas has a default value if None
+    existing_operation_areas = user.operation_areas.split(',') if user.operation_areas else []
+    new_operation_areas = data.get('operation_areas', existing_operation_areas)
+    user.operation_areas = ','.join(new_operation_areas)
     
     profile_picture = data.get('profile_picture')
     if profile_picture and profile_picture.startswith('data:image'):
@@ -224,7 +229,6 @@ def update_profile():
     
     profile_picture_url = url_for('static', filename=user.profile_picture, _external=True) if user.profile_picture else None
 
-    
     return jsonify({
         "message": "Profile updated successfully",
         "profile": {
@@ -258,6 +262,27 @@ def update_status():
     
     db.session.commit()
     return jsonify({"message": "Status updated successfully", "status": new_status})
+
+@app.route('/update-pickup-station-status', methods=['PUT'])
+@jwt_required()
+def update_pickup_station_status():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    
+    if user.user_role != 'PickupStation':
+        return jsonify({"message": "Only Pickup Stations can update their status"}), 403
+    
+    data = request.get_json()
+    new_status = data.get('is_open')
+    
+    if new_status is None:
+        return jsonify({"message": "Status is required"}), 400
+    
+    user.is_open = new_status
+    user.updated_at = datetime.now()
+    
+    db.session.commit()
+    return jsonify({"message": "Status updated successfully", "is_open": new_status})
 
 # change password
 @app.route('/change_password', methods=['PUT'])
@@ -373,6 +398,15 @@ def get_businesses():
     businesses = User.query.filter_by(user_role='Business').all()
     return jsonify([business.to_dict() for business in businesses])
 
+# get all pickup stations as an admin
+@app.route('/get-pickup-stations', methods=['GET'])
+@jwt_required()
+def get_pickup_stations():
+    current_user = User.query.get(get_jwt_identity())
+    if current_user.user_role != 'Admin':
+        return jsonify({"message": "Only admins can get pickup stations"}), 403
+    pickup_stations = User.query.filter_by(user_role='PickupStation').all()
+    return jsonify([pickup_station.to_dict() for pickup_station in pickup_stations])
 
 @app.route('/parcels', methods=['GET'])
 @jwt_required()
@@ -446,15 +480,11 @@ def delete_parcel(parcel_id):
 @app.route('/update_status/<int:parcel_id>', methods=['PUT'])
 @jwt_required()
 def update_parcel_status(parcel_id):
-    logging.debug(f"Updating status for parcel ID: {parcel_id}")
-    logging.debug(f"Received data: {request.get_json()}")
     current_user = User.query.get(get_jwt_identity())
     if current_user.user_role != 'Agent':
         return jsonify({"message": "Only agents can update parcel status"}), 403
     
-    # Find the parcel based on the parcel_id
     parcel = Parcel.query.get(parcel_id)
-    logging.debug(f"Queried parcel: {parcel}")
     if not parcel:
         return jsonify({"message": "Parcel not found"}), 404
     
@@ -468,9 +498,14 @@ def update_parcel_status(parcel_id):
     parcel.status = data['status']
     parcel.updated_at = datetime.now()
     
+    # Update location
+    parcel.latitude = data.get('latitude')
+    parcel.longitude = data.get('longitude')
+    parcel.current_location = data.get('location')
+
     new_tracking = Tracking(
         parcel_id=parcel.parcel_id,
-        location=data['location'],
+        location=parcel.current_location,
         status=parcel.status,
         timestamp=datetime.now()
     )
@@ -482,7 +517,7 @@ def update_parcel_status(parcel_id):
         send_notification(parcel.sender.email, 'Parcel Status Update', f'Your parcel with tracking number {parcel.tracking_number} is now {parcel.status}.')
         send_notification(parcel.recipient_email, 'Parcel Status Update', f'The parcel with tracking number {parcel.tracking_number} is now {parcel.status}. \n visit https://parcelpoa.netlify.app/track/{parcel.tracking_number} to track your parcel.')
 
-    return jsonify({"message": "Parcel status updated successfully"}), 200
+    return jsonify({"message": "Parcel status and location updated successfully"}), 200
 
 # agent associated parcels:
 @app.route('/agent_parcels', methods=['GET'])
@@ -1294,6 +1329,51 @@ def save_base64_image(base64_string, filename):
     
     return os.path.join('uploads', filename)
 
+# twilio SMS
+# from twilio.rest import Client
+import re
+from flask import request
+
+# Twilio credentials
+# account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
+# auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
+# twilio_phone_number = os.environ.get('TWILIO_PHONE_NUMBER')
+
+# client = Client(account_sid, auth_token)
+
+# @app.route('/send-sms', methods=['POST'])
+# def send_sms():
+#     data = request.json
+#     to_number = data.get('to')
+#     message = data.get('message')
+
+#     # Function to format Kenyan phone numbers
+#     def format_kenyan_number(number):
+#         # Remove any non-digit characters
+#         number = re.sub(r'\D', '', number)
+        
+#         if number.startswith('0'):
+#             number = number[1:]  # Remove the leading '0'
+        
+#         # Check if the number already has the country code
+#         if not number.startswith('254'):
+#             number = '254' + number
+        
+#         return '+' + number
+
+#     # Format the 'to' number
+#     to_number = format_kenyan_number(to_number)
+
+#     try:
+#         message = client.messages.create(
+#             body=message,
+#             from_=twilio_phone_number,
+#             to=to_number
+#         )
+#         return jsonify({'success': True, 'message_sid': message.sid}), 200
+#     except Exception as e:
+#         return jsonify({'success': False, 'error': str(e)}), 400
+
 
 # Africastalking SMS
 import africastalking
@@ -1316,7 +1396,7 @@ def send_sms(phone_number, message):
         logging.error(f"Failed to send SMS to {phone_number}: {str(e)}")
         return False
 
-# send_sms("+254755854832", "Hello from parcelpoa!")
+# send_sms("+254103947514", "Hello from parcelpoa!")
 
 
 # sendchamp SMS
@@ -1382,3 +1462,7 @@ logging.info("Application setup completed")
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)
+
+
+
+
