@@ -1,6 +1,3 @@
-import random
-import string
-from decimal import Decimal
 from datetime import datetime, timedelta, timezone
 from faker import Faker
 from flask import Flask
@@ -8,6 +5,9 @@ from sqlalchemy import text
 from models import db, User, Parcel, Delivery, Notification, Tracking, Order
 from app import app, mail
 from flask_mail import Message
+import random
+import string
+from decimal import Decimal
 
 faker = Faker()
 
@@ -46,10 +46,10 @@ with app.app_context():
             primary_region='Nairobi',
             operation_areas='Nairobi,Mombasa,Kisumu'
         )
-        admin.set_password('admin1234')  # 8-character password
+        admin.set_password('admin1234')
         db.session.add(admin)
 
-        user_roles = ['Business', 'Agent']
+        user_roles = ['Business', 'Agent', 'PickupStation']
         users = [admin]
         for _ in range(num_users):
             name = faker.name()
@@ -63,9 +63,10 @@ with app.app_context():
                 updated_at=datetime.now(timezone.utc),
                 profile_picture='default.png',
                 status='Available',
-                Request='Approved' if user_role == 'Business' else 'Pending',
+                Request='Approved' if user_role in ['Business', 'PickupStation'] else 'Pending',
                 primary_region=faker.city(),
-                operation_areas=','.join([faker.city() for _ in range(3)])  # Generate 3 random cities
+                operation_areas=','.join([faker.city() for _ in range(3)]),
+                is_open=user_role == 'PickupStation'
             )
             user.set_password('password')
             users.append(user)
@@ -74,7 +75,6 @@ with app.app_context():
         print(f"Seeded {num_users + 1} users (including admin).")
         return users
 
-
     def seed_parcels(users, num_parcels=20):
         parcels = []
         categories = ['Small Electronic', 'Envelope', 'Big electronic', 'Food']
@@ -82,6 +82,7 @@ with app.app_context():
         for _ in range(num_parcels):
             sender = random.choice([u for u in users if u.user_role == 'Business'])
             recipient = random.choice(users)
+            pickup_station = random.choice([u for u in users if u.user_role == 'PickupStation'])
             parcel = Parcel(
                 sender_id=sender.user_id,
                 tracking_number=''.join(random.choices(string.ascii_uppercase + string.digits, k=10)),
@@ -98,7 +99,9 @@ with app.app_context():
                 recipient_email=recipient.email,
                 category=random.choice(categories),
                 latitude=float(faker.latitude()),
-                longitude=float(faker.longitude())
+                longitude=float(faker.longitude()),
+                delivery_type=random.choice(['PickupStation', 'DoorDelivery']),
+                pickup_station_id=pickup_station.user_id
             )
             parcels.append(parcel)
             db.session.add(parcel)
@@ -109,7 +112,7 @@ with app.app_context():
     def seed_deliveries(parcels, users, num_deliveries=15):
         deliveries = []
         agents = [user for user in users if user.user_role == 'Agent' and user.Request == 'Approved']
-        statuses = ['Scheduled', 'In Transit', 'Delivered']
+        statuses = ['At Pickup Station', 'Collected']
         for parcel in random.sample(parcels, num_deliveries):
             delivery = Delivery(
                 parcel_id=parcel.parcel_id,
@@ -125,7 +128,7 @@ with app.app_context():
         db.session.commit()
         print(f"Seeded {num_deliveries} deliveries.")
         return deliveries
-    
+
     def seed_orders(users, parcels, num_orders=10):
         orders = []
         for _ in range(num_orders):
@@ -149,7 +152,7 @@ with app.app_context():
         notifications = []
         types = ['SMS', 'Email', 'App']
         statuses = ['Sent', 'Delivered', 'Read']
-        
+
         for _ in range(num_notifications):
             user = random.choice(users)
             notification = Notification(
@@ -168,26 +171,17 @@ with app.app_context():
     def seed_tracking(parcels):
         trackings = []
         statuses = ['Scheduled for Pickup', 'Picked Up', 'Out for Delivery', 'In Transit', 'Delivered', 'Cancelled']
-        
         for parcel in parcels:
-            num_entries = random.randint(1, len(statuses))
-            
-            for i in range(num_entries):
-                status = statuses[i]
-                
-                tracking = Tracking(
-                    parcel_id=parcel.parcel_id,
-                    location=faker.city(),
-                    status=status,
-                    timestamp=datetime.now(timezone.utc) + timedelta(hours=i*6)
-                )
-                trackings.append(tracking)
-                db.session.add(tracking)
-            
-            parcel.status = trackings[-1].status
-            
+            tracking = Tracking(
+                parcel_id=parcel.parcel_id,
+                location=faker.city(),
+                status=random.choice(statuses),
+                timestamp=datetime.now(timezone.utc)
+            )
+            trackings.append(tracking)
+            db.session.add(tracking)
         db.session.commit()
-        print(f"Seeded {len(trackings)} trackings for {len(parcels)} parcels.")
+        print("Seeded tracking info.")
         return trackings
 
     users = seed_users()
@@ -196,18 +190,3 @@ with app.app_context():
     orders = seed_orders(users, parcels)
     notifications = seed_notifications(users)
     trackings = seed_tracking(parcels)
-
-    # Approve or reject pending agents
-    admin = User.query.filter_by(user_role='Admin').first()
-    pending_agents = User.query.filter_by(user_role='Agent', Request='Pending').all()
-    for agent in pending_agents:
-        if random.choice([True, False]):
-            agent.Request = 'Approved'
-            agent.status = 'Available'
-            send_notification(agent.email, 'Agent Request Approved', f'Your agent request has been approved. Welcome to our system!')
-        else:
-            agent.Request = 'Rejected'
-            agent.status = 'Unavailable'
-            send_notification(agent.email, 'Agent Request Rejected', f'We regret to inform you that your agent request has been rejected.')
-    db.session.commit()
-    print(f"Processed {len(pending_agents)} pending agent requests.")
