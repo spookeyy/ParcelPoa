@@ -45,7 +45,11 @@ import OrderManagement from "./pages/Business/OrderManagement";
 import ParcelForm from "./pages/Business/ParcelForm";
 import ParcelTracking from "./pages/Business/ParcelTracking";
 import PickupScheduling from "./pages/Business/PickupScheduling";
-import PickupStationDashboard from "./pages/Business/PickupStationDashboard";
+
+// Pickup Station
+import PickupStationLayout from "./pages/PickupStation/PickupStationLayout";
+import PickupStationDashboard from "./pages/PickupStation/PickupStationDashboard";
+import ManageParcels from "./pages/PickupStation/ManageParcels";
 
 // Buyer Pages
 import OrderTracking from "./pages/Buyer/OrderTracking";
@@ -237,6 +241,19 @@ function App() {
                   <Route path="businesses" element={<BusinessList />} />
                   <Route path="agent/:id" element={<Agent_Details />} />
                   <Route path="pickup-stations" element={<PickUpStations />} />
+                </Route>
+
+                {/* Pickup Station Routes */}
+                <Route
+                  path="/pickup-station"
+                  element={<ProtectedRoute element={<PickupStationLayout />} />}
+                >
+                  <Route index element={<Navigate to="dashboard" replace />} />
+                  <Route
+                    path="dashboard"
+                    element={<PickupStationDashboard />}
+                  />
+                  <Route path="parcels" element={<ManageParcels />} />
                 </Route>
               </Routes>
             </DeliveryProvider>
