@@ -5,11 +5,10 @@ import { toast } from "react-toastify";
 import Header from "./Header";
 
 function PickupScheduling() {
-  const { authToken } = useContext(UserContext);
+  const { authToken, currentUser } = useContext(UserContext);
   const [availableAgents, setAvailableAgents] = useState([]);
   const [regions, setRegions] = useState([]);
-  const [primaryRegion, setPrimaryRegion] = useState("");
-  const [operationalArea, setOperationalArea] = useState("");
+  const [pickupStations, setPickupStations] = useState([]);
   const [formData, setFormData] = useState({
     recipient_name: "",
     recipient_address: "",
@@ -20,122 +19,153 @@ function PickupScheduling() {
     category: "",
     pickup_time: "",
     agent_id: "",
+    delivery_type: "door_delivery",
+    pickup_station_id: "",
+    current_location: "",
   });
 
   useEffect(() => {
-    // Fetch primary region for business account
-    const fetchPrimaryRegion = async () => {
-      try {
-        const response = await fetch(`${server}/get-business-primary-region`, {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        });
-        if (!response.ok) {
-          throw new Error("Failed to fetch primary region");
-        }
-        const data = await response.json();
-        setPrimaryRegion(data.primary_region); // Set the fetched primary region
-        console.log("Primary region:", data.primary_region);
-      } catch (error) {
-        console.error("Error fetching primary region:", error);
-        toast.error("Failed to fetch primary region");
-      }
-    };
-
     fetchPrimaryRegion();
+    fetchRegions();
+    fetchPickupStations();
   }, [authToken]);
 
   useEffect(() => {
-    const fetchRegions = async () => {
-      try {
-        const response = await fetch(`${server}/get-regions`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch regions");
-        }
-        const regionsData = await response.json();
-        console.log("Regions data:", regionsData); // Log to inspect the response
-
-        // Extract arrays from the object and flatten them into a single array
-        const allRegions = Object.values(regionsData).flat();
-        console.log("All regions:", allRegions);
-
-        setRegions(allRegions);
-      } catch (error) {
-        console.error("Error fetching regions:", error);
-        toast.error("Failed to fetch regions");
-      }
-    };
-
-    fetchRegions();
-  }, []);
-
-  useEffect(() => {
-    const fetchAvailableAgents = async () => {
-      if (!authToken || !operationalArea) return setAvailableAgents([]);
-      try {
-        const response = await fetch(
-          `${server}/get-available-agents?primary_region=${primaryRegion}&operational_area=${operationalArea}`,
-          {
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          }
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch available agents");
-        }
-        const agents = await response.json();
-        setAvailableAgents(agents);
-      } catch (error) {
-        console.error("Error fetching available agents:", error);
-        toast.error("Failed to fetch available agents");
-      }
-    };
-
     fetchAvailableAgents();
-  }, [authToken, operationalArea, primaryRegion]);
+  }, [authToken, formData.current_location]);
+
+  const fetchPrimaryRegion = async () => {
+    try {
+      const response = await fetch(`${server}/get-business-primary-region`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to fetch primary region");
+      const data = await response.json();
+      setFormData((prev) => ({
+        ...prev,
+        current_location: data.primary_region,
+      }));
+    } catch (error) {
+      console.error("Error fetching primary region:", error);
+      toast.error("Failed to fetch primary region");
+    }
+  };
+
+  const fetchRegions = async () => {
+    try {
+      const response = await fetch(`${server}/get-regions`);
+      if (!response.ok) throw new Error("Failed to fetch regions");
+      const regionsData = await response.json();
+      const allRegions = Object.values(regionsData).flat();
+      setRegions(allRegions);
+    } catch (error) {
+      console.error("Error fetching regions:", error);
+      toast.error("Failed to fetch regions");
+    }
+  };
+
+  const fetchPickupStations = async () => {
+    try {
+      const response = await fetch(`${server}/get-open-pickup-stations`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to fetch pickup stations");
+      const stations = await response.json();
+      setPickupStations(stations);
+    } catch (error) {
+      console.error("Error fetching pickup stations:", error);
+      toast.error("Failed to fetch pickup stations");
+    }
+  };
+
+  const fetchAvailableAgents = async () => {
+    if (!authToken || !formData.current_location) return setAvailableAgents([]);
+    try {
+      const response = await fetch(
+        `${server}/get-available-agents?primary_region=${formData.current_location}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to fetch available agents");
+      const agents = await response.json();
+      setAvailableAgents(agents);
+    } catch (error) {
+      console.error("Error fetching available agents:", error);
+      toast.error("Failed to fetch available agents");
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
-      [name]: name === "agent_id" ? parseInt(value, 10) : value,
+      [name]:
+        name === "agent_id" || name === "pickup_station_id"
+          ? parseInt(value, 10)
+          : value,
     }));
   };
 
   const schedulePickup = async (e) => {
     e.preventDefault();
     try {
+      const pickupData = {
+        ...formData,
+        pickup_time: new Date(formData.pickup_time).toISOString(),
+      };
+
+      // Remove recipient_address if delivery_type is pickup_station
+      if (pickupData.delivery_type === "pickup_station") {
+        delete pickupData.recipient_address;
+      } else {
+        delete pickupData.pickup_station_id;
+      }
+
       const response = await fetch(`${server}/schedule_pickup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${authToken}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(pickupData),
       });
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to schedule pickup");
       }
       const result = await response.json();
-      toast.success("Pickup scheduled successfully");
-      setFormData({
-        recipient_name: "",
-        recipient_address: "",
-        recipient_phone: "",
-        recipient_email: "",
-        description: "",
-        weight: "",
-        category: "",
-        pickup_time: "",
-        agent_id: "",
-      });
+      toast.success(
+        `Pickup scheduled successfully. Tracking number: ${result.tracking_number}`
+      );
+      resetForm();
     } catch (error) {
       toast.error(error.message || "Failed to schedule pickup");
       console.error("Error scheduling pickup:", error);
     }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      recipient_name: "",
+      recipient_address: "",
+      recipient_phone: "",
+      recipient_email: "",
+      description: "",
+      weight: "",
+      category: "",
+      pickup_time: "",
+      agent_id: "",
+      delivery_type: "door_delivery",
+      pickup_station_id: "",
+      current_location: formData.current_location,
+    });
   };
 
   return (
@@ -187,6 +217,18 @@ function PickupScheduling() {
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
                       required
                     />
+                    <select
+                      name="delivery_type"
+                      value={formData.delivery_type}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
+                      required
+                    >
+                      <option value="door_delivery">Door Delivery</option>
+                      <option value="pickup_station">Pickup Station</option>
+                    </select>
+                  </div>
+                  {formData.delivery_type === "door_delivery" ? (
                     <input
                       type="text"
                       name="recipient_address"
@@ -196,7 +238,22 @@ function PickupScheduling() {
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
                       required
                     />
-                  </div>
+                  ) : (
+                    <select
+                      name="pickup_station_id"
+                      value={formData.pickup_station_id}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
+                      required
+                    >
+                      <option value="">Select Pickup Station</option>
+                      {pickupStations.map((station) => (
+                        <option key={station.user_id} value={station.user_id}>
+                          {station.name} - {station.primary_region}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                   <textarea
                     name="description"
                     value={formData.description}
@@ -234,11 +291,13 @@ function PickupScheduling() {
                       required
                     />
                     <select
-                      value={operationalArea}
-                      onChange={(e) => setOperationalArea(e.target.value)}
+                      name="current_location"
+                      value={formData.current_location}
+                      onChange={handleChange}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
+                      required
                     >
-                      <option value="">Select Agent Operational Area</option>
+                      <option value="">Select Current Location</option>
                       {regions.map((region, index) => (
                         <option key={index} value={region}>
                           {region}
@@ -263,7 +322,7 @@ function PickupScheduling() {
                   <div className="text-center">
                     <button
                       type="submit"
-                      className="px-24 py-3 bg-black text-white rounded-lg shadow-md hover:bg-yellow-900 transition duration-300 md:ml-2 mt-4 md:mt-0 sm:ml-0 sm:mt-0 sm:px-12 sm:py-2" 
+                      className="px-24 py-3 bg-black text-white rounded-lg shadow-md hover:bg-yellow-900 transition duration-300 md:ml-2 mt-4 md:mt-0 sm:ml-0 sm:mt-0 sm:px-12 sm:py-2"
                     >
                       Schedule Pickup
                     </button>
