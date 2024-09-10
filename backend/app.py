@@ -682,10 +682,10 @@ def schedule_pickup():
     sender_region = get_region_from_address(sender_location)
 
     delivery_type = data.get('delivery_type')
-    if delivery_type not in ['pickup_station', 'door_delivery']:
+    if delivery_type not in ['PickupStation', 'DoorDelivery']:
         return jsonify({"message": "Invalid delivery type"}), 400
 
-    if delivery_type == 'pickup_station':
+    if delivery_type == 'PickupStation':
         pickup_station_id = data.get('pickup_station_id')
         if not pickup_station_id:
             return jsonify({"message": "Pickup station ID is required for pickup station delivery"}), 400
@@ -700,7 +700,7 @@ def schedule_pickup():
 
     new_parcel = Parcel(
         sender_id=current_user_id,
-        tracking_number=generate_unique_tracking_number(),
+        tracking_number=generate_unique_tracking_number(existing_numbers=Parcel.query.with_entities(Parcel.tracking_number).all()),
         recipient_name=data['recipient_name'],
         recipient_address=recipient_address,
         recipient_phone=data['recipient_phone'],
@@ -709,6 +709,8 @@ def schedule_pickup():
         category=data['category'],
         status='Scheduled for Pickup',
         current_location=sender_location,
+        delivery_type=delivery_type,
+        pickup_station_id=pickup_station_id if delivery_type == 'pickup_station' else None,
         sender_email=user.email,
         recipient_email=data['recipient_email']
     )
@@ -760,7 +762,7 @@ def schedule_pickup():
         parcel_id=new_parcel.parcel_id,
         agent_id=selected_agent.user_id,
         pickup_time=pickup_time,
-        status='Scheduled'  # Initial status
+        status='At Pickup Station'  # Initial status
     )
     db.session.add(new_delivery)
 
@@ -1016,7 +1018,7 @@ def update_delivery_status(delivery_id):
         return jsonify({"message": "Status is required"}), 400
 
     new_status = data['status']
-    if new_status not in ['Scheduled', 'Picked Up', 'In Transit', 'At Pickup Station', 'Collected']:
+    if new_status not in ['At Pickup Station', 'Collected']:
         return jsonify({"message": "Invalid status"}), 400
 
     delivery.status = new_status

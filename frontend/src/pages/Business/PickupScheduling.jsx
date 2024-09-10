@@ -19,7 +19,7 @@ function PickupScheduling() {
     category: "",
     pickup_time: "",
     agent_id: "",
-    delivery_type: "door_delivery",
+    delivery_type: "DoorDelivery",
     pickup_station_id: "",
     current_location: "",
   });
@@ -122,7 +122,7 @@ function PickupScheduling() {
       };
 
       // Remove recipient_address if delivery_type is pickup_station
-      if (pickupData.delivery_type === "pickup_station") {
+      if (pickupData.delivery_type === "PickupStation") {
         delete pickupData.recipient_address;
       } else {
         delete pickupData.pickup_station_id;
@@ -142,7 +142,7 @@ function PickupScheduling() {
       }
       const result = await response.json();
       toast.success(
-        `Pickup scheduled successfully. Tracking number: ${result.tracking_number}`
+        `Pickup scheduled successfully. }` //Tracking number: ${result.tracking_number
       );
       resetForm();
     } catch (error) {
@@ -224,11 +224,11 @@ function PickupScheduling() {
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
                       required
                     >
-                      <option value="door_delivery">Door Delivery</option>
-                      <option value="pickup_station">Pickup Station</option>
+                      <option value="DoorDelivery">Door Delivery</option>
+                      <option value="PickupStation">Pickup Station</option>
                     </select>
                   </div>
-                  {formData.delivery_type === "door_delivery" ? (
+                  {formData.delivery_type === "DoorDelivery" ? (
                     <input
                       type="text"
                       name="recipient_address"
