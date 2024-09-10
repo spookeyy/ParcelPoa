@@ -1400,49 +1400,49 @@ def save_base64_image(base64_string, filename):
     return os.path.join('uploads', filename)
 
 # twilio SMS
-from twilio.rest import Client
+# from twilio.rest import Client
 import re
 from flask import request
 
 # Twilio credentials
-account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
-auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
-twilio_phone_number = os.environ.get('TWILIO_PHONE_NUMBER')
+# account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
+# auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
+# twilio_phone_number = os.environ.get('TWILIO_PHONE_NUMBER')
 
-client = Client(account_sid, auth_token)
+# client = Client(account_sid, auth_token)
 
-@app.route('/send-sms', methods=['POST'])
-def send_sms():
-    data = request.json
-    to_number = data.get('to')
-    message = data.get('message')
+# @app.route('/send-sms', methods=['POST'])
+# def send_sms():
+#     data = request.json
+#     to_number = data.get('to')
+#     message = data.get('message')
 
-    # Function to format Kenyan phone numbers
-    def format_kenyan_number(number):
-        # Remove any non-digit characters
-        number = re.sub(r'\D', '', number)
+#     # Function to format Kenyan phone numbers
+#     def format_kenyan_number(number):
+#         # Remove any non-digit characters
+#         number = re.sub(r'\D', '', number)
         
-        if number.startswith('0'):
-            number = number[1:]  # Remove the leading '0'
+#         if number.startswith('0'):
+#             number = number[1:]  # Remove the leading '0'
         
-        # Check if the number already has the country code
-        if not number.startswith('254'):
-            number = '254' + number
+#         # Check if the number already has the country code
+#         if not number.startswith('254'):
+#             number = '254' + number
         
-        return '+' + number
+#         return '+' + number
 
-    # Format the 'to' number
-    to_number = format_kenyan_number(to_number)
+#     # Format the 'to' number
+#     to_number = format_kenyan_number(to_number)
 
-    try:
-        message = client.messages.create(
-            body=message,
-            from_=twilio_phone_number,
-            to=to_number
-        )
-        return jsonify({'success': True, 'message_sid': message.sid}), 200
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 400
+#     try:
+#         message = client.messages.create(
+#             body=message,
+#             from_=twilio_phone_number,
+#             to=to_number
+#         )
+#         return jsonify({'success': True, 'message_sid': message.sid}), 200
+#     except Exception as e:
+#         return jsonify({'success': False, 'error': str(e)}), 400
 
 
 # Africastalking SMS
@@ -1466,7 +1466,7 @@ def send_sms(phone_number, message):
         logging.error(f"Failed to send SMS to {phone_number}: {str(e)}")
         return False
 
-# send_sms("+254755854832", "Hello from parcelpoa!")
+# send_sms("+254103947514", "Hello from parcelpoa!")
 
 
 # sendchamp SMS
@@ -1532,3 +1532,7 @@ logging.info("Application setup completed")
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)
+
+
+
+
