@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { server } from "../../../config.json";
 
-// Define the getStatus function
+
 const getStatus = (status) => (status === "Available" ? "Available" : "Unavailable");
 
 // FilterBar Component

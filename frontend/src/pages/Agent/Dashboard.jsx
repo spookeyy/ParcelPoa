@@ -27,55 +27,55 @@ export default function Dashboard() {
     }
 
     // Fetch deliveries
-    fetch(`${server}/assigned_deliveries`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authToken}`,
-      },
-    })
-      .then((response) => {
-        if (response.status === 422) {
-          return response.json().then((errorData) => {
-            throw new Error(
-              `Unprocessable Entity: ${JSON.stringify(errorData)}`
-            );
-          });
-        }
-        if (!response.ok) {
-          throw new Error("Failed to fetch deliveries");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        // console.log("Fetched deliveries data:", data); // Log the entire response
+    // fetch(`${server}/assigned_deliveries`, {
+    //   method: "GET",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     Authorization: `Bearer ${authToken}`,
+    //   },
+    // })
+    //   .then((response) => {
+    //     if (response.status === 422) {
+    //       return response.json().then((errorData) => {
+    //         throw new Error(
+    //           `Unprocessable Entity: ${JSON.stringify(errorData)}`
+    //         );
+    //       });
+    //     }
+    //     if (!response.ok) {
+    //       throw new Error("Failed to fetch deliveries");
+    //     }
+    //     return response.json();
+    //   })
+    //   .then((data) => {
+    //     // console.log("Fetched deliveries data:", data); // Log the entire response
 
-        setAssignedDeliveries(
-          data.map((delivery) => ({
-            deliveryID: delivery.delivery_id,
-            orderID: delivery.parcel_id,
-            trackingNumber: delivery.parcel?.tracking_number || "N/A",
-            status: delivery.status,
-            orderDate: delivery.created_at,
-            recipientEmail: delivery.parcel?.recipient_email || "N/A",
-            sender_email: delivery.parcel?.sender?.sender_email || "N/A",
-          }))
-        );
-        setTotalDeliveries(data.length);
+    //     setAssignedDeliveries(
+    //       data.map((delivery) => ({
+    //         deliveryID: delivery.delivery_id,
+    //         orderID: delivery.parcel_id,
+    //         trackingNumber: delivery.parcel?.tracking_number || "N/A",
+    //         status: delivery.status,
+    //         orderDate: delivery.created_at,
+    //         recipientEmail: delivery.parcel?.recipient_email || "N/A",
+    //         sender_email: delivery.parcel?.sender?.sender_email || "N/A",
+    //       }))
+    //     );
+    //     setTotalDeliveries(data.length);
 
-        const deliveredCount = data.filter(
-          (delivery) => delivery.status === "Delivered"
-        ).length;
-        setDelivered(deliveredCount);
+    //     const deliveredCount = data.filter(
+    //       (delivery) => delivery.status === "Delivered"
+    //     ).length;
+    //     setDelivered(deliveredCount);
 
-        const inTransitCount = data.filter(
-          (delivery) => delivery.status === "In Transit"
-        ).length;
-        setInTransit(inTransitCount);
-      })
-      .catch((error) => {
-        console.error("Error fetching deliveries:", error);
-      });
+    //     const inTransitCount = data.filter(
+    //       (delivery) => delivery.status === "In Transit"
+    //     ).length;
+    //     setInTransit(inTransitCount);
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error fetching deliveries:", error);
+    //   });
 
     // Fetch parcels
     fetch(`${server}/agent_parcels`, {
