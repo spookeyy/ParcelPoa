@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import L from "leaflet";
+import { LoadScript, GoogleMap, Marker } from "@react-google-maps/api";
 import { server } from "../../config.json";
 
 export default function GPS({ parcel_id }) {
@@ -53,10 +54,15 @@ export default function GPS({ parcel_id }) {
     };
   }, [parcel_id, fetchLatestLocation]);
 
+  const mapContainerStyle = {
+    width: "100%",
+    height: "400px",
+  };
+
   return (
     <div>
       <h6 className="text-md font-bold mb-4">GPS Tracker</h6>
-      <LoadScript googleMapsApiKey="https://maps.googleapis.com/maps/api/js?key=AIzaSyAOVYRIgupAurZup5y1PRh8Ismb1A3lLao&libraries=places&callback=initMap">
+      <LoadScript googleMapsApiKey="https://cdn.jsdelivr.net/gh/somanchiu/Keyless-Google-Maps-API@v6.8/mapsJavaScriptAPI.js">
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
           center={position}

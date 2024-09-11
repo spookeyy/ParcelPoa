@@ -160,7 +160,22 @@ def logout():
 @app.route('/users', methods=['GET'])
 def get_users():
     users = User.query.all()
-    return jsonify([user.to_dict() for user in users])
+    return jsonify([user_to_dict(user) for user in users])
+
+def user_to_dict(user):
+    profile_picture_url = url_for('static', filename=f'/{user.profile_picture}', _external=True) if user.profile_picture else None
+    
+    return {
+        'user_id': user.user_id,
+        'name': user.name,
+        'email': user.email,
+        'phone_number': user.phone_number,
+        'user_role': user.user_role,
+        'profile_picture': profile_picture_url,
+        'status': user.status if user.status else 'Available',
+        'primary_region': user.primary_region,
+        'operation_areas': user.operation_areas.split(',') if user.operation_areas else []
+    }
 
 @app.route('/users/<int:user_id>', methods=['GET'])
 def get_user(user_id):
@@ -710,7 +725,7 @@ def schedule_pickup():
         status='Scheduled for Pickup',
         current_location=sender_location,
         delivery_type=delivery_type,
-        pickup_station_id=pickup_station_id if delivery_type == 'pickup_station' else None,
+        pickup_station_id=pickup_station_id if delivery_type == 'PickupStation' else None,
         sender_email=user.email,
         recipient_email=data['recipient_email']
     )
