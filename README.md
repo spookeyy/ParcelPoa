@@ -22,7 +22,7 @@ License
      Email:pangasmeshack@gmail.com
      Phone:+254793057720
      Name:Whitney Shisia
-     Email:
+     Email:Shisiawhitney215@gmail.com
      Phone:+254705719325
      Name:Scarlet Sarah
      Email:sarahscarlet641@gmail.com
