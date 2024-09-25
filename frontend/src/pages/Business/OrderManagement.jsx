@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from "react";
 import { UserContext } from "../../Context/UserContext";
 import { server } from "../../../config.json";
 import { toast } from "react-toastify";
-import Header from "./Header";
 
 function OrderManagement() {
   const [orders, setOrders] = useState([]);
@@ -157,7 +156,6 @@ function OrderManagement() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <Header />
       <div className="container mx-auto px-4 py-8">
         {/* Filter Bar */}
         <div className="bg-gray-100 p-4 rounded-lg shadow-md mb-6 flex flex-wrap gap-4 items-center">
