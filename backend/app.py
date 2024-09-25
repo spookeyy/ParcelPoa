@@ -454,32 +454,25 @@ def update_parcel_status(parcel_id):
     current_user = User.query.get(get_jwt_identity())
     if not current_user or current_user.user_role != 'Agent':
         return jsonify({"message": "Unauthorized access"}), 403
-
     parcel = Parcel.query.get(parcel_id)
     if not parcel:
         return jsonify({"message": "Parcel not found"}), 404
-
     data = request.get_json()
     if not data or 'status' not in data:
         return jsonify({"message": "Invalid request data"}), 400
-
     new_status = data['status']
     valid_statuses = ['Picked Up', 'Out for Delivery', 'In Transit', 'Delivered']
     if new_status not in valid_statuses:
         return jsonify({"message": "Invalid status"}), 400
-
-    if hmac.compare_digest(parcel.status, 'Delivered'): 
+    if hmac.compare_digest(parcel.status, 'Delivered'):
         return jsonify({"message": "Cannot update delivered parcel status"}), 400
-
     old_status = parcel.status
     parcel.status = new_status
     parcel.updated_at = datetime.now()
-
     # Update location (with input validation)
     parcel.latitude = float(data.get('latitude', parcel.latitude))
     parcel.longitude = float(data.get('longitude', parcel.longitude))
-    parcel.current_location = data.get('location', parcel.current_location)[:255]  # Limit length
-
+    parcel.current_location = data.get('location', parcel.current_location)[:255] # Limit length
     new_tracking = Tracking(
         parcel_id=parcel.parcel_id,
         location=parcel.current_location,
@@ -487,30 +480,31 @@ def update_parcel_status(parcel_id):
         timestamp=datetime.now()
     )
     db.session.add(new_tracking)
-    
     try:
         db.session.commit()
     except Exception as e:
         db.session.rollback()
         app.logger.error(f"Database error: {str(e)}")
         return jsonify({"message": "An error occurred while updating the parcel"}), 500
-
     # Send notifications
     if old_status != parcel.status:
         safe_tracking_number = quote(parcel.tracking_number)
         tracking_url = f"https://parcelpoa.netlify.app/track/{safe_tracking_number}"
-        
         notification_sender = f'Your parcel with tracking number {parcel.tracking_number} is now {parcel.status}.'
-        notification_recipient = (f'The parcel with tracking number {parcel.tracking_number} is now {parcel.status}. '
-                                  f'Visit {tracking_url} to track your parcel.')
-        
+        notification_recipient = f'''
+        <html>
+        <body>
+        <p>The parcel with tracking number {parcel.tracking_number} is now {parcel.status}.</p>
+        <p>Click <a href="{tracking_url}">here</a> to track your parcel.</p>
+        </body>
+        </html>
+        '''
         try:
             send_notification(parcel.sender.email, 'Parcel Status Update', notification_sender)
-            send_notification(parcel.recipient_email, 'Parcel Status Update', notification_recipient)
+            send_notification(parcel.recipient_email, 'Parcel Status Update', notification_recipient, html=True)
         except Exception as e:
             app.logger.error(f"Notification error: {str(e)}")
-            # Continue execution even if notification fails
-
+        # Continue execution even if notification fails
     return jsonify({"message": "Parcel status and location updated successfully"}), 200
 
 # agent associated parcels:
@@ -1032,11 +1026,20 @@ def update_parcel_status_at_pickup_station(parcel_id):
         parcel.updated_at = datetime.now(timezone.utc)
     
     db.session.commit()
+
+    notification_recipient = f'''
+        <html>
+        <body>
+        <p>The parcel with tracking number {parcel.tracking_number} is now {new_status}.</p>
+        <p>Visit <a href="https://parcelpoa.netlify.app/track/{parcel.tracking_number}">here</a> to track your parcel.</p>
+        </body>
+        </html>
+        '''
     
     # Send notifications
     if old_status != new_status:
         send_notification(parcel.sender.email, 'Parcel Status Update', f'Your parcel with tracking number {parcel.tracking_number} is now {new_status}.')
-        send_notification(parcel.recipient_email, 'Parcel Status Update', f'The parcel with tracking number {parcel.tracking_number} is now {new_status}. \n Visit https://parcelpoa.netlify.app/track/{parcel.tracking_number} to track your parcel.')
+        send_notification(parcel.recipient_email, 'Parcel Status Update', notification_recipient, html=True)
 
     return jsonify({"message": "Pickup station status updated successfully"}), 200
 
@@ -1072,10 +1075,19 @@ def update_delivery_status(delivery_id):
         parcel.updated_at = datetime.now(timezone.utc)
 
     db.session.commit()
+
+    notification_recipient = f'''
+        <html>
+        <body>
+        <p>The parcel with tracking number {parcel.tracking_number} is now {new_status}.</p>
+        <p>Visit <a href="https://parcelpoa.netlify.app/track/{parcel.tracking_number}">here</a> to track your parcel.</p>
+        </body>
+        </html>
+        '''
     
     # Send notifications
     send_notification(parcel.sender.email, 'Parcel Status Update', f'Your parcel with tracking number {parcel.tracking_number} is now {new_status}.')
-    send_notification(parcel.recipient_email, 'Parcel Status Update', f'The parcel with tracking number {parcel.tracking_number} is now {new_status}. \n Visit https://parcelpoa.netlify.app/track/{parcel.tracking_number} to track your parcel.')
+    send_notification(parcel.recipient_email, 'Parcel Status Update', notification_recipient, html=True)
 
     return jsonify({"message": "Delivery status updated successfully"}), 200
 
@@ -1233,14 +1245,17 @@ def get_unread_notification_count():
 
 
 # send email notifications to users/parties
-def send_notification(email, subject, body):
+def send_notification(email, subject, body, html=False):
     if not is_valid_email(email):
         logging.error(f"Invalid email address: {email}")
         return
 
     with app.app_context():
         try:
-            msg = Message(subject, recipients=[email], body=body)
+            if html:
+                msg = Message(subject, recipients=[email], html=body)
+            else:
+                msg = Message(subject, recipients=[email], body=body)
             mail.send(msg)
             logging.info(f"Notification sent to {email}.")
         except Exception as e:
@@ -1336,7 +1351,7 @@ def request_reset_password():
 
     token = s.dumps(email, salt='password-reset-salt') 
 
-    # seting reset URL to use frontend URL
+    # setting reset URL to use frontend URL
     reset_url = f"{frontend_url}/reset-password/{token}"
 
     try:
@@ -1345,8 +1360,7 @@ def request_reset_password():
     except Exception as e:
         print(f"Error sending email: {str(e)}")
         return jsonify({"message": "An error occurred while processing your request."}), 500
-    
-    
+
 @app.route('/reset-password/<token>', methods=['POST'])
 def reset_password(token):
     try:
@@ -1373,25 +1387,28 @@ def reset_password(token):
     
     return jsonify({"message": "Password has been reset successfully"}), 200
 
-
 def send_email(to_email, reset_url):
     subject = "Password Reset Request"
-    content = f"""
-    Hello from parcelpoa!,
+    html_content = f"""
+    <html>
+    <body>
+    <p>Hello from parcelpoa!,</p>
 
-    You have requested to reset your password. Please click on the following link to reset your password:
+    <p>You have requested to reset your password. Please click on the following link to reset your password:</p>
 
-    {reset_url}
+    <p><a href="{reset_url}">Reset Password</a></p>
 
-    If you did not request this, please ignore this email and your password will remain unchanged.
+    <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
 
-    Best regards,
-    The parcelpoa Team
+    <p>Best regards,<br>
+    The parcelpoa Team</p>
+    </body>
+    </html>
     """
     
     msg = Message(subject=subject,
                   recipients=[to_email],
-                  body=content)
+                  html=html_content)
     
     try:
         print(f"Attempting to send email to {to_email}")
