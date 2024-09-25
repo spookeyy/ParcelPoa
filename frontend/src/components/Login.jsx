@@ -1,7 +1,8 @@
 import React, { useContext, useState } from "react";
+import { motion } from "framer-motion";
 import { UserContext } from "../Context/UserContext";
 import { Link, useNavigate } from "react-router-dom";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { EyeIcon, EyeOffIcon, Mail, Lock } from "lucide-react";
 import Navbar from "./Navbar";
 import logo from "../assets/Logo.png";
 
@@ -22,7 +23,6 @@ export default function Login() {
         setPassword("");
       })
       .catch((error) => {
-        // Error is already handled in the login function in the UserContext
         console.error("Login failed:", error);
       });
   };
@@ -38,9 +38,19 @@ export default function Login() {
   return (
     <>
       <Navbar />
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <div className="login-container flex flex-col p-8 bg-opacity-20 backdrop-blur-md shadow-lg rounded-lg max-w-md w-full max-h-[90vh] mt-[-60px]">
-          <div className="flex items-center justify-center ">
+      <div className="flex items-center justify-center min-h-screen bg-gray-200">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 2.5 }}
+          className="login-container flex flex-col p-8 bg-opacity-20 backdrop-blur-md shadow-lg rounded-lg max-w-md w-full max-h-[90vh] mt-[-60px]"
+        >
+          <motion.div
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="flex items-center justify-center"
+          >
             <img
               src={logo}
               alt="ParcelPoa Logo"
@@ -51,12 +61,20 @@ export default function Login() {
                 ParcelPoa
               </h1>
             </div>
-          </div>
-          <p className="text-gray-900 mb-4 text-center">
+          </motion.div>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="text-gray-900 mb-4 text-center"
+          >
             Login to your account
-          </p>
+          </motion.p>
 
-          <form
+          <motion.form
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
             onSubmit={handleSubmit}
             className="space-y-6 bg-gradient-to-br from-yellow-200 to-yellow-400 bg-opacity-150 backdrop-blur-md shadow-lg rounded-lg p-6"
           >
@@ -67,14 +85,20 @@ export default function Login() {
               >
                 Email
               </label>
-              <input
-                type="email"
-                id="email"
-                value={email || ""}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-gray-100 p-2 focus:outline-none border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition pr-10"
-                required
-              />
+              <div className="relative">
+                <input
+                  type="email"
+                  id="email"
+                  value={email || ""}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-gray-100 p-2 pl-10 focus:outline-none border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition pr-10"
+                  required
+                />
+                <Mail
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={18}
+                />
+              </div>
             </div>
             <div>
               <label
@@ -89,8 +113,12 @@ export default function Login() {
                   id="password"
                   value={password || ""}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-gray-100 p-2 border focus:outline-none border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition pr-10"
+                  className="w-full bg-gray-100 p-2 pl-10 border focus:outline-none border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition pr-10"
                   required
+                />
+                <Lock
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={18}
                 />
                 <button
                   type="button"
@@ -106,14 +134,21 @@ export default function Login() {
                 </button>
               </div>
             </div>
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               type="submit"
               className="w-full bg-black text-white p-3 rounded-md hover:bg-yellow-800 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition duration-200"
             >
               Login
-            </button>
-          </form>
-          <div className="mt-6 space-y-2">
+            </motion.button>
+          </motion.form>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="mt-6 space-y-2"
+          >
             <p className="text-sm text-center text-gray-900 font-medium">
               Don't have an account?{" "}
               <Link
@@ -136,11 +171,9 @@ export default function Login() {
                 </Link>
               </button>
             </p>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </>
   );
 }
-
-// bg-gradient-to-bl from-yellow-200 to-yellow-400
