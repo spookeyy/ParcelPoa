@@ -57,7 +57,14 @@ export default function AgentRequests() {
       });
       if (!response.ok) throw new Error("Failed to fetch agents");
       const agentsData = await response.json();
-      setAgentRequests(agentsData);
+
+      // Map the agents data to include the full profile picture URL
+      const mappedAgentsData = agentsData.map((agent) => ({
+        ...agent,
+        profile_picture: agent.profile_picture || "/path/to/default/image.png",
+      }));
+
+      setAgentRequests(mappedAgentsData);
     } catch (error) {
       console.error("Error fetching agents:", error);
       toast.error("Failed to fetch agents");
@@ -149,7 +156,7 @@ export default function AgentRequests() {
                     Name
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider border">
-                    Contact
+                    Email
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider border">
                     Phone
@@ -172,7 +179,9 @@ export default function AgentRequests() {
                         className="w-12 h-12 rounded-full object-cover"
                       />
                     </td>
-                    <td className="px-6 py-4 text-sm border">{agent.user_id}</td>
+                    <td className="px-6 py-4 text-sm border">
+                      {agent.user_id}
+                    </td>
                     <td className="px-6 py-4 text-sm border">{agent.name}</td>
                     <td className="px-6 py-4 text-sm border">{agent.email}</td>
                     <td className="px-6 py-4 text-sm border">
