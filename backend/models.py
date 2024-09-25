@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from flask import url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Boolean, Column, Float, Integer, String, Enum, ForeignKey, Text, DECIMAL, TIMESTAMP
 from sqlalchemy.orm import relationship
@@ -46,7 +47,7 @@ class User(db.Model):
             'user_role': self.user_role,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
-            'profile_picture': self.profile_picture,
+            'profile_picture': url_for('static', filename=self.profile_picture, _external=True) if self.profile_picture else None,
             'status': self.status,
             'Request': self.Request,
             'primary_region': self.primary_region,
