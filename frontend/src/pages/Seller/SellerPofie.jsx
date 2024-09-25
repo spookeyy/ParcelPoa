@@ -13,6 +13,7 @@ export default function SellerProfile({ onClose }) {
   const [message, setMessage] = useState("");
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [userName, setUserName] = useState("");
+  const [profileImage, setProfileImage] = useState(null); // For profile picture
 
   const { authToken } = useContext(UserContext);
   const userInitial = userName.charAt(0).toUpperCase();
@@ -21,6 +22,7 @@ export default function SellerProfile({ onClose }) {
     fetchProfile();
   }, []);
 
+  // Fetch profile data including the profile picture
   const fetchProfile = () => {
     fetch(`${server}/profile`, {
       method: "GET",
@@ -30,6 +32,7 @@ export default function SellerProfile({ onClose }) {
     })
       .then((response) => response.json())
       .then((profile) => {
+        setProfileImage(profile.profile_picture); // Set the profile picture
         setName(profile.name);
         setEmail(profile.email);
         setPhoneNumber(profile.phone_number);
@@ -42,6 +45,19 @@ export default function SellerProfile({ onClose }) {
       });
   };
 
+  // Handle profile picture change
+  const handleProfilePictureChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImage(reader.result); // Set the profile image preview
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Update profile data including the profile picture
   const handleUpdateProfile = (e) => {
     e.preventDefault();
 
@@ -51,7 +67,12 @@ export default function SellerProfile({ onClose }) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${authToken}`,
       },
-      body: JSON.stringify({ name, email, phone_number: phoneNumber }),
+      body: JSON.stringify({
+        name,
+        email,
+        phone_number: phoneNumber,
+        profile_picture: profileImage, // Include profile picture in update
+      }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -101,6 +122,50 @@ export default function SellerProfile({ onClose }) {
         {/* Modal body */}
         <div className="mt-[-10px] p-4 sm:p-6 sm:mt-[-10px]">
           <form onSubmit={handleUpdateProfile} className="space-y-4">
+            {/* Profile picture */}
+            <div className="flex flex-col items-center mb-6">
+              <div className="relative mb-4">
+                <img
+                  src={profileImage || "/path/to/default/profile.jpg"} // Default profile picture
+                  alt="Profile"
+                  className="w-32 h-32 rounded-full object-cover border-4 border-yellow-500 shadow-lg"
+                />
+                <label
+                  htmlFor="profile-picture-upload"
+                  className="absolute bottom-0 right-0 bg-yellow-500 text-white p-2 rounded-full cursor-pointer hover:bg-yellow-600 transition-colors"
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                </label>
+                <input
+                  type="file"
+                  id="profile-picture-upload"
+                  accept="image/*"
+                  onChange={handleProfilePictureChange}
+                  className="hidden"
+                />
+              </div>
+            </div>
+
+            {/* Name */}
             <div className="mb-4">
               <label
                 htmlFor="name"
@@ -114,9 +179,11 @@ export default function SellerProfile({ onClose }) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="mt-1 block w-full border-yellow-300 rounded-lg shadow-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600 focus:ring-opacity-50 px-3 py-2 transition-all duration-300 ease-in-out"
+                className="text-black mt-1 block w-full border-yellow-300 rounded-lg shadow-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600 focus:ring-opacity-50 px-3 py-2 transition-all duration-300 ease-in-out"
               />
             </div>
+
+            {/* Email */}
             <div className="mb-4">
               <label
                 htmlFor="email"
@@ -130,9 +197,11 @@ export default function SellerProfile({ onClose }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="mt-1 block w-full border-yellow-300 rounded-lg shadow-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600 focus:ring-opacity-50 px-3 py-2 transition-all duration-300 ease-in-out"
+                className="text-black mt-1 block w-full border-yellow-300 rounded-lg shadow-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600 focus:ring-opacity-50 px-3 py-2 transition-all duration-300 ease-in-out"
               />
             </div>
+
+            {/* Phone number */}
             <div className="mb-4">
               <label
                 htmlFor="phone"
@@ -146,59 +215,54 @@ export default function SellerProfile({ onClose }) {
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 required
-                className="mt-1 block w-full border-yellow-300 rounded-lg shadow-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600 focus:ring-opacity-50 px-3 py-2 transition-all duration-300 ease-in-out"
+                className="text-black mt-1 block w-full border-yellow-300 rounded-lg shadow-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600 focus:ring-opacity-50 px-3 py-2 transition-all duration-300 ease-in-out"
               />
             </div>
+
+            {/* User role */}
             <div className="mb-4">
-              <label
-                htmlFor="userRole"
-                className="block text-sm font-bold text-yellow-700"
-              >
+              <label className="block text-sm font-bold text-yellow-700">
                 User Role
               </label>
               <input
                 type="text"
-                id="userRole"
                 value={userRole}
                 readOnly
-                className="mt-1 block w-full border-yellow-300 rounded-lg shadow-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600 focus:ring-opacity-50 px-3 py-2 transition-all duration-300 ease-in-out"
+                className="text-black mt-1 block w-full border-yellow-300 rounded-lg shadow-sm bg-yellow-50"
               />
             </div>
-            <button
-              type="submit"
-              className="w-full bg-black text-white py-2 rounded-md shadow hover:bg-yellow-800 hover:text-white transition-all duration-300 ease-in-out"
-            >
-              Update Profile
-            </button>
-            {message && (
-              <div className="mt-4 text-green-500 text-center">{message}</div>
-            )}
+
+            {/* Password change link */}
+            <div className="flex items-center justify-between mb-6">
+              <button
+                type="button"
+                className="text-sm font-bold text-yellow-600 hover:text-yellow-700 focus:outline-none"
+                onClick={() => setShowChangePassword(true)}
+              >
+                Change Password
+              </button>
+            </div>
+
+            {/* Update button */}
+            <div className="flex justify-center">
+              <button
+                type="submit"
+                className="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:ring-opacity-50"
+              >
+                Update Profile
+              </button>
+            </div>
           </form>
         </div>
-
-        {/* Modal footer */}
-        <div className="flex flex-col sm:flex-row justify-between p-4 border-t border-yellow-200">
-          <button
-            onClick={onClose}
-            className="mb-2 sm:mb-0 sm:mr-2 px-4 py-2 bg-gray-600 text-white border border-yellow-300 rounded-md hover:bg-yellow-800 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition duration-300 ease-in-out"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={() => setShowChangePassword(!showChangePassword)}
-            className="px-4 py-2 text-white bg-yellow-600 border border-yellow-300 rounded-md hover:bg-yellow-800 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition duration-300 ease-in-out"
-          >
-            Change Password
-          </button>
-        </div>
       </div>
-
+      {/* Change Password modal */}
       {showChangePassword && (
-        <div className="fixed inset-0 flex items-center justify-center bg-yellow-900 bg-opacity-50 z-50">
-          <ChangePassword onClose={() => setShowChangePassword(false)} />
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg w-full max-w-sm mx-auto relative">
+            <ChangePassword onClose={() => setShowChangePassword(false)} />
+          </div>
         </div>
       )}
     </div>
   );
-
 }
