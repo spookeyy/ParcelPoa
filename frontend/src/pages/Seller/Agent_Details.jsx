@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import {server} from "../../../config.json";
-import Navbar from "../Admin/Navbar";
 
 const Agent_Details = () => {
   const { id } = useParams(); // 'id' here corresponds to the agent's ID in the URL params
@@ -73,7 +72,6 @@ const Agent_Details = () => {
 
   return (
     <>
-      <Navbar />
       <div className="p-8 max-w-3xl mx-auto bg-white rounded-lg shadow-lg border border-gray-200 mt-10 mb-14">
         <h1 className="text-3xl font-bold mb-6 text-gray-900">Agent Details</h1>
         <div className="bg-gray-50 p-6 rounded-lg shadow-md border border-gray-300">
@@ -106,7 +104,7 @@ const Agent_Details = () => {
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   agent.Request === "Approved"
                     ? "bg-green-500 text-white cursor-not-allowed"
-                    : "bg-blue-500 text-white hover:bg-blue-600"
+                    : "bg-black text-white hover:bg-yellow-500 hover:text-white"
                 }`}
                 disabled={agent.Request === "Approved"}
               >
