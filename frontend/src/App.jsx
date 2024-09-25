@@ -40,6 +40,7 @@ import SellerPofie from "./pages/Seller/SellerPofie";
 import SellerLayout from "./components/SellerLayout";
 
 // Business Pages
+import BusinessLayout from "./pages/Business/BusinessLayout";
 import BusinessDashboard from "./pages/Business/BusinessDashboard";
 import OrderManagement from "./pages/Business/OrderManagement";
 import ParcelForm from "./pages/Business/ParcelForm";
@@ -199,35 +200,46 @@ function App() {
 
                 {/* Business Routes */}
                 <Route
-                  path="/business/dashboard"
-                  element={<ProtectedRoute element={<BusinessDashboard />} />}
-                />
-                <Route
-                  path="/business/parcel-tracking"
-                  element={<ProtectedRoute element={<ParcelTracking />} />}
-                />
-                <Route
-                  path="/business/parcel-tracking/:trackingid"
-                  element={<ProtectedRoute element={<ParcelTracking />} />}
-                />
-                <Route
-                  path="/business/orders"
-                  element={<ProtectedRoute element={<OrderManagement />} />}
-                />
-                <Route
-                  path="/business/parcels"
-                  element={<ProtectedRoute element={<ParcelForm />} />}
-                />
-                <Route
-                  path="/business/schedule-pickup"
-                  element={<ProtectedRoute element={<PickupScheduling />} />}
-                />
+                  path="/business/*"
+                  element={<ProtectedRoute element={<BusinessLayout />} />}
+                >
+                  <Route
+                    path="dashboard"
+                    element={<ProtectedRoute element={<BusinessDashboard />} />}
+                  />
+                  <Route
+                    path="parcel-tracking"
+                    element={<ProtectedRoute element={<ParcelTracking />} />}
+                  />
+                  <Route
+                    path="parcel-tracking/:trackingid"
+                    element={<ProtectedRoute element={<ParcelTracking />} />}
+                  />
+                  <Route
+                    path="orders"
+                    element={<ProtectedRoute element={<OrderManagement />} />}
+                  />
+                  <Route
+                    path="parcels"
+                    element={<ProtectedRoute element={<ParcelForm />} />}
+                  />
+                  <Route
+                    path="schedule-pickup"
+                    element={<ProtectedRoute element={<PickupScheduling />} />}
+                  />
+                  <Route
+                    path="agents"
+                    element={<ProtectedRoute element={<Agents />} />}
+                  />
+                </Route>
+
+                {/* Pickup Station Routes
                 <Route
                   path="/pickup-station/dashboard"
                   element={
                     <ProtectedRoute element={<PickupStationDashboard />} />
                   }
-                />
+                /> */}
 
                 {/* Admin Routes */}
                 <Route
