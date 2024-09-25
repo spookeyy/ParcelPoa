@@ -1,21 +1,20 @@
 import os
 import random
 import string
+from sqlalchemy import func
+from werkzeug.security import hmac
 from dotenv import load_dotenv
-from flask import Flask, redirect, request, jsonify,url_for
+from flask import Flask, request, jsonify,url_for
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from datetime import datetime, timedelta, timezone
-from flask_apscheduler import APScheduler
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
-from requests_oauthlib import OAuth1
-from werkzeug.security import generate_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, get_jwt
 from models import db, User, Parcel, Delivery, Notification, Tracking, Order
+from analytics import register_analytics_routes
 from flask_cors import CORS
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+from urllib.parse import quote
 from sqlalchemy.orm import joinedload
 import logging
 
@@ -30,8 +29,8 @@ logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__, static_folder='static')
 CORS(app)
-# app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db?mode=rw'
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
+app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db?mode=rw'
+# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
 print(f"Connecting to database: {app.config['SQLALCHEMY_DATABASE_URI']}")
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -44,6 +43,7 @@ migrate = Migrate(app, db)
 db.init_app(app)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
+register_analytics_routes(app)
 
 s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
@@ -448,32 +448,37 @@ def delete_parcel(parcel_id):
     db.session.commit()
     return jsonify({"message": "Parcel deleted successfully"}), 200
 
-# update parcel status
 @app.route('/update_status/<int:parcel_id>', methods=['PUT'])
 @jwt_required()
 def update_parcel_status(parcel_id):
     current_user = User.query.get(get_jwt_identity())
-    if current_user.user_role != 'Agent':
-        return jsonify({"message": "Only agents can update parcel status"}), 403
-    
+    if not current_user or current_user.user_role != 'Agent':
+        return jsonify({"message": "Unauthorized access"}), 403
+
     parcel = Parcel.query.get(parcel_id)
     if not parcel:
         return jsonify({"message": "Parcel not found"}), 404
-    
+
     data = request.get_json()
-    if parcel.status == 'Delivered':
-        return jsonify({"message": "Cannot update delivered parcel status"}), 400
-    if data['status'] not in ['Picked Up', 'Out for Delivery', 'In Transit', 'Delivered']:
+    if not data or 'status' not in data:
+        return jsonify({"message": "Invalid request data"}), 400
+
+    new_status = data['status']
+    valid_statuses = ['Picked Up', 'Out for Delivery', 'In Transit', 'Delivered']
+    if new_status not in valid_statuses:
         return jsonify({"message": "Invalid status"}), 400
-    
+
+    if hmac.compare_digest(parcel.status, 'Delivered'): 
+        return jsonify({"message": "Cannot update delivered parcel status"}), 400
+
     old_status = parcel.status
-    parcel.status = data['status']
+    parcel.status = new_status
     parcel.updated_at = datetime.now()
-    
-    # Update location
-    parcel.latitude = data.get('latitude')
-    parcel.longitude = data.get('longitude')
-    parcel.current_location = data.get('location')
+
+    # Update location (with input validation)
+    parcel.latitude = float(data.get('latitude', parcel.latitude))
+    parcel.longitude = float(data.get('longitude', parcel.longitude))
+    parcel.current_location = data.get('location', parcel.current_location)[:255]  # Limit length
 
     new_tracking = Tracking(
         parcel_id=parcel.parcel_id,
@@ -482,12 +487,29 @@ def update_parcel_status(parcel_id):
         timestamp=datetime.now()
     )
     db.session.add(new_tracking)
-    db.session.commit()
+    
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"Database error: {str(e)}")
+        return jsonify({"message": "An error occurred while updating the parcel"}), 500
 
     # Send notifications
     if old_status != parcel.status:
-        send_notification(parcel.sender.email, 'Parcel Status Update', f'Your parcel with tracking number {parcel.tracking_number} is now {parcel.status}.')
-        send_notification(parcel.recipient_email, 'Parcel Status Update', f'The parcel with tracking number {parcel.tracking_number} is now {parcel.status}. \n visit https://parcelpoa.netlify.app/track/{parcel.tracking_number} to track your parcel.')
+        safe_tracking_number = quote(parcel.tracking_number)
+        tracking_url = f"https://parcelpoa.netlify.app/track/{safe_tracking_number}"
+        
+        notification_sender = f'Your parcel with tracking number {parcel.tracking_number} is now {parcel.status}.'
+        notification_recipient = (f'The parcel with tracking number {parcel.tracking_number} is now {parcel.status}. '
+                                  f'Visit {tracking_url} to track your parcel.')
+        
+        try:
+            send_notification(parcel.sender.email, 'Parcel Status Update', notification_sender)
+            send_notification(parcel.recipient_email, 'Parcel Status Update', notification_recipient)
+        except Exception as e:
+            app.logger.error(f"Notification error: {str(e)}")
+            # Continue execution even if notification fails
 
     return jsonify({"message": "Parcel status and location updated successfully"}), 200
 
@@ -872,7 +894,6 @@ def get_agents():
     if user.user_role != 'Admin':
         return jsonify({"message": "Only admins can get agents"}), 403
     agents = User.query.filter_by(user_role='Agent').all()
-    print('agents', agents)
     return jsonify([agent.to_dict() for agent in agents])
 
 
@@ -1224,6 +1245,10 @@ def send_notification(email, subject, body):
             logging.info(f"Notification sent to {email}.")
         except Exception as e:
             logging.error(f"Failed to send notification to {email}: {str(e)}")
+
+#TODO Performance Monitoring
+# analytics.py
+
 
 # generate tracking numbers
 def generate_unique_tracking_number(existing_numbers):
