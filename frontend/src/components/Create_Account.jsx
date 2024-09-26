@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { server } from "../../config.json";
 import Navbar from "./Navbar";
+import Footer from "./Footer";
 import { motion } from "framer-motion";
 import bodaparcelpoa from "../assets/bodaparcelpoa.png";
 
@@ -457,6 +458,7 @@ function Create_Account() {
         </div>
         </motion.div>
       </motion.div>
+      <Footer />
     </>
   );
 }
