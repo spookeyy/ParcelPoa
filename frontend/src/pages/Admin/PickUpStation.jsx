@@ -77,52 +77,72 @@ export default function PickUpStations() {
   );
 
   return (
-    <>
-      <div className="p-6 bg-gray-50 min-h-screen h-full flex flex-col">
-        <h1 className="text-2xl font-bold mb-6 text-gray-800">
-          Pickup Station List
-        </h1>
+    <div className="p-6 bg-gray-50 min-h-screen h-full flex flex-col">
+      <h1 className="text-2xl font-bold mb-6 text-gray-800 text-center">
+        Pickup Station List
+      </h1>
 
-        <FilterBar
-          filters={filters}
-          onFilterChange={handleFilterChange}
-          onReset={resetFilters}
-        />
+      <FilterBar
+        filters={filters}
+        onFilterChange={handleFilterChange}
+        onReset={resetFilters}
+      />
 
-        <div className="overflow-x-auto flex-grow">
+      <div className="flex-grow overflow-hidden">
+        <div className="overflow-x-auto">
           <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-lg">
-            <thead>
-              <tr className="bg-gray-100 text-gray-600 text-base">
-                <th className="px-4 py-2 text-left font-medium">
+            <thead className="bg-gray-100 text-gray-600 text-base sticky top-0">
+              <tr>
+                <th className="px-4 py-2 text-left font-medium border border-gray-300">
                   Profile Image
                 </th>
-                <th className="px-4 py-2 text-left font-medium">Name</th>
-                <th className="px-4 py-2 text-left font-medium">Email</th>
-                <th className="px-4 py-2 text-left font-medium">Phone</th>
-                <th className="px-4 py-2 text-left font-medium">
+                <th className="px-4 py-2 text-left font-medium border border-gray-300">
+                  Name
+                </th>
+                <th className="px-4 py-2 text-left font-medium border border-gray-300">
+                  Email
+                </th>
+                <th className="px-4 py-2 text-left font-medium border border-gray-300">
+                  Phone
+                </th>
+                <th className="px-4 py-2 text-left font-medium border border-gray-300">
                   Primary Region
                 </th>
-                <th className="px-4 py-2 text-left font-medium">Location</th>
+                <th className="px-4 py-2 text-left font-medium border border-gray-300">
+                  Location
+                </th>
               </tr>
             </thead>
+          </table>
+        </div>
+        <div className="overflow-y-auto h-[calc(100vh-300px)]">
+          <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-lg">
             <tbody className="text-gray-700 text-sm">
               {filteredPickUpStations.map((pickupStation) => (
                 <tr
                   key={pickupStation.id}
                   className="hover:bg-gray-50 transition-colors duration-300"
                 >
-                  <td className="px-4 py-2">
+                  <td className="px-4 py-2 border border-gray-300">
                     <img
                       src={pickupStation.profile_picture}
                       alt={`${pickupStation.name}'s profile`}
                       className="w-12 h-12 rounded-full object-cover"
                     />
                   </td>
-                  <td className="px-4 py-2">{pickupStation.name}</td>
-                  <td className="px-4 py-2">{pickupStation.email}</td>
-                  <td className="px-4 py-2">{pickupStation.phone_number}</td>
-                  <td className="px-4 py-2">{pickupStation.primary_region}</td>
-                  <td className="px-4 py-2">
+                  <td className="px-4 py-2 border border-gray-300">
+                    {pickupStation.name}
+                  </td>
+                  <td className="px-4 py-2 border border-gray-300">
+                    {pickupStation.email}
+                  </td>
+                  <td className="px-4 py-2 border border-gray-300">
+                    {pickupStation.phone_number}
+                  </td>
+                  <td className="px-4 py-2 border border-gray-300">
+                    {pickupStation.primary_region}
+                  </td>
+                  <td className="px-4 py-2 border border-gray-300">
                     {pickupStation.operation_areas[0]}
                   </td>
                 </tr>
@@ -131,6 +151,7 @@ export default function PickUpStations() {
           </table>
         </div>
       </div>
-    </>
+    </div>
   );
+  
 }

@@ -5,6 +5,8 @@ import { toast } from "react-toastify";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { server } from "../../config.json";
 import Navbar from "./Navbar";
+import { motion } from "framer-motion";
+import bodaparcelpoa from "../assets/bodaparcelpoa.png";
 
 function Create_Account() {
   const nav = useNavigate();
@@ -127,10 +129,25 @@ function Create_Account() {
   return (
     <>
       <Navbar />
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-yellow-50 to-yellow-100 p-4 sm:p-6">
-        <div className="w-full max-w-4xl bg-white rounded-xl shadow-2xl overflow-hidden sm:rounded-2xl sm:overflow-visible mt-2 mb-8">
+      <motion.div 
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: 1 }} 
+        transition={{ duration: 1.5 }}
+        className="flex items-center justify-center min-h-screen bg-gradient-to-r from-yellow-50 to-yellow-100 p-4 sm:p-6"
+      >
+        <motion.div 
+          initial={{ y: 50, opacity: 0 }} 
+          animate={{ y: 0, opacity: 1 }} 
+          transition={{ delay: 0.3, duration: 1.5 }}
+          className="w-full max-w-4xl bg-white rounded-xl shadow-2xl overflow-hidden sm:rounded-2xl sm:overflow-visible mt-2 mb-8"
+        >
           <div className="md:flex">
-            <div className="md:w-1/2 bg-gradient-to-l from-yellow-500 to-yellow-600 p-8 text-white flex flex-col justify-center rounded-l-xl">
+            <motion.div 
+              initial={{ x: -50, opacity: 0 }} 
+              animate={{ x: 0, opacity: 1 }} 
+              transition={{ delay: 0.4, duration: 1.5 }}
+              className="md:w-1/2 bg-gradient-to-l from-yellow-500 to-yellow-600 p-8 text-white flex flex-col justify-center rounded-l-xl"
+            >
               <h2 className="text-3xl text-gray-600 italic font-bold mb-4">
                 Welcome to ParcelPoa
               </h2>
@@ -146,9 +163,22 @@ function Create_Account() {
                   Login here
                 </Link>
               </p>
-            </div>
+              <motion.img
+                src={bodaparcelpoa}
+                alt="Delivery illustration"
+                className="h-64 w-full mt-8 rounded-lg shadow-lg"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.6, duration: 1.5 }}
+              />
+            </motion.div>
 
-            <div className="md:w-1/2 p-8 rounded-r-xl ">
+            <motion.div 
+              initial={{ x: 50, opacity: 0 }} 
+              animate={{ x: 0, opacity: 1 }} 
+              transition={{ delay: 0.4, duration: 1.5 }}
+              className="md:w-1/2 p-8 rounded-r-xl"
+            >
               <h2 className="text-2xl font-bold mb-6 text-gray-800">
                 Create Account
               </h2>
@@ -423,10 +453,10 @@ function Create_Account() {
                   </button>
                 </div>
               </form>
-            </div>
-          </div>
+          </motion.div>
         </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </>
   );
 }

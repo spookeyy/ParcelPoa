@@ -87,7 +87,7 @@ const ManageParcels = () => {
               <td className="p-2">
                 <button
                   onClick={() => handleUpdateStatus(parcel)}
-                  className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-2 rounded"
+                  className="bg-gray-600 hover:bg-yellow-600 text-white font-semibold py-1 px-2 rounded"
                 >
                   Update Status
                 </button>

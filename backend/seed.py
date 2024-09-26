@@ -83,6 +83,7 @@ with app.app_context():
             sender = random.choice([u for u in users if u.user_role == 'Business'])
             recipient = random.choice(users)
             pickup_station = random.choice([u for u in users if u.user_role == 'PickupStation'])
+            delivery_type = random.choice(['PickupStation', 'DoorDelivery'])
             parcel = Parcel(
                 sender_id=sender.user_id,
                 tracking_number=''.join(random.choices(string.ascii_uppercase + string.digits, k=10)),
@@ -100,8 +101,8 @@ with app.app_context():
                 category=random.choice(categories),
                 latitude=float(faker.latitude()),
                 longitude=float(faker.longitude()),
-                delivery_type=random.choice(['PickupStation', 'DoorDelivery']),
-                pickup_station_id=pickup_station.user_id
+                delivery_type=delivery_type,
+                pickup_station_id=pickup_station.user_id if delivery_type == 'PickupStation' else None
             )
             parcels.append(parcel)
             db.session.add(parcel)

@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
-import React from 'react';
-import { Outlet } from 'react-router-dom';
-import Header from '../pages/Business/Header';
+import React from "react";
+import { Outlet } from "react-router-dom";
+import Header from "../pages/Business/Navbar";
 
 function SellerLayout() {
   return (

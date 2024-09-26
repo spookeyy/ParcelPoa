@@ -15,7 +15,7 @@ import {
   faMapMarkerAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { useTracking } from "../../Context/TrackingContext";
-// import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { motion } from "framer-motion";
 
 library.add(
   faSearch,
@@ -86,16 +86,28 @@ const OrderTracking = () => {
   return (
     <>
       <Navbar />
-      {/* <GPS /> */}
-      <div className="order-tracking p-4 sm:p-6 bg-gradient-to-r from-yellow-50 to-yellow-200 shadow-lg rounded-lg max-w-3xl mx-auto mt-8 min-h-screen">
-        <h2 className="text-3xl font-bold text-center mb-4 text-yellow-900 flex items-center justify-center">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="order-tracking p-4 sm:p-6 bg-gradient-to-r from-yellow-50 to-yellow-200 shadow-lg rounded-lg max-w-3xl mx-auto mt-8 min-h-screen"
+      >
+        <motion.h2
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="text-3xl font-bold text-center mb-4 text-yellow-900 flex items-center justify-center"
+        >
           <FontAwesomeIcon
             icon={faMapMarkerAlt}
             className="mr-2 text-4xl text-yellow-700 animate-pulse"
           />
           Track Your Order
-        </h2>
-        <form
+        </motion.h2>
+        <motion.form
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
           onSubmit={handleTrackOrder}
           className="bg-white p-4 rounded-lg shadow-md border border-gray-200"
         >
@@ -123,30 +135,51 @@ const OrderTracking = () => {
             <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
             Track Order
           </button>
-        </form>
+        </motion.form>
         {loading && (
-          <p className="mt-4 text-yellow-600 text-center flex items-center justify-center">
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="mt-4 text-yellow-600 text-center flex items-center justify-center"
+          >
             <FontAwesomeIcon icon={faSpinner} spin className="mr-2 text-2xl" />
             <span>Loading...</span>
-          </p>
+          </motion.p>
         )}
         {error && (
-          <p className="mt-4 text-red-600 text-center flex items-center justify-center">
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="mt-4 text-red-600 text-center flex items-center justify-center"
+          >
             <FontAwesomeIcon
               icon={faExclamationCircle}
               className="mr-2 text-2xl"
             />
             <span>{error}</span>
-          </p>
+          </motion.p>
         )}
         {parcelData && trackingHistory && trackingHistory.length > 0 && (
-          <div className="mt-6 p-4 max-w-3xl mx-auto bg-white shadow-md rounded-lg">
+          <motion.div
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+            className="mt-6 p-4 max-w-3xl mx-auto bg-white shadow-md rounded-lg"
+          >
             <h3 className="text-xl font-semibold text-yellow-800 mb-3 text-center">
               Tracking History
             </h3>
             <ul role="list" className="divide-y divide-gray-200 mb-6">
               {trackingHistory.map((track, index) => (
-                <li key={index} className="relative py-4">
+                <motion.li
+                  key={index}
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.1 * index, duration: 0.3 }}
+                  className="relative py-4"
+                >
                   {index !== trackingHistory.length - 1 && (
                     <span
                       className="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200"
@@ -180,7 +213,7 @@ const OrderTracking = () => {
                       </p>
                     </div>
                   </div>
-                </li>
+                </motion.li>
               ))}
             </ul>
             {/* {parcelData.latitude && parcelData.longitude && (
@@ -203,16 +236,21 @@ const OrderTracking = () => {
               </div>
             )} */}
             {parcelData && (
-              <div>
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.8, duration: 0.5 }}
+              >
                 <h4 className="text-md font-semibold mb-2">Current Location</h4>
                 <p className="mb-3 text-sm">{parcelData.current_location}</p>
                 <GPS parcel_id={parcelData.parcel_id} />
-              </div>
+              </motion.div>
             )}
-          </div>
+          </motion.div>
         )}
-      </div>
+      </motion.div>
     </>
   );
 };
+
 export default OrderTracking;
