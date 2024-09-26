@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import ParcelPoaTeam from "../assets/ParcelPoaTeam.png";
 import DeliveryAction from "../assets/DeliveryAction.png";
 import OurServices from "../assets/OurServices.png";
@@ -152,6 +153,7 @@ export default function About() {
           </motion.div>
         </motion.div>
       </div>
+      <Footer />
     </>
   );
 }

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import { Send, MapPin, Phone, Mail } from "lucide-react";
 import parcelpoaOffice2 from "../assets/parcelpoaOffice2.png";
+import Footer from "../components/Footer";
 
 function Contact() {
   const [formData, setFormData] = useState({
@@ -37,6 +38,7 @@ function Contact() {
   };
 
   return (
+    <>
     <div className="min-h-screen bg-gradient-to-br from-yellow-100 to-yellow-200">
       <Navbar />
       <motion.div
@@ -163,6 +165,8 @@ function Contact() {
         </div>
       </motion.div>
     </div>
+    <Footer />
+    </>
   );
 }
 
