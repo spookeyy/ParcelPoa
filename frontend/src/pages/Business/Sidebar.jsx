@@ -58,7 +58,7 @@ function Sidebar({ isOpen, toggleSidebar }) {
               to={item.link}
               className="flex items-center p-3 mb-2 rounded hover:bg-yellow-600 transition-colors duration-200"
             >
-              <span className="mr-3 bg-black text-white rounded p-2">{item.icon}</span>
+              <span className="mr-3 bg-gray-600 text-white rounded p-2">{item.icon}</span>
               <span className="text-black font-semibold">{item.title}</span>
             </Link>
           ))}
@@ -69,7 +69,7 @@ function Sidebar({ isOpen, toggleSidebar }) {
             transition-colors duration-200 hover:cursor-pointer"
             onClick={handleLogout}
           >
-            <span className="mr-3 bg-black text-white rounded p-2">
+            <span className="mr-3 bg-red-600 text-white rounded p-2">
               <FaSignOutAlt />
             </span>
             <span className="text-black font-semibold">Logout</span>
