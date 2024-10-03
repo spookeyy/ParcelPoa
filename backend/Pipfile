@@ -24,3 +24,5 @@ twilio = "*"
 sqlalchemy = "*"
 scikit-learn = "*"
 numpy = "*"
+
+[dev-packages]
