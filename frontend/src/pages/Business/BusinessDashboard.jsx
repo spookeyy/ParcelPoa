@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState, useContext } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { FaCalendarAlt, FaBox, FaMapMarkerAlt, FaUsers } from "react-icons/fa";
 import {
   LineChart,
@@ -14,8 +14,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useAnalytics } from "../../Context/AnalyticsContext";
-import { currentUser } from "../../Context/UserContext";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { UserContext } from "../../Context/UserContext";
+import { Card, CardHeader, CardContent } from "@/components/ui/Card";
 
 function BusinessDashboard() {
   const navigate = useNavigate();
@@ -28,7 +28,8 @@ function BusinessDashboard() {
     getBusinessPerformance,
   } = useAnalytics();
   const [dateRange, setDateRange] = useState("week");
-  const userId = currentUser.user_id;
+  const { currentUser } = useContext(UserContext);
+  const userId = currentUser?.user_id;
 
   useEffect(() => {
     getOrdersCount(dateRange, userId);
@@ -63,24 +64,52 @@ function BusinessDashboard() {
     { title: "Agents", icon: <FaUsers size={24} />, link: "/business/agents" },
   ];
 
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Business Dashboard</h1>
+  const renderChart = (data, ChartComponent, dataKey) => {
+    if (!data || data.length === 0) {
+      return <p>No data available for the selected period.</p>;
+    }
+    if (data.length === 1) {
+      return (
+        <div>
+          <p>Only one data point available:</p>
+          <p>
+            {data[0].date}: {data[0][dataKey]}
+          </p>
+        </div>
+      );
+    }
+    return (
+      <ResponsiveContainer width="100%" height="100%">
+        <ChartComponent data={data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="date" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          {ChartComponent === LineChart ? (
+            <Line type="monotone" dataKey={dataKey} stroke="#8884d8" />
+          ) : (
+            <Bar dataKey={dataKey} fill="#82ca9d" />
+          )}
+        </ChartComponent>
+      </ResponsiveContainer>
+    );
+  };
 
+  return (
+    <div className="container mx-auto px-4 py-8 overflow-y-auto h-full">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {dashboardItems.map((item, index) => (
-          <Card
+          <Link
             key={index}
-            onClick={() => navigate(item.link)}
-            className="cursor-pointer hover:shadow-lg transition-shadow duration-300"
+            to={item.link}
+            className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col items-center justify-center"
           >
-            <CardContent className="flex flex-col items-center justify-center p-6">
-              {item.icon}
-              <CardHeader className="text-lg font-semibold mt-4">
-                {item.title}
-              </CardHeader>
-            </CardContent>
-          </Card>
+            <div className="text-4xl mb-4 text-yellow-500">{item.icon}</div>
+            <h2 className="text-xl font-semibold text-gray-700">
+              {item.title}
+            </h2>
+          </Link>
         ))}
       </div>
 
@@ -99,66 +128,47 @@ function BusinessDashboard() {
       {loading ? (
         <p>Loading charts...</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Card>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <Card className="min-h-[400px]">
             <CardHeader>Orders Count</CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={analyticsData.orders}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="count" stroke="#8884d8" />
-                </LineChart>
-              </ResponsiveContainer>
+            <CardContent className="h-[350px]">
+              {renderChart(analyticsData.orders, LineChart, "count")}
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="min-h-[400px]">
             <CardHeader>Parcels by Status</CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={analyticsData.parcels}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="status" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="count" fill="#82ca9d" />
-                </BarChart>
-              </ResponsiveContainer>
+            <CardContent className="h-[350px]">
+              {renderChart(analyticsData.parcels, BarChart, "count")}
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="min-h-[400px]">
             <CardHeader>Orders Trend</CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={analyticsData.trend?.historical}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="count" stroke="#8884d8" />
-                </LineChart>
-              </ResponsiveContainer>
+            <CardContent className="h-[350px]">
+              {analyticsData.trend?.error ? (
+                <p className="text-red-500">{analyticsData.trend.error}</p>
+              ) : (
+                renderChart(analyticsData.trend?.historical, LineChart, "count")
+              )}
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="min-h-[400px]">
             <CardHeader>Business Performance</CardHeader>
             <CardContent>
               {analyticsData.performance && (
-                <div>
-                  <p>Total Orders: {analyticsData.performance.total_orders}</p>
-                  <p>
-                    Total Parcels: {analyticsData.performance.total_parcels}
+                <div className="space-y-4">
+                  <p className="text-lg">
+                    <span className="font-semibold">Total Orders:</span>{" "}
+                    {analyticsData.performance.total_orders}
                   </p>
-                  <p>
-                    Avg Delivery Time:{" "}
+                  <p className="text-lg">
+                    <span className="font-semibold">Total Parcels:</span>{" "}
+                    {analyticsData.performance.total_parcels}
+                  </p>
+                  <p className="text-lg">
+                    <span className="font-semibold">Avg Delivery Time:</span>{" "}
                     {analyticsData.performance.avg_delivery_time}
                   </p>
                 </div>
