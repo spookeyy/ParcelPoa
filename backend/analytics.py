@@ -102,6 +102,8 @@ def get_delivery_performance(date_range):
     result = [{'date': str(item.date), 'avg_delivery_time': str(item.avg_delivery_time)} for item in delivery_performance]
     return jsonify(result)
 
+from datetime import datetime
+
 @analytics_bp.route('/trend/orders/<date_range>')
 def get_orders_trend(date_range):
     start_date, end_date = get_date_range(date_range)
@@ -121,7 +123,14 @@ def get_orders_trend(date_range):
         func.date(Order.created_at)
     ).all()
     
-    dates = [(item.date - start_date).days for item in orders_count]
+    if not orders_count:
+        return jsonify({
+            'error': 'No data available for the specified date range and user ID.',
+            'historical': [],
+            'predictions': []
+        }), 404
+    
+    dates = [(datetime.strptime(str(item.date), '%Y-%m-%d').date() - start_date).days for item in orders_count]
     counts = [item.count for item in orders_count]
     
     X = np.array(dates).reshape(-1, 1)
@@ -135,7 +144,7 @@ def get_orders_trend(date_range):
     
     result = {
         'historical': [{'date': str(item.date), 'count': item.count} for item in orders_count],
-        'predictions': [{'date': str(start_date + timedelta(days=int(date))), 'count': int(count)} for date, count in zip(future_dates, future_predictions)]
+        'predictions': [{'date': str(start_date + timedelta(days=int(date[0]))), 'count': max(0, int(count))} for date, count in zip(future_dates, future_predictions)]
     }
     return jsonify(result)
 
