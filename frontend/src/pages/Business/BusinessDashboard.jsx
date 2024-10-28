@@ -65,22 +65,26 @@ function BusinessDashboard() {
   ];
 
   const renderChart = (data, ChartComponent, dataKey) => {
-    if (!data || data.length === 0) {
+    if (
+      !data ||
+      (Array.isArray(data) && data.length === 0) ||
+      (typeof data === "object" && Object.keys(data).length === 0)
+    ) {
       return <p>No data available for the selected period.</p>;
     }
-    if (data.length === 1) {
-      return (
-        <div>
-          <p>Only one data point available:</p>
-          <p>
-            {data[0].date}: {data[0][dataKey]}
-          </p>
-        </div>
-      );
+
+    let chartData = data;
+    if (data.historical && data.predictions) {
+      chartData = [...data.historical, ...data.predictions];
     }
+
+    if (chartData.length === 0) {
+      return <p>No data available for the selected period.</p>;
+    }
+
     return (
       <ResponsiveContainer width="100%" height="100%">
-        <ChartComponent data={data}>
+        <ChartComponent data={chartData}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="date" />
           <YAxis />
@@ -149,7 +153,7 @@ function BusinessDashboard() {
               {analyticsData.trend?.error ? (
                 <p className="text-red-500">{analyticsData.trend.error}</p>
               ) : (
-                renderChart(analyticsData.trend?.historical, LineChart, "count")
+                renderChart(analyticsData.trend, LineChart, "count")
               )}
             </CardContent>
           </Card>

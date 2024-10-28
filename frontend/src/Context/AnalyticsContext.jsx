@@ -29,19 +29,22 @@ export const AnalyticsProvider = ({ children }) => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          // Add any authentication headers if needed
         },
       });
 
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        const errorText = await response.text();
+        console.error(
+          `HTTP error! status: ${response.status}, message: ${errorText}`
+        );
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
       setAnalyticsData((prevData) => ({ ...prevData, [endpoint]: data }));
     } catch (error) {
       console.error("Error fetching analytics data:", error);
-      toast.error("Failed to fetch analytics data");
+      toast.error(`Failed to fetch analytics data: ${error.message}`);
     } finally {
       setLoading(false);
     }
