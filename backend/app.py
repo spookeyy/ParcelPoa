@@ -1264,6 +1264,9 @@ def send_notification(email, subject, body, html=False):
 #TODO Performance Monitoring
 # analytics.py
 
+import analytics
+
+
 
 # generate tracking numbers
 def generate_unique_tracking_number(existing_numbers):

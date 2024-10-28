@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
 import { server } from "../../../config.json";
 
@@ -45,7 +44,9 @@ export default function PickUpStations() {
         throw new Error("Network response was not ok");
       }
       const data = await response.json();
-      const pickupstations = data.filter((user) => user.user_role === "PickupStation");
+      const pickupstations = data.filter(
+        (user) => user.user_role === "PickupStation"
+      );
       setPickUpStations(pickupstations);
     } catch (error) {
       console.error("Error fetching PickupStation data:", error);
@@ -90,68 +91,101 @@ export default function PickUpStations() {
 
       <div className="flex-grow overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-lg">
-            <thead className="bg-gray-100 text-gray-600 text-base sticky top-0">
-              <tr>
-                <th className="px-4 py-2 text-left font-medium border border-gray-300">
-                  Profile Image
-                </th>
-                <th className="px-4 py-2 text-left font-medium border border-gray-300">
-                  Name
-                </th>
-                <th className="px-4 py-2 text-left font-medium border border-gray-300">
-                  Email
-                </th>
-                <th className="px-4 py-2 text-left font-medium border border-gray-300">
-                  Phone
-                </th>
-                <th className="px-4 py-2 text-left font-medium border border-gray-300">
-                  Primary Region
-                </th>
-                <th className="px-4 py-2 text-left font-medium border border-gray-300">
-                  Location
-                </th>
-              </tr>
-            </thead>
-          </table>
-        </div>
-        <div className="overflow-y-auto h-[calc(100vh-300px)]">
-          <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-lg">
-            <tbody className="text-gray-700 text-sm">
-              {filteredPickUpStations.map((pickupStation) => (
-                <tr
-                  key={pickupStation.id}
-                  className="hover:bg-gray-50 transition-colors duration-300"
-                >
-                  <td className="px-4 py-2 border border-gray-300">
-                    <img
-                      src={pickupStation.profile_picture}
-                      alt={`${pickupStation.name}'s profile`}
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                  </td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    {pickupStation.name}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    {pickupStation.email}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    {pickupStation.phone_number}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    {pickupStation.primary_region}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    {pickupStation.operation_areas[0]}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="inline-block min-w-full align-middle">
+            <div className="overflow-hidden border border-gray-200 rounded-lg shadow-lg">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6"
+                    >
+                      Profile Image
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6"
+                    >
+                      Name
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6"
+                    >
+                      Email
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6"
+                    >
+                      Phone
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6"
+                    >
+                      Primary Region
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6"
+                    >
+                      Location
+                    </th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+            <div className="overflow-auto max-h-[calc(100vh-300px)] border border-gray-200 border-t-0 rounded-b-lg">
+              <table className="min-w-full divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredPickUpStations.map((pickupStation) => (
+                    <tr key={pickupStation.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap w-1/6">
+                        <div className="flex flex-col items-center">
+                          <img
+                            src={pickupStation.profile_picture}
+                            alt={`${pickupStation.name}'s profile`}
+                            className="w-12 h-12 rounded-full object-cover mb-2"
+                          />
+                          <span className="text-xs text-center">
+                            Profile Image
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap w-1/6">
+                        <div className="text-sm font-medium text-gray-900">
+                          {pickupStation.name}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap w-1/6">
+                        <div className="text-sm text-gray-500">
+                          {pickupStation.email}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap w-1/6">
+                        <div className="text-sm text-gray-500">
+                          {pickupStation.phone_number}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap w-1/6">
+                        <div className="text-sm text-gray-500">
+                          {pickupStation.primary_region}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap w-1/6">
+                        <div className="text-sm text-gray-500">
+                          {pickupStation.operation_areas[0]}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
-  
 }
