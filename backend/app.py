@@ -29,8 +29,8 @@ logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__, static_folder='static')
 CORS(app)
-# app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db?mode=rw'
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
+app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.db?mode=rw'
+# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
 print(f"Connecting to database: {app.config['SQLALCHEMY_DATABASE_URI']}")
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
