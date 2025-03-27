@@ -1,15 +1,24 @@
 from datetime import datetime, timedelta, timezone
 from faker import Faker
-from flask import Flask
-from sqlalchemy import text
-from models import db, User, Parcel, Delivery, Notification, Tracking, Order
-from app import app, mail
 from flask_mail import Message
+from sqlalchemy import text
 import random
 import string
 from decimal import Decimal
 
+from . import create_app
+from backend import db
+from backend import mail
+from backend.model.user import User
+from backend.model.parcel import Parcel
+from backend.model.delivery import Delivery
+from backend.model.tracking import Tracking
+from backend.model.order import Order
+from backend.model.notification import Notification
+
 faker = Faker()
+
+app = create_app()
 
 def generate_phone_number():
     country_code = '+254'

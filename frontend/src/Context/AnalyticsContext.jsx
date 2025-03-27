@@ -18,7 +18,13 @@ export const AnalyticsProvider = ({ children }) => {
 
   const fetchData = useCallback(async (endpoint, params = {}) => {
     setLoading(true);
-    const queryString = new URLSearchParams(params).toString();
+
+    // Filter out undefined/null params
+    const cleanParams = Object.fromEntries(
+      Object.entries(params).filter(([_, v]) => v != null)
+    );
+
+    const queryString = new URLSearchParams(cleanParams).toString();
     const url = `${server}/analytics/${endpoint}${
       queryString ? `?${queryString}` : ""
     }`;
@@ -26,32 +32,33 @@ export const AnalyticsProvider = ({ children }) => {
     try {
       const response = await fetch(url, {
         method: "GET",
+        mode: "cors", // Explicitly enable CORS
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         },
+        // credentials: "include", // If using cookies
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error(
-          `HTTP error! status: ${response.status}, message: ${errorText}`
-        );
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(await response.text());
       }
 
       const data = await response.json();
-      setAnalyticsData((prevData) => ({ ...prevData, [endpoint]: data }));
+      setAnalyticsData((prev) => ({ ...prev, [endpoint]: data }));
+      return data;
     } catch (error) {
-      console.error("Error fetching analytics data:", error);
-      toast.error(`Failed to fetch analytics data: ${error.message}`);
+      console.error("Fetch error:", error);
+      toast.error(error.message);
+      throw error;
     } finally {
       setLoading(false);
     }
   }, []);
-
   const getOrdersCount = useCallback(
     (dateRange, userId) => {
+      const params = {};
+      if (userId) params.user_id = userId;
       fetchData(`orders/${dateRange}`, { user_id: userId });
     },
     [fetchData]

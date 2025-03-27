@@ -14,51 +14,6 @@ LOGIN USER
 }
 
 
-@app.route('/track/<string:tracking_number>', methods=['GET', 'POST'])
-def track_parcel(tracking_number):
-    parcel = Parcel.query.filter_by(tracking_number=tracking_number).first()
-    if parcel is None:
-        return jsonify({"message": "Parcel not found"}), 404
-    
-    tracking_info = Tracking.query.filter_by(parcel_id=parcel.parcel_id).order_by(Tracking.timestamp.desc()).all()
-    print(f"tracking_info: {tracking_info}")
-
-    # Simulate GPS location if not available
-    if not hasattr(parcel, 'latitude') or not hasattr(parcel, 'longitude') or parcel.latitude is None or parcel.longitude is None:
-        parcel.latitude = random.uniform(-90, 90)
-        parcel.longitude = random.uniform(-180, 180)
-        db.session.commit()
-
-    # Get address from coordinates
-    geolocator = Nominatim(user_agent="parcel_tracker")
-    location = geolocator.reverse(f"{parcel.latitude}, {parcel.longitude}")
-    address = location.address if location else "Unknown location"
-
-    tracking_data = [track.to_dict() for track in tracking_info]
-    for track in tracking_data:
-        track['gps_location'] = {
-            'latitude': parcel.latitude,
-            'longitude': parcel.longitude,
-            'address': address
-        }
-
-    parcel.current_location = address
-
-    response_data = {
-        "parcel": {
-            "tracking_number": parcel.tracking_number,
-            "status": parcel.status,
-            "current_location": parcel.current_location,
-            "sender_name": parcel.sender.name if parcel.sender else "Unknown",
-            "recipient_name": parcel.recipient_name,
-            "description": parcel.description,
-            "category": parcel.category
-        },
-        "tracking_history": tracking_data
-    }
-
-    print(f"response_data: {response_data}")
-    return jsonify(response_data)
 
     
 
@@ -67,43 +22,6 @@ def track_parcel(tracking_number):
  run both frontend and backend
  honcho start -f Procfile.dev
 
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-import json
-import os
-
-# Load contacts from JSON file
-def load_contacts(file_path):
-    with open(file_path, 'r') as file:
-        contacts = json.load(file)
-    return contacts
-
-# Compose the message
-def compose_message(sender_email, recipient_email, subject, body):
-    message = MIMEMultipart()
-    message['From'] = sender_email
-    message['To'] = recipient_email
-    message['Subject'] = subject
-    message.attach(MIMEText(body, 'plain'))
-    return message
-
-# Send the message
-def send_message(smtp_server, smtp_port, sender_email, sender_password, contacts, subject, body):
-    try:
-        server = smtplib.SMTP(smtp_server, smtp_port)
-        server.starttls()
-        server.login(sender_email, sender_password)
-        
-        for contact in contacts:
-            recipient_email = contact['email']
-            message = compose_message(sender_email, recipient_email, subject, body)
-            server.send_message(message)
-            print(f"Message sent to {recipient_email}")
-        
-        server.quit()
-    except Exception as e:
-        print(f"Failed to send message: {e}")
 
 if __name__ == "__main__":
     # Configuration

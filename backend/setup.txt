@@ -1,0 +1,5 @@
+for seeding, 
+change directory to main dir, parcelpoa, then run ``python -m backend.seed`` to run the seed script
+
+
+run the seed script as module
