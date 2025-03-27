@@ -4,6 +4,8 @@ logging.basicConfig(level=logging.INFO)
 
 app = create_app()
 
+application = app
+
 @app.route('/')
 def index():
     return 'Server is running'
