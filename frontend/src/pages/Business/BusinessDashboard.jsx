@@ -126,6 +126,8 @@ function BusinessDashboard() {
           <option value="week">Last Week</option>
           <option value="month">Last Month</option>
           <option value="year">Last Year</option>
+          <option value="today">Today</option>
+          <option value="yesterday">Yesterday</option>
         </select>
       </div>
 

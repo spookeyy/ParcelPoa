@@ -24,5 +24,6 @@ twilio = "*"
 sqlalchemy = "*"
 scikit-learn = "*"
 numpy = "*"
+faker = "*"
 
 [dev-packages]

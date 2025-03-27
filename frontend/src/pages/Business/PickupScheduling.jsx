@@ -141,7 +141,7 @@ function PickupScheduling() {
       }
       const result = await response.json();
       toast.success(
-        `Pickup scheduled successfully. }` //Tracking number: ${result.tracking_number
+        `Pickup scheduled successfully. ` //Tracking number: ${result.tracking_number
       );
       resetForm();
     } catch (error) {
