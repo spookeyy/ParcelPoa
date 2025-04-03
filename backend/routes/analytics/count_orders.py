@@ -2,8 +2,9 @@ from datetime import datetime, timedelta
 from flask import request, jsonify
 from sqlalchemy import func, and_
 from backend.model.order import Order
-from date_range import get_date_range
+from .date_range import get_date_range
 from backend import db
+
 from . import analytics
 
 @analytics.route('/orders/<date_range>', methods=['GET', 'OPTIONS'])
@@ -13,11 +14,7 @@ def get_orders_count(date_range):
     
     try:
         start_date, end_date = get_date_range(date_range)
-        user_id = request.args.get('user_id')
-
-        # Handle undefined/null user_id
-        if user_id in ('undefined', 'null'):
-            user_id = None
+        user_id = request.args.get('user_id', type=int)  # Get as integer
         
         # Base query
         query = db.session.query(

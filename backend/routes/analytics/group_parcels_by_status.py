@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from sqlalchemy import func
 from backend.model.parcel import Parcel
-from date_range import get_date_range
+from .date_range import get_date_range
 from backend import db
 from . import analytics
 

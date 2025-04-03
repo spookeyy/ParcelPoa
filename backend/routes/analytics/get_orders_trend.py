@@ -3,7 +3,7 @@ from . import analytics
 from flask import request, jsonify
 from sqlalchemy import func
 from backend.model.order import Order
-from date_range import get_date_range
+from .date_range import get_date_range
 from backend import db
 from sklearn.linear_model import LinearRegression
 import numpy as np
@@ -29,7 +29,7 @@ def get_orders_trend(date_range):
     
     if not orders_count:
         return jsonify({
-            'error': 'No data available for the specified date range and user ID.',
+            'error': f'No data available for the specified date range and user ID, {user_id}',
             'historical': [],
             'predictions': []
         }), 404

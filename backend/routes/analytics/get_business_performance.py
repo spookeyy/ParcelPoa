@@ -4,11 +4,20 @@ from backend.model.order import Order
 from backend.model.parcel import Parcel
 from backend.model.delivery import Delivery
 from backend import db
-from date_range import get_date_range
+from .date_range import get_date_range
 from . import analytics
+from flask import make_response
 
 @analytics.route('/business/performance/<date_range>' , methods=['GET', 'OPTIONS'])
 def get_business_performance(date_range):
+    # Handle OPTIONS request
+    if request.method == 'OPTIONS':
+        response = make_response()
+        response.headers.add('Access-Control-Allow-Origin', 'http://localhost:5173')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,OPTIONS')
+        return response
+      
     start_date, end_date = get_date_range(date_range)
     user_id = request.args.get('user_id')
     
@@ -45,4 +54,11 @@ def get_business_performance(date_range):
     
     if not result:
         return jsonify({'error': 'No data available for the specified date range'}), 404
-    return jsonify(result)
+    
+    # Add CORS headers to the response
+    response = jsonify(result)
+    response.headers.add('Access-Control-Allow-Origin', [
+        "http://localhost:5173",
+        "https://parcelpoa.marps.co.ke"
+    ])
+    return response

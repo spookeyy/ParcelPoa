@@ -1,4 +1,4 @@
-from date_range import get_date_range
+from .date_range import get_date_range
 from backend.model.user import User
 from sqlalchemy import func
 from flask import jsonify

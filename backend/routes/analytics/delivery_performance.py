@@ -2,7 +2,7 @@ from flask import jsonify, request
 from sqlalchemy import func
 from backend.model.delivery import Delivery
 from backend import db
-from date_range import get_date_range
+from .date_range import get_date_range
 from . import analytics
 
 @analytics.route('/deliveries/performance/<date_range>' , methods=['GET', 'OPTIONS'])

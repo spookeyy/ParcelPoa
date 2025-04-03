@@ -4,7 +4,7 @@ logging.basicConfig(level=logging.INFO)
 
 app = create_app()
 
-application = app
+# application = app
 
 @app.route('/')
 def index():
