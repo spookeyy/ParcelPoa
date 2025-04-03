@@ -5,8 +5,6 @@ from flask import jsonify
 from backend import db
 from . import analytics
 
-# 0758735366
-
 @analytics.route('/users/role/<date_range>' , methods=['GET', 'OPTIONS'])
 def get_users_by_role(date_range):
     start_date, end_date = get_date_range(date_range)

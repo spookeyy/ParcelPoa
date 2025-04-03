@@ -17,7 +17,7 @@ def get_business_performance(date_range):
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
         response.headers.add('Access-Control-Allow-Methods', 'GET,OPTIONS')
         return response
-
+      
     start_date, end_date = get_date_range(date_range)
     user_id = request.args.get('user_id')
     
@@ -57,5 +57,8 @@ def get_business_performance(date_range):
     
     # Add CORS headers to the response
     response = jsonify(result)
-    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:5173')
+    response.headers.add('Access-Control-Allow-Origin', [
+        "http://localhost:5173",
+        "https://parcelpoa.marps.co.ke"
+    ])
     return response

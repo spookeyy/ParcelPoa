@@ -100,7 +100,6 @@ export const AnalyticsProvider = ({ children }) => {
       setLoading(false);
     }
   }, []);
-
   const getOrdersCount = useCallback(
     (dateRange, userId) => {
       return fetchData(`orders/${dateRange}`, { user_id: userId });
