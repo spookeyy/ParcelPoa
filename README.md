@@ -1,6 +1,21 @@
 # ParcelPoa Delivery System
  ParcelPoa is an online delivery system designed for seamless interaction between three primary users: Seller, Agent, and Buyer. The system ensures that goods are tracked throughout the delivery process, providing transparency and reliability for all parties involved.
 
+
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+
+# # Enable Rewrite Engine
+# RewriteEngine On
+
+# # Redirect all requests to index.html
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [L]
+
+
 # Table of Contents
  Contributors
   User Roles

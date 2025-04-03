@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useState,
-  useContext,
-  useEffect,
-  useCallback,
-} from "react";
+import React, { createContext, useState, useContext, useCallback } from "react";
 import { toast } from "react-toastify";
 import { server } from "../../config.json";
 
@@ -13,9 +7,60 @@ const AnalyticsContext = createContext();
 export const useAnalytics = () => useContext(AnalyticsContext);
 
 export const AnalyticsProvider = ({ children }) => {
-  const [analyticsData, setAnalyticsData] = useState({});
+  const [OldAnalyticsData, setOldAnalyticsData] = useState([]);
+  const [analyticsData, setAnalyticsData] = useState({
+    orders: [],
+    parcels: [],
+    trend: {
+      historical: [],
+      predictions: [],
+    },
+    performance: {
+      total_orders: 0,
+      total_parcels: 0,
+      avg_delivery_time: null,
+    },
+  });
   const [loading, setLoading] = useState(false);
 
+
+  const fetchDashboardData = useCallback(async (dateRange, userId) => {
+    setLoading(true);
+
+    try {
+      const response = await fetch(
+        `${server}/analytics/business-dashboard/${dateRange}?user_id=${userId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+
+      const data = await response.json();
+      setAnalyticsData({
+        orders: data.orders || [],
+        parcels: data.parcels || [],
+        trend: data.trend || {},
+        performance: data.performance || {},
+      });
+      return data;
+    } catch (error) {
+      console.error("Fetch error:", error);
+      toast.error(error.message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+// -------------------------------------------------------------------------------------------------------------------------//
+  //individual fetch functions if needed for other components
   const fetchData = useCallback(async (endpoint, params = {}) => {
     setLoading(true);
 
@@ -45,7 +90,7 @@ export const AnalyticsProvider = ({ children }) => {
       }
 
       const data = await response.json();
-      setAnalyticsData((prev) => ({ ...prev, [endpoint]: data }));
+      setOldAnalyticsData((prev) => ({ ...prev, [endpoint]: data }));
       return data;
     } catch (error) {
       console.error("Fetch error:", error);
@@ -55,11 +100,10 @@ export const AnalyticsProvider = ({ children }) => {
       setLoading(false);
     }
   }, []);
+
   const getOrdersCount = useCallback(
     (dateRange, userId) => {
-      const params = {};
-      if (userId) params.user_id = userId;
-      fetchData(`orders/${dateRange}`, { user_id: userId });
+      return fetchData(`orders/${dateRange}`, { user_id: userId });
     },
     [fetchData]
   );
@@ -108,7 +152,9 @@ export const AnalyticsProvider = ({ children }) => {
 
   const value = {
     analyticsData,
+    OldAnalyticsData,
     loading,
+    fetchDashboardData,
     getOrdersCount,
     getParcelsByStatus,
     getUsersByRole,
